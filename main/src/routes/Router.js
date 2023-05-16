@@ -9,6 +9,7 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/BlankLayout')));
 
 /***** Master Pages ****/
 const ChartOfAccounts = Loadable(lazy(() => import('../views/masters/coa')));
+const Contact = Loadable(lazy(() => import('../views/masters/contact')));
 
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
@@ -113,6 +114,8 @@ const ThemeRoutes = [
     children: [
       { path: '/', name: 'Home', element: <Navigate to="/dashboards/dashboard1" /> },
       { path: '/masters/coa', name: 'Chart of Accounts', exact: true, element: <ChartOfAccounts /> },
+      { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact /> },
+
       { path: '/dashboards/dashboard1', name: 'Dashboard 1', exact: true, element: <Dashboard1 /> },
       { path: '/dashboards/dashboard2', name: 'Dashboard 2', exact: true, element: <Dashboard2 /> },
       { path: '/dashboards/dashboard3', name: 'Dashboard 3', exact: true, element: <Dashboard3 /> },
