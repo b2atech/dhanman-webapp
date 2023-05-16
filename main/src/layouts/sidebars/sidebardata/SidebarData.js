@@ -17,8 +17,8 @@ const SidebarData = [
         collapisble: false,
       },
       {
-        title: 'Contacts',
-        href: '/masters/contacts',
+        title: 'Contact',
+        href: '/masters/contact',
         icon: <MaterialIcon icon="radio_button_checked" />,
         id: 1.1,
         collapisble: false,

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import Themeroutes from './routes/Router';
 import ThemeSelector from './layouts/theme/ThemeSelector';
 import Loader from './layouts/loader/Loader';
+// import Contact from './views/masters/contact';
 
 const App = () => {
   const routing = useRoutes(Themeroutes);
@@ -18,6 +19,7 @@ const App = () => {
         <ThemeSelector />
         {routing}
       </div>
+      
     </Suspense>
   );
 };
