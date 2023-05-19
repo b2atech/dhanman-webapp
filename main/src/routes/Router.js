@@ -114,7 +114,7 @@ const ThemeRoutes = [
     children: [
       { path: '/', name: 'Home', element: <Navigate to="/dashboards/dashboard1" /> },
       { path: '/masters/coa', name: 'Chart of Accounts', exact: true, element: <ChartOfAccounts /> },
-      { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact /> },
+       { path: '/masters/Contact', name: 'Contact', exact: true, element: <Contact /> },
 
       { path: '/dashboards/dashboard1', name: 'Dashboard 1', exact: true, element: <Dashboard1 /> },
       { path: '/dashboards/dashboard2', name: 'Dashboard 2', exact: true, element: <Dashboard2 /> },
