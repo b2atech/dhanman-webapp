@@ -1,6 +1,17 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import Loadable from '../layouts/loader/Loadable';
+import Invoices from '../views/masters/Invoices';
+import Transactions from '../views/masters/Transactions/Transactions';
+import Sales from '../views/masters/Transactions/Sales';
+import Categories from '../views/masters/Transactions/Categories';
+import Tags from '../views/masters/Transactions/Tags';
+import Expenses from '../views/masters/Transactions/Expenses';
+import BankTransactions from '../views/masters/Transactions/BankTransactions';
+import Reconciliation from '../views/masters/Transactions/Reconciliation';
+import Recurring from '../views/masters/Transactions/Recurring';
+import Bills from '../views/masters/Transactions/Bills';
+import ManageBanks from '../views/masters/Transactions/ManageBanks';
 /****Layouts*****/
 
 const FullLayout = Loadable(lazy(() => import('../layouts/FullLayout')));
@@ -9,6 +20,7 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/BlankLayout')));
 
 /***** Master Pages ****/
 const ChartOfAccounts = Loadable(lazy(() => import('../views/masters/coa')));
+const Contact = Loadable(lazy(() => import('../views/masters/contact')));
 
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
@@ -113,6 +125,19 @@ const ThemeRoutes = [
     children: [
       { path: '/', name: 'Home', element: <Navigate to="/dashboards/dashboard1" /> },
       { path: '/masters/coa', name: 'Chart of Accounts', exact: true, element: <ChartOfAccounts /> },
+      { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact/> },
+      { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },
+      { path: '/masters/Transactions', name: 'Transactions', exact: true, element: <Transactions/> },
+      { path: '/masters/Transactions/Sales', name: 'Sales', exact: true, element: <Sales/> },
+      { path: '/masters/Transactions/Categories', name: 'Categories', exact: true, element: <Categories/> },
+      { path: '/masters/Transactions/Tags', name: 'Tags', exact: true, element: <Tags/> },
+      { path: '/masters/Transactions/Expenses', name: 'Expenses', exact: true, element: <Expenses/> },
+      { path: '/masters/Transactions/BankTransactions', name: 'BankTransactions', exact: true, element: <BankTransactions/> },
+      { path: '/masters/Transactions/Reconciliation', name: 'Reconciliation', exact: true, element: <Reconciliation/> },
+      { path: '/masters/Transactions/Recurring', name: 'Recurring', exact: true, element: <Recurring/> },
+      { path: '/masters/Transactions/Bills', name: 'Bills', exact: true, element: <Bills/> },
+      { path: '/masters/Transactions/ManageBanks', name: 'ManageBanks', exact: true, element: <ManageBanks/> },
+
       { path: '/dashboards/dashboard1', name: 'Dashboard 1', exact: true, element: <Dashboard1 /> },
       { path: '/dashboards/dashboard2', name: 'Dashboard 2', exact: true, element: <Dashboard2 /> },
       { path: '/dashboards/dashboard3', name: 'Dashboard 3', exact: true, element: <Dashboard3 /> },
