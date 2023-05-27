@@ -20,10 +20,122 @@ const SidebarData = [
         title: 'Contact',
         href: '/masters/contact',
         icon: <MaterialIcon icon="radio_button_checked" />,
-        id: 1.1,
+        id: 1.2,
         collapisble: false,
-      },]
+      },      
+    ]
   },
+
+  
+      // ****************************************************** START TRANSACTION SIDEBAR DROPDOWN
+      {
+        title: 'Transactions',
+        href: '/masters',
+        id: 1,
+        icon: <MaterialIcon icon="description" />,
+        collapisble: true,
+        children: [
+
+          {
+            title: 'Transactions',
+            href: '/masters/Transactions',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.4,
+            collapisble: false,
+          },
+          {
+            title: 'Sales',
+            href: '/masters/Transactions/Sales',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.3,
+            collapisble: false,
+          },
+          {
+            title: 'Categories',
+            href: '/masters/Transactions/Categories',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.4,
+            collapisble: false,
+          },
+          {
+            title: 'Tags',
+            href: '/masters/Transactions/Tags',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          {
+            title: 'Expenses',
+            href: '/masters/Transactions/Expenses',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          {
+            title: 'Bank Transactions',
+            href: '/masters/Transactions/BankTransactions',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          {
+            title: 'Reconciliation',
+            href: '/masters/Transactions/Reconciliation',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          {
+            title: 'Recurring',
+            href: '/masters/Transactions/Recurring',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          {
+            title: 'Bills',
+            href: '/masters/Transactions/Bills',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          {
+            title: 'Manage Banks',
+            href: '/masters/Transactions/ManageBanks',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.5,
+            collapisble: false,
+          },
+          
+        ]
+      },
+      // ****************************************************** END TRANSACTION SIDEBAR DROPDOWN
+      // ****************************************************** START REPORTS SIDEBAR DROPDOWN
+      {
+        title: 'Reports',
+        href: '/masters',
+        id: 1,
+        icon: <MaterialIcon icon="description" />,
+        collapisble: true,
+        children: [
+          {
+            title: 'Chart of Accounts',
+            href: '/masters/coa',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.1,
+            collapisble: false,
+          },
+          {
+            title: 'Contact',
+            href: '/masters/contact',
+            icon: <MaterialIcon icon="radio_button_checked" />,
+            id: 1.2,
+            collapisble: false,
+          },      
+        ]
+      },
+// ****************************************************** END REPORTS SIDEBAR DROPDOWN
+
   {
     title: 'Dashboards',
     href: '/dashboards',
@@ -60,6 +172,7 @@ const SidebarData = [
         collapisble: false,
       },
     ],
+
   },
   { caption: 'Apps' },
   {

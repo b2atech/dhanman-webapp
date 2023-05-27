@@ -1,212 +1,90 @@
 import React from 'react';
-import { Table } from 'reactstrap';
-import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
+import { Table, Button } from 'reactstrap';
+// import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
 import ComponentCard from '../../components/ComponentCard';
-// import ProjectTables from '../../components/dashboard/ProjectTable';
 
-const BasicTable = () => {
+
+const COA = () => {
+
   return (
     <>
-      <BreadCrumbs />
-    
-
+      {/* class="btn text-right"  className="mr-auto" */}
+      <div className="button-group" style={{ float: 'right' }}>
+        <Button className="btn" color="primary">
+          Save
+        </Button>
+        <Button className="btn" color="success">
+          Add Payment
+        </Button>
+        <Button className="btn" color="primary">
+          Finalize for sending
+        </Button>
+      </div>
+      <br />
+      <br />
       <ComponentCard
-        title="Striped rows"
+        title="Chart Of Accounts"
         subtitle={
           <p>
-            Use <code>striped</code> to add zebra-striping to any table row within the{' '}
-            <code>&lt;tbody&gt;</code>.
+            {/* Use <code>striped</code> to add zebra-striping to any table row within the{' '}
+            <code>&lt;tbody&gt;</code>. */}
+            A chart of accounts (COA) is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions.
           </p>
         }
       >
         <Table striped responsive>
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">firstName</th>
-              <th scope="col">lastName</th>
-              <th scope="col">Address</th>
-              <th scope="col">Address</th>
-          
-              <th scope="col">Address</th>
-
+              <th scope="col">Accoun Code</th>
+              <th scope="col">Account Name</th>
+              <th scope="col">Account Category</th>
+              <th scope="col">Parent Id</th>
+              <th scope="col">Active Status</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
+              <th scope="row">100</th>
+              <td> Cash</td>
+              <td>Assets</td>
+              <td>1</td>
+              <td>Yes</td>
             </tr>
             <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
+              <th scope="row">200</th>
+              <td>Loans Payable</td>
+              <td>Liabilities</td>
+              <td>2</td>
+              <td>No</td>
             </tr>
             <tr>
-              <th scope="row">3</th>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
+              <th scope="row">300</th>
+              <td>Owners Capital</td>
+              <td>Equity</td>
+              <td>3</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <th scope="row">400</th>
+              <td>Sales Revenue</td>
+              <td>Revenue</td>
+              <td>4</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <th scope="row">500</th>
+              <td>Rent Expense</td>
+              <td>Expenses</td>
+              <td>5</td>
+              <td>Yes</td>
             </tr>
           </tbody>
         </Table>
       </ComponentCard>
-
-      {/*--------------------------------------------------------------------------------*/}
-      {/* Bordered Table                                                                 */}
-      {/*--------------------------------------------------------------------------------*/}
-
-      {/* <ComponentCard
-        title="Bordered Table"
-        subtitle={
-          <p>
-            Use <code>bordered</code> to add zebra-striping to any table row within the
-            <code>&lt;tbody&gt;</code>.
-          </p>
-        }
-      >
-        <Table bordered responsive>
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
-            </tr>
-          </tbody>
-        </Table>
-      </ComponentCard> */}
-
-      {/*--------------------------------------------------------------------------------*/}
-      {/* Hoverable Rows                                                                 */}
-      {/*--------------------------------------------------------------------------------*/}
-
-      {/* <ComponentCard
-        title="Hoverable Rows"
-        subtitle={
-          <p>
-            Use <code>hover</code> to add zebra-striping to any table row within the{' '}
-            <code>&lt;tbody&gt;</code>.
-          </p>
-        }
-      >
-        <Table hover responsive>
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">First</th>
-              <th scope="col">Last</th>
-              <th scope="col">Handle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
-            </tr>
-          </tbody>
-        </Table>
-      </ComponentCard> */}
-
-      {/*--------------------------------------------------------------------------------*/}
-      {/* Responsive Table                                                               */}
-      {/*--------------------------------------------------------------------------------*/}
-
-      {/* <ComponentCard
-        title="Responsive Table"
-        subtitle={
-          <p>
-            Use <code>responsive</code> to add zebra-striping to any table row within the{' '}
-            <code>&lt;tbody&gt;</code>.
-          </p>
-        }
-      >
-        <Table responsive>
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Heading</th>
-              <th scope="col">Heading</th>
-              <th scope="col">Heading</th>
-              <th scope="col">Heading</th>
-              <th scope="col">Heading</th>
-              <th scope="col">Heading</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-              <td>Cell</td>
-            </tr>
-          </tbody>
-        </Table>
-      </ComponentCard> */}
-
       {/*--------------------------------------------------------------------------------*/}
       {/*End Inner Div*/}
       {/*--------------------------------------------------------------------------------*/}
     </>
   );
 };
-
-export default BasicTable;
+export default COA
