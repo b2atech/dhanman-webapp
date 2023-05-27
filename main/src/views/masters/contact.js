@@ -1,188 +1,101 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {
-  Col,
-  Row,
-  Form,
-  FormGroup,
-  Label,
-  Button,
-  Input,
-  ModalBody,
-  ModalFooter,
-} from 'reactstrap';
-import { useSelector, useDispatch } from 'react-redux';
- import user1 from '../../assets/images/users/user1.jpg';
-import { addContact } from '../../store/apps/contacts/ContactSlice';
+import { Table ,Button,Modal,ModalHeader} from 'reactstrap';
+import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
+import ComponentCard from '../../components/ComponentCard';
+ import ContactAdd from '../../components/apps/contact/ContactAdd';
 
-const ContactAdd = ({ click }) => {
- const id = useSelector((state) => state.contactsReducer.contacts.length);
-  const dispatch = useDispatch();
-  const [values, setValues] = React.useState({
-    firstname: '',
-    lastname: '',
-    department: '',
-    company: '',
-    phone: '',
-    email: '',
-    address: '',
-    notes: '',
-  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(
-        addContact(
-        id,
-        values.firstname,
-        values.lastname,
-        user1,
-        values.department,
-        values.company,
-        values.phone,
-        values.email,
-        values.address,
-        values.notes,
-      ),
-    );
-  };
 
+const BasicTable = () => {
+   
+      const [modal, setModal] = React.useState(false);
+      const toggle = () => {
+        setModal(!modal);
+     };
   return (
-    
+    <>
+      <BreadCrumbs />
+      {/* <div  className="p-3 border-bottom"> */}
+        {/* <Button color="danger" block onClick={toggle} >
+          Add 
+        </Button> */}
+        <div className="button-group" style={{float: 'right'}}>
+              <Button className="btn align-Right"   color="success"  onClick={toggle}>
+               Add
+              </Button>
+              <Button className="btn" color="primary ">
+               Edit
+              </Button>
+              <Button className="btn" color="danger">
+               Delete
+              </Button>
+       </div>
+<br />
+<br />
+<br />
+      <ComponentCard
+     
+        title="Contact"
+        subtitle={
+          <p>
+            Use <code>Contact</code> to add zebra-striping to any table row within the{' '}
+            <code>&lt;tbody&gt;</code>.
+          </p>
+        }
+      >
+        <Table striped responsive>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">firstName</th>
+              <th scope="col">lastName</th>
+              <th scope="col">Address</th>
+              <th scope="col">Phone</th>          
+              <th scope="col">Email</th>
 
-    <Form onSubmit={handleSubmit}>
-      <ModalBody>
-        <Row>
-          <Col md={6} className="text-center">
-            <img src={user1} className="rounded-circle" alt={id} width="100" /> 
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="firstName">First Name</Label>
-              <Input
-                className="form-control"
-                type="text"
-                name="firstname"
-                id="firstName"
-                value={values.firstname}
-                onChange={(e) => setValues({ ...values, firstname: e.target.value })}
-                required
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label for="lastName">Last Name</Label>
-              <Input
-                className="form-control"
-                type="text"
-                name="lastname"
-                id="lastName"
-                value={values.lastname}
-                onChange={(e) => setValues({ ...values, lastname: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="department">Department</Label>
-              <Input
-                className="form-control"
-                type="text"
-                name="department"
-                id="department"
-                value={values.department}
-                onChange={(e) => setValues({ ...values, department: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="company">Company</Label>
-              <Input
-                className="form-control"
-                type="text"
-                name="company"
-                id="company"
-                value={values.company}
-                onChange={(e) => setValues({ ...values, company: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="phone">Phone</Label>
-              <Input
-                className="form-control"
-                type="phone"
-                name="phone"
-                id="phone"
-                value={values.phone}
-                onChange={(e) => setValues({ ...values, phone: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="email">Email</Label>
-              <Input
-                className="form-control"
-                type="email"
-                name="email"
-                id="email"
-                value={values.email}
-                onChange={(e) => setValues({ ...values, email: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="address">Address</Label>
-              <Input
-                className="form-control"
-                type="text"
-                name="address"
-                id="address"
-                value={values.address}
-                onChange={(e) => setValues({ ...values, address: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label for="notes">Notes</Label>
-              <Input
-                className="form-control"
-                type="textarea"
-                name="notes"
-                id="notes"
-                value={values.notes}
-                onChange={(e) => setValues({ ...values, notes: e.target.value })}
-              />
-            </FormGroup>
-          </Col>
-        </Row>
-      </ModalBody>
-      <ModalFooter>
-        <Button
-          color="primary"
-          type="submit"
-          onClick={click}
-          disabled={values.firstname.length === 0 || values.notes.length === 0}
-        >
-          Add Contact
-        </Button>
-      </ModalFooter>
-    </Form>
-  );
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+              <td>1356984664</td>
+              <td>@mdo@.com</td>
+
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+              <td>796564658796</td>
+
+              <td>@fat@.com</td>
+
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>the Bird</td>
+              <td>@twitter</td>
+              <td>789565164</td>
+
+              <td>@fat@.com</td>
+
+              </tr>
+          </tbody>
+          </Table>
+      </ComponentCard>
+      <Modal isOpen={modal} toggle={toggle} size="md">
+        <ModalHeader toggle={toggle}>Add Contact</ModalHeader>
+        <ContactAdd click={toggle} />
+      </Modal>
+      
+      </>
+ );
 };
 
-ContactAdd.propTypes = {
-  click: PropTypes.any,
-};
+ export default BasicTable;
 
-export default ContactAdd;
