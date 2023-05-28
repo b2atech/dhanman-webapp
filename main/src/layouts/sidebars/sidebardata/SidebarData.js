@@ -9,13 +9,7 @@ const SidebarData = [
     icon: <MaterialIcon icon="speed" />,
     collapisble: true,
     children: [
-      {
-        title: 'Chart of Accounts',
-        href: '/masters/coa',
-        icon: <MaterialIcon icon="radio_button_checked" />,
-        id: 1.1,
-        collapisble: false,
-      },
+      
       {
         title: 'Contact',
         href: '/masters/contact',
@@ -23,6 +17,70 @@ const SidebarData = [
         id: 1.1,
         collapisble: false,
       },]
+  },
+  {
+    title: 'Invoices',
+    href: '/invoices',
+    id: 1,
+    icon: <MaterialIcon icon="speed" />,
+    collapisble: true,
+    children: [
+      
+      {
+        title: 'Estimate',
+        href: '/masters/estimate',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
+        title: 'Item',
+        href: '/masters/Item',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
+        title: 'Reminder',
+        href: '/masters/Reminder',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+     
+    ]
+  },
+  {
+    title: 'Tracking',
+    href: '/Tracking',
+    id: 1,
+    icon: <MaterialIcon icon="speed" />,
+    collapisble: true,
+    children: [
+      
+      {
+        title: 'TrackTime',
+        href: '/Tracking/TrackTime',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
+        title: 'Project',
+        href: '/Tracking/Project',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
+        title: 'Time & Pay',
+        href: '/Tracking/Time & Pay',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+     
+    ]
   },
   {
     title: 'Dashboards',

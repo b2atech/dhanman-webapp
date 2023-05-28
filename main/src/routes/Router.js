@@ -8,8 +8,13 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/BlankLayout')));
 /***** Pages ****/
 
 /***** Master Pages ****/
-const ChartOfAccounts = Loadable(lazy(() => import('../views/masters/coa')));
-const Contact = Loadable(lazy(() => import('../views/masters/contact')));
+const Contact = Loadable(lazy(() => import('../views/Invoices/contact')));
+const Estimate = Loadable(lazy(() => import('../views/Invoices/Estimate')));
+const Item = Loadable(lazy(() => import('../views/Invoices/item')));
+const Reminder = Loadable(lazy(() => import('../views/Invoices/Reminder')));
+const TrackTime = Loadable(lazy(() => import('../views/Tracking/TrackTime')));
+const Project = Loadable(lazy(() => import('../views/Tracking/Project')));
+const TimeAndPay = Loadable(lazy(() => import('../views/Tracking/Time & Pay')));
 
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
@@ -113,8 +118,13 @@ const ThemeRoutes = [
     element: <FullLayout />,
     children: [
       { path: '/', name: 'Home', element: <Navigate to="/dashboards/dashboard1" /> },
-      { path: '/masters/coa', name: 'Chart of Accounts', exact: true, element: <ChartOfAccounts /> },
        { path: '/masters/Contact', name: 'Contact', exact: true, element: <Contact /> },
+       { path: '/masters/Estimate', name: 'Contact', exact: true, element: <Estimate /> },
+       { path: '/masters/Item', name: 'Contact', exact: true, element: <Item /> },
+       { path: '/masters/Reminder', name: 'Contact', exact: true, element: <Reminder /> },
+       { path: '/Tracking/TrackTime', name: 'Contact', exact: true, element: <TrackTime /> },
+       { path: '/Tracking/Project', name: 'Contact', exact: true, element: <Project /> },
+       { path: '/Tracking/Time & Pay', name: 'Contact', exact: true, element: <TimeAndPay /> },
 
       { path: '/dashboards/dashboard1', name: 'Dashboard 1', exact: true, element: <Dashboard1 /> },
       { path: '/dashboards/dashboard2', name: 'Dashboard 2', exact: true, element: <Dashboard2 /> },
