@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from "axios";
 import { Table, Button } from 'reactstrap';
-// import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
 import ComponentCard from '../../components/ComponentCard';
 
 
 const COA = () => {
+  const [apiData, setApiData] = useState([]);
+  function getData() {
+    axios.get("https://localhost:7290/api/V1/Bill/GetAllCoa?clientId=5").then((response) => {
+      setApiData(response.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
 
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <>
-      {/* class="btn text-right"  className="mr-auto" */}
       <div className="button-group" style={{ float: 'right' }}>
         <Button className="btn" color="primary">
           Save
@@ -26,8 +36,6 @@ const COA = () => {
         title="Chart Of Accounts"
         subtitle={
           <p>
-            {/* Use <code>striped</code> to add zebra-striping to any table row within the{' '}
-            <code>&lt;tbody&gt;</code>. */}
             A chart of accounts (COA) is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions.
           </p>
         }
@@ -43,48 +51,21 @@ const COA = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">100</th>
-              <td> Cash</td>
-              <td>Assets</td>
-              <td>1</td>
-              <td>Yes</td>
-            </tr>
-            <tr>
-              <th scope="row">200</th>
-              <td>Loans Payable</td>
-              <td>Liabilities</td>
-              <td>2</td>
-              <td>No</td>
-            </tr>
-            <tr>
-              <th scope="row">300</th>
-              <td>Owners Capital</td>
-              <td>Equity</td>
-              <td>3</td>
-              <td>Yes</td>
-            </tr>
-            <tr>
-              <th scope="row">400</th>
-              <td>Sales Revenue</td>
-              <td>Revenue</td>
-              <td>4</td>
-              <td>No</td>
-            </tr>
-            <tr>
-              <th scope="row">500</th>
-              <td>Rent Expense</td>
-              <td>Expenses</td>
-              <td>5</td>
-              <td>Yes</td>
-            </tr>
+            {apiData.map((item) => {
+              return (
+                <>
+                  <tr>                    
+                    <td>{item.Name}</td>   
+                    <td>{item.CategoryId}</td>
+                    <td>{item.ParentId}</td>
+                    <td>{item.IsActive}</td>                    
+                  </tr>
+                </>
+              );
+            })}
           </tbody>
         </Table>
       </ComponentCard>
-
-      {/*--------------------------------------------------------------------------------*/}
-      {/*End Inner Div*/}
-      {/*--------------------------------------------------------------------------------*/}
     </>
   );
 };
