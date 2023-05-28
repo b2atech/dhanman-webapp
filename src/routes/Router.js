@@ -137,7 +137,6 @@ const ThemeRoutes = [
       { path: '/masters/Transactions/Recurring', name: 'Recurring', exact: true, element: <Recurring/> },
       { path: '/masters/Transactions/Bills', name: 'Bills', exact: true, element: <Bills/> },
       { path: '/masters/Transactions/ManageBanks', name: 'ManageBanks', exact: true, element: <ManageBanks/> },
-
       { path: '/dashboards/dashboard1', name: 'Dashboard 1', exact: true, element: <Dashboard1 /> },
       { path: '/dashboards/dashboard2', name: 'Dashboard 2', exact: true, element: <Dashboard2 /> },
       { path: '/dashboards/dashboard3', name: 'Dashboard 3', exact: true, element: <Dashboard3 /> },

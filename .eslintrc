@@ -18,6 +18,7 @@
   "extends": [
     "airbnb",
     "prettier",
+	"prettier/react",
     "plugin:jsx-a11y/recommended",
     "plugin:react-hooks/recommended"
   ],
@@ -26,7 +27,7 @@
     "react",
     "react-hooks"
   ],
-  "parser": "",
+  "parser": "react-scripts/node_modules/babel-eslint",
   "rules": {
     "comma-dangle": "off",
     "import/no-unresolved": "off",
