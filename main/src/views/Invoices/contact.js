@@ -6,15 +6,12 @@ import user1 from '../../assets/images/users/user1.jpg';
 import user2 from '../../assets/images/users/user2.jpg';
 import user3 from '../../assets/images/users/user3.jpg';
 import user4 from '../../assets/images/users/user4.jpg';
-import user5 from '../../assets/images/users/user5.jpg';
-
 
 const changeBackdrop = (e) => {
   let { value } = e.target;
   if (value !== 'active') {
     value = JSON.parse(value);
   }
-
 };
 const tableData = [
   {
@@ -52,18 +49,8 @@ const tableData = [
     Expenses: '$0.00',
     
   },
-  {
-    avatar: user5,
-    Firstname: 'Thuklk luu',
-    Lastname: ' Gover',
-    Companyname: 'Daksha',
-    Revenue: '$200',
-    Expenses: '$0.00',
-    
-  },
+ 
 ];
-
-  
   const ProjectTables = () => {
     
     return (
@@ -83,7 +70,6 @@ const tableData = [
 
 </div>
       <div>
-      
           <Form className="d-flex align-items-center" onSubmit={(e) => e.preventDefault()}>
               <FormGroup >
                 <FormGroup check>
