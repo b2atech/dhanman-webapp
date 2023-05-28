@@ -1,13 +1,27 @@
-import React from 'react';
-import { Table ,Button,Modal,ModalHeader} from 'reactstrap';
+import React, { useState } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import { Button,Modal,ModalHeader} from 'reactstrap';
 import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
 import ComponentCard from '../../components/ComponentCard';
- import ContactAdd from '../../components/apps/contact/ContactAdd';
+import ContactAdd from '../../components/apps/contact/ContactAdd';
 
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 
-
-const BasicTable = () => {
+const Contacts = () => {
    
+  const [rowData] = useState([
+    {make: "Toyota", model: "Celica", price: 35000},
+    {make: "Ford", model: "Mondeo", price: 32000},
+    {make: "Porsche", model: "Boxster", price: 72000}
+  ]);
+
+  const [columnDefs] = useState([
+    { field: 'make' },
+    { field: 'model' },
+    { field: 'price' }
+  ])
+
       const [modal, setModal] = React.useState(false);
       const toggle = () => {
         setModal(!modal);
@@ -15,10 +29,10 @@ const BasicTable = () => {
   return (
     <>
       <BreadCrumbs />
-      {/* <div  className="p-3 border-bottom"> */}
-        {/* <Button color="danger" block onClick={toggle} >
-          Add 
-        </Button> */}
+        
+      <br/>
+      <ComponentCard
+      actions={
         <div className="button-group" style={{float: 'right'}}>
               <Button className="btn align-Right"   color="success"  onClick={toggle}>
                Add
@@ -30,11 +44,7 @@ const BasicTable = () => {
                Delete
               </Button>
        </div>
-<br />
-<br />
-<br />
-      <ComponentCard
-     
+      }
         title="Contact"
         subtitle={
           <p>
@@ -43,50 +53,12 @@ const BasicTable = () => {
           </p>
         }
       >
-        <Table striped responsive>
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">firstName</th>
-              <th scope="col">lastName</th>
-              <th scope="col">Address</th>
-              <th scope="col">Phone</th>          
-              <th scope="col">Email</th>
-
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>1356984664</td>
-              <td>@mdo@.com</td>
-
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-              <td>796564658796</td>
-
-              <td>@fat@.com</td>
-
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
-              <td>789565164</td>
-
-              <td>@fat@.com</td>
-
-              </tr>
-          </tbody>
-          </Table>
+       <div className="ag-theme-alpine" style={{height: 400}}>
+           <AgGridReact
+               rowData={rowData}
+               columnDefs={columnDefs}>
+           </AgGridReact>
+       </div>
       </ComponentCard>
       <Modal isOpen={modal} toggle={toggle} size="md">
         <ModalHeader toggle={toggle}>Add Contact</ModalHeader>
@@ -97,5 +69,5 @@ const BasicTable = () => {
  );
 };
 
- export default BasicTable;
+ export default Contacts;
 
