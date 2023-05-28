@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import React from 'react';
-import { ReactComponent as LogoDarkIcon } from '../assets/images/logos/dark-logo-icon.svg';
-import { ReactComponent as LogoDarkText } from '../assets/images/logos/dark-logo-text.svg';
-import { ReactComponent as LogoWhiteIcon } from '../assets/images/logos/white-logo-icon.svg';
-import { ReactComponent as LogoWhiteText } from '../assets/images/logos/white-logo-text.svg';
+import { ReactComponent as LogoDarkIcon } from '../../assets/images/logos/dark-logo-icon.svg';
+import { ReactComponent as LogoDarkText } from '../../assets/images/logos/dark-logo-text.svg';
+import { ReactComponent as LogoWhiteIcon } from '../../assets/images/logos/white-logo-icon.svg';
+import { ReactComponent as LogoWhiteText } from '../../assets/images/logos/white-logo-text.svg';
 
 const HorizontalLogo = () => {
   const isDarkMode = useSelector((state) => state.customizer.isDark);
