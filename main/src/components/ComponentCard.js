@@ -1,15 +1,18 @@
 import { Card, CardBody, CardTitle, CardSubtitle } from 'reactstrap';
 import PropTypes from 'prop-types';
 
-const ComponentCard = ({ children, title, subtitle }) => {
+const ComponentCard = ({ children, title, subtitle,actions }) => {
   return (
     <Card>
       <CardTitle tag="h4" className="border-bottom px-4 py-3 mb-0">
+      <div className="d-md-flex">
         {title}
+        <div className="ms-auto mt-3 mt-md-0">{actions}</div>
+        </div>
       </CardTitle>
-      <CardBody className="p-4">
-        <CardSubtitle className="text-muted mb-3">{subtitle || ''}</CardSubtitle>
-        <div>{children}</div>
+      <CardSubtitle className="text-muted  px-4 py-3 mb-0">{subtitle}</CardSubtitle>
+      <CardBody>
+        <div className='pt-0' >{children}</div>
       </CardBody>
     </Card>
   );
@@ -18,7 +21,8 @@ const ComponentCard = ({ children, title, subtitle }) => {
 ComponentCard.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,
-  subtitle: PropTypes.node
+  subtitle: PropTypes.node,
+  actions: PropTypes.node,
 };
 
 export default ComponentCard;
