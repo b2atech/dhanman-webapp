@@ -51,7 +51,7 @@ const Contacts = () => {
         title="Contact"
         subtitle={
           <p>
-            A <code>customer</code> is an entity that buys goods or services from third parties. 
+            A <strong>customer</strong> is an entity that buys goods or services from third parties. 
             Accumulating a profitable and recurring group of customers is the primary goal of a business,
              since this group generates revenue for the business.
           </p>
