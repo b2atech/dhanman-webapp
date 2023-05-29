@@ -16,10 +16,8 @@
     }
   },
   "extends": [
-    "airbnb",
-    "airbnb/hooks",
-    "prettier/react",
-    "plugin:prettier/recommended"
+    "some-other-config-you-use",
+    "prettier"
   ],
   "plugins": [
     "prettier",
