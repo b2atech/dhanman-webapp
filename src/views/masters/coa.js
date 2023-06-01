@@ -3,14 +3,17 @@ import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { Button, Modal, ModalHeader } from 'reactstrap';
+import ComponentCard from '../../components/ComponentCard';
+import ContactAdd from '../../components/apps/contact/ContactAdd';
 
 const COA = () => {
   const [rowData] = useState([
-    { accountcode: "001", accountname: "Cash", accountcategory: 1, parentid: 2, activestatus: "Yes" },
-    { accountcode: "002", accountname: "liabilities", accountcategory: 2, parentid: 1, activestatus: "Yes" },
-    { accountcode: "003", accountname: "equity", accountcategory: 3, parentid: 5, activestatus: "Yes" },
-    { accountcode: "004", accountname: "expenses", accountcategory: 4, parentid: 3, activestatus: "Yes" },
-    { accountcode: "005", accountname: "revenue", accountcategory: 5, parentid: 4, activestatus: "Yes" }
+    { accountcode: "001", accountname: "Cash", accountcategory: "Assets", parentid: 1, activestatus: "Yes",  },
+    { accountcode: "002", accountname: "Taxes Payable", accountcategory: "Liabilities", parentid: 2, activestatus: "Yes" },
+    { accountcode: "003", accountname: "Owner's Capital", accountcategory: "Equity", parentid: 3, activestatus: "Yes" },
+    { accountcode: "004", accountname: "Interest Income", accountcategory: "Revenue", parentid: 4, activestatus: "Yes" },
+    { accountcode: "005", accountname: "Interest Income", accountcategory: "Expenses", parentid: 5, activestatus: "Yes" }
   ]);
 
   const [columnDefs] = useState([
@@ -18,19 +21,50 @@ const COA = () => {
     { field: 'accountcode', headerName: 'Account Code' },
     { field: 'accountname', headerName: 'Account Name' },
     { field: 'accountcategory', headerName: 'Account Category' },
-    { field: 'parentid', headerName: 'Parent Id' },
+    { field: 'parentid', headerName: ' Id' },
     { field: 'activestatus', headerName: 'Active Status' }
   ]);
 
+  const [modal, setModal] = React.useState(false);
+  const toggle = () => {
+    setModal(!modal);
+  };
   return (
     <>
-    <BreadCrumbs />
-      <div className="ag-theme-alpine" style={{ height: 400, width: 1000 }}>
-        <AgGridReact
-          rowData={rowData}
-          columnDefs={columnDefs}
-        ></AgGridReact>
-      </div>
+      <BreadCrumbs />
+      <br />
+      <ComponentCard
+        actions={
+          <div className="button-group" style={{ float: 'right' }}>
+            <Button className="btn align-Right" color="success" onClick={toggle}>
+              Add
+            </Button>
+            <Button className="btn" color="primary ">
+              Edit
+            </Button>
+            <Button className="btn" color="danger">
+              Delete
+            </Button>
+          </div>
+        }
+        title="Chart of Accounts "
+        subtitle={
+          <p>
+            A <strong>Chart Of Accounts (COA)</strong> is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions
+          </p>
+        }
+      >
+        <div className="ag-theme-alpine" style={{height: 400}}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+          ></AgGridReact>
+        </div>
+      </ComponentCard>
+      <Modal isOpen={modal} toggle={toggle} size="md">
+        <ModalHeader toggle={toggle}>Add Contact</ModalHeader>
+        <ContactAdd click={toggle} />
+      </Modal>
     </>
   );
 };
