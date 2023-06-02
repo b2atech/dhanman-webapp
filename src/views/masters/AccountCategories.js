@@ -7,22 +7,21 @@ import { Button, Modal, ModalHeader } from 'reactstrap';
 import ComponentCard from '../../components/ComponentCard';
 import ContactAdd from '../../components/apps/contact/ContactAdd';
 
-const COA = () => {
-  const [rowData] = useState([
-    { accountcode: "001", accountname: "Cash", accountcategory: "Assets", parentid: 1, activestatus: "Yes",  },
-    { accountcode: "002", accountname: "Taxes Payable", accountcategory: "Liabilities", parentid: 2, activestatus: "Yes" },
-    { accountcode: "003", accountname: "Owner's Capital", accountcategory: "Equity", parentid: 3, activestatus: "Yes" },
-    { accountcode: "004", accountname: "Interest Income", accountcategory: "Revenue", parentid: 4, activestatus: "Yes" },
-    { accountcode: "005", accountname: "Interest Income", accountcategory: "Expenses", parentid: 5, activestatus: "Yes" }
-  ]);
+const AccountCategories = () => {
+    const [rowData] = useState([
+        { accountcatid: "001", accountchildid: "123", accountcategoryname: "Assets", accountcatdscription: "Discriptionone"  },
+        { accountcatid: "002", accountchildid: " 654", accountcategoryname: "Liabilities", accountcatdscription: "Discriptiontwo"},
+        { accountcatid: "003", accountchildid: "5487", accountcategoryname: "Equity", accountcatdscription: "Discriptionthree"},
+        { accountcatid: "004", accountchildid: "214", accountcategoryname: "Revenue", accountcatdscription: "Discriptionfour"},
+        { accountcatid: "005", accountchildid: "546", accountcategoryname: "Expenses", accountcatdscription: "Discriptionfour"}
+      ]);
 
   const [columnDefs] = useState([
     { checkboxSelection: true, width: 50 },
-    { field: 'accountcode', headerName: 'Account Code', width: 235 },
-    { field: 'accountname', headerName: 'Account Name', width: 235 , sortable:true,filterable:true},
-    { field: 'accountcategory', headerName: 'Account Category', width: 235 },
-    { field: 'parentid', headerName: ' Id', width: 235 },
-    { field: 'activestatus', headerName: 'Active Status', width: 235 }
+    { field: 'accountcatid', headerName: 'Account Code', width: 235 },
+    { field: 'accountchildid', headerName: 'Client Id', width: 235 , sortable:true,filterable:true},
+    { field: 'accountcategoryname', headerName: 'Name', width: 235 },
+    { field: 'accountcatdscription', headerName: 'Description', width: 235 },
   ]);
 
   const [modal, setModal] = React.useState(false);
@@ -47,10 +46,10 @@ const COA = () => {
             </Button>
           </div>
         }
-        title="Chart of Accounts "
+        title="Account Categories "
         subtitle={
           <p>
-            A <strong>Chart Of Accounts (COA)</strong> is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions
+           <strong>Account Categories</strong> refer to the classification or grouping of accounts based on their nature, purpose, or financial characteristics.They help organize and classify financial transactions and provide structure to the Chart Of Accounts.
           </p>
         }
       >
@@ -62,11 +61,11 @@ const COA = () => {
         </div>
       </ComponentCard>
       <Modal isOpen={modal} toggle={toggle} size="md">
-        <ModalHeader toggle={toggle}>Add Contact</ModalHeader>
+        <ModalHeader toggle={toggle}>Add Account Categories</ModalHeader>
         <ContactAdd click={toggle} />
       </Modal>
     </>
   );
 };
 
-export default COA;
+export default AccountCategories;
