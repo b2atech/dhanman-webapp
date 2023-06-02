@@ -12,6 +12,9 @@ import Reconciliation from '../views/masters/Transactions/Reconciliation';
 import Recurring from '../views/masters/Transactions/Recurring';
 import Bills from '../views/masters/Transactions/Bills';
 import ManageBanks from '../views/masters/Transactions/ManageBanks';
+import AccountCategories from '../views/masters/AccountCategories';
+import Currencies from '../views/masters/Currencies';
+import InvoiceStatus from '../views/masters/InvoiceStatus';
 /****Layouts*****/
 
 const FullLayout = Loadable(lazy(() => import('../layouts/FullLayout')));
@@ -125,6 +128,9 @@ const ThemeRoutes = [
     children: [
       { path: '/', name: 'Home', element: <Navigate to="/dashboards/dashboard1" /> },
       { path: '/masters/coa', name: 'Chart of Accounts', exact: true, element: <ChartOfAccounts /> },
+      { path: '/masters/Invoice', name: 'Invoice', exact: true, element: <InvoiceStatus /> },
+      { path: '/masters/AccountCategories', name: 'AccountCategories', exact: true, element: <AccountCategories /> },
+      { path: '/masters/Currencies', name: 'Currencies', exact: true, element: <Currencies /> },
       { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact/> },
       { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },
       { path: '/masters/Transactions', name: 'Transactions', exact: true, element: <Transactions/> },

@@ -17,6 +17,27 @@ const SidebarData = [
         collapisble: false,
       },
       {
+        title: 'Invoice Status',
+        href: '/masters/Invoice',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
+        title: 'Account Categories',
+        href: '/masters/AccountCategories',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
+        title: 'Currencies',
+        href: '/masters/Currencies',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
         title: 'Contact',
         href: '/masters/contact',
         icon: <MaterialIcon icon="radio_button_checked" />,
@@ -125,6 +146,7 @@ const SidebarData = [
             id: 1.1,
             collapisble: false,
           },
+          
           {
             title: 'Contact',
             href: '/masters/contact',
