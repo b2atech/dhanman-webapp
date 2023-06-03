@@ -25,6 +25,7 @@ const ChartOfAccounts = Loadable(lazy(() => import('../views/masters/coa')));
 const Contact = Loadable(lazy(() => import('../views/masters/contact')));
 const Vendors = Loadable(lazy(() => import('../views/masters/Vendors')));
 const Tags = Loadable(lazy(() => import('../views/masters/Tags')));
+const TagTypes = Loadable(lazy(() => import('../views/masters/TagTypes')));
 
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
@@ -136,6 +137,7 @@ const ThemeRoutes = [
       { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },
       { path: '/masters/Vendors', name: 'Vendors', exact: true, element: <Vendors/> },
       { path: '/masters/Tags', name: 'Tags', exact: true, element: <Tags/> },
+      { path: '/masters/TagTypes', name: 'Tags', exact: true, element: <TagTypes/> },
 
       { path: '/masters/Transactions', name: 'Transactions', exact: true, element: <Transactions/> },
       { path: '/masters/Transactions/Sales', name: 'Sales', exact: true, element: <Sales/> },

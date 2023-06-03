@@ -24,6 +24,13 @@ const SidebarData = [
         collapisble: false,
       },
       {
+        title: 'TagTypes',
+        href: '/masters/TagTypes',
+        icon: <MaterialIcon icon="radio_button_checked" />,
+        id: 1.1,
+        collapisble: false,
+      },
+      {
         title: 'Vendors',
         href: '/masters/Vendors',
         icon: <MaterialIcon icon="radio_button_checked" />,
