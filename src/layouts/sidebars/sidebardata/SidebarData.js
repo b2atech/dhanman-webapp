@@ -46,7 +46,7 @@ const SidebarData = [
       },
       {
         title: 'Invoice Status',
-        href: '/masters/Invoice',
+        href: '/masters/Invoice Status',
         icon: <MaterialIcon icon="radio_button_checked" />,
         id: 1.1,
         collapisble: false,

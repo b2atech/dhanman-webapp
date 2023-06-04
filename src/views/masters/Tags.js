@@ -48,7 +48,6 @@ const Tags = () => {
             TagTypeId:5,
 
           },
-         
 ]);       
 
   const [columnDefs] = useState([

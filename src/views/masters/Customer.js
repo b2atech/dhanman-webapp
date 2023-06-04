@@ -20,6 +20,7 @@ const Customer = () => {
            
            },
            {
+
             Id: 2,
             Name: 'Jantara HighSchool Jsp',
             ContactPerson:'HeadSir',
@@ -28,6 +29,7 @@ const Customer = () => {
             Address: 'near Bsnl office, Jsp',
            },
            {
+
             Id: 3,
             Name: 'John Smith',
             ContactPerson:'John',
@@ -49,13 +51,12 @@ const Customer = () => {
   const [columnDefs] = useState([
   {checkboxSelection: true ,width:40},
   { field: 'Id' ,width:60,sortable:true,filterable:true},
-  // { field: 'ClientId' ,width:100,sortable:true,filterable:true},
+
   { field: 'Name' ,width:300,sortable:true,filterable:true},
   { field: 'ContactPerson' ,width:180,sortable:true,filterable:true},
     { field: 'Email',width:200,sortable:true,filterable:true },                                    
     { field: 'PhoneNumber',width:150 ,sortable:true,filterable:true},
     { field: 'Address',width:300,sortable:true,filterable:true },
-
   ]);
 
   const [modal, setModal] = React.useState(false);

@@ -28,6 +28,8 @@ const Tags = Loadable(lazy(() => import('../views/masters/Tags')));
 const TagTypes = Loadable(lazy(() => import('../views/masters/TagTypes')));
 const Customer = Loadable(lazy(() => import('../views/masters/Customer')));
 
+
+
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
 const Dashboard3 = Loadable(lazy(() => import('../views/dashboards/Dashboard3')));
@@ -135,11 +137,11 @@ const ThemeRoutes = [
       { path: '/masters/AccountCategories', name: 'AccountCategories', exact: true, element: <AccountCategories /> },
       { path: '/masters/Currencies', name: 'Currencies', exact: true, element: <Currencies /> },
       { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact/> },
-      { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },
-      { path: '/masters/vendors', name: 'Vendors', exact: true, element: <Vendors/> },
-      { path: '/masters/Tags', name: 'Tags', exact: true, element: <Tags/> },
-      { path: '/masters/TagTypes', name: 'TagTypes', exact: true, element: <TagTypes/> },
+      { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },  
       { path: '/masters/Customer', name: 'Customer', exact: true, element: <Customer/> },
+      { path: '/masters/Vendors', name: 'Vendors', exact: true, element: <Vendors/> },
+       { path: '/masters/TagTypes', name: 'TagTypes', exact: true, element: <TagTypes/> },
+      { path: '/masters/Tags', name: 'Tags', exact: true, element: <Tags/> },
 
       { path: '/masters/Transactions', name: 'Transactions', exact: true, element: <Transactions/> },
       { path: '/masters/Transactions/Sales', name: 'Sales', exact: true, element: <Sales/> },

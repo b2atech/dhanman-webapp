@@ -79,7 +79,6 @@ const vendors = () => {
     { field: 'PhoneNumber',width:150,sortable:true,filterable:true },
     { field: 'Address',width:350,sortable:true,filterable:true },
     { field: 'ClientId',width:90,sortable:true,filterable:true },
-
   ]);
 
   const [modal, setModal] = React.useState(false);
