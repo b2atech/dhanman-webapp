@@ -5,7 +5,6 @@ import Invoices from '../views/masters/Invoices';
 import Transactions from '../views/masters/Transactions/Transactions';
 import Sales from '../views/masters/Transactions/Sales';
 import Categories from '../views/masters/Transactions/Categories';
-import Tags from '../views/masters/Transactions/Tags';
 import Expenses from '../views/masters/Transactions/Expenses';
 import BankTransactions from '../views/masters/Transactions/BankTransactions';
 import Reconciliation from '../views/masters/Transactions/Reconciliation';
@@ -24,6 +23,10 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/BlankLayout')));
 /***** Master Pages ****/
 const ChartOfAccounts = Loadable(lazy(() => import('../views/masters/coa')));
 const Contact = Loadable(lazy(() => import('../views/masters/contact')));
+const Customer = Loadable(lazy(() => import('../views/masters/Customer')));
+const Vendors = Loadable(lazy(() => import('../views/masters/Vendors')));
+const Tags = Loadable(lazy(() => import('../views/masters/Tags')));
+const TagTypes = Loadable(lazy(() => import('../views/masters/TagTypes')));
 
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
@@ -132,7 +135,13 @@ const ThemeRoutes = [
       { path: '/masters/AccountCategories', name: 'AccountCategories', exact: true, element: <AccountCategories /> },
       { path: '/masters/Currencies', name: 'Currencies', exact: true, element: <Currencies /> },
       { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact/> },
-      { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },
+      { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },  
+          { path: '/masters/Customer', name: 'Customer', exact: true, element: <Customer/> },
+          { path: '/masters/Vendors', name: 'Vendors', exact: true, element: <Vendors/> },
+          { path: '/masters/TagTypes', name: 'TagTypes', exact: true, element: <TagTypes/> },
+
+      { path: '/masters/Tags', name: 'Tags', exact: true, element: <Tags/> },
+
       { path: '/masters/Transactions', name: 'Transactions', exact: true, element: <Transactions/> },
       { path: '/masters/Transactions/Sales', name: 'Sales', exact: true, element: <Sales/> },
       { path: '/masters/Transactions/Categories', name: 'Categories', exact: true, element: <Categories/> },

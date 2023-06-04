@@ -1,52 +1,64 @@
-import React, { useState, Avatar} from 'react';
+import React, { useState} from 'react';
 import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
 import { AgGridReact, } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Button, } from 'reactstrap';
+import { Button, Modal, ModalHeader } from 'reactstrap';
 import ComponentCard from '../../components/ComponentCard';
+import ContactAdd from '../../components/apps/contact/ContactAdd';
 
 const Customer = () => {
     const [rowData] = useState([
 
         {
-            avatar: 'Avatar',
-            name: 'Hanna Gover',
-            Companyname: 'Daksha',    
-            Revenue: '$30',
-            Expenses : '$0.00',
-           },
-           {
-             avatar: 'Images',
-             name: 'Jonathan Gover',
-             Companyname: 'Amazon',
-             Revenue: '$100',
-             Expenses:'$20',   
-           },
-           {
-             avatar: 'Images',
-             name: 'Steave Gover',
-             Companyname: 'acer',    
-             Revenue: '$630',
-             Expenses: '$8.00',
+            Id: 1,
+            ClientId: 1,
+            Name: 'Navjeevan HighSchool Jsp',
+            ContactPerson:'HeadSir',
+            Email: 'nhj@gmail.com',
+            PhoneNumber: '1234567890',
+            Address: '9th lane Jsp',
            
            },
            {
-             avatar: 'Images',
-             name: 'Mukesh chava',
-             Companyname: 'Flipcart',
-             Revenue: '$400',
-             Expenses: '$0.00',
+            Id: 1,
+            ClientId: 1,
+            Name: 'Jantara HighSchool Jsp',
+            ContactPerson:'HeadSir',
+            Email: 'jhj@gmail.com',
+            PhoneNumber: '1234567891',
+            Address: 'near Bsnl office, Jsp',
+           },
+           {
+            Id: 1,
+            ClientId: 1,
+            Name: 'John Smith',
+            ContactPerson:'John',
+            Email: 'johnsmith@example.com',
+            PhoneNumber: '55-123-4567',
+            Address: '123 Main Street',
+           
+           },
+           {
+            Id: 1,
+            ClientId: 1,
+            Name: 'Microsoft',
+            ContactPerson:'Microsoft',
+            Email: 'Microsoft@gmail.com',
+            PhoneNumber: '999-895-9652',
+            Address: 'One Microsoft Way, Redmond, WA',
            },
 ]);       
 
   const [columnDefs] = useState([
-  {checkboxSelection: true ,width:100},
-    {field: 'Avatar' ,headername:'Avatar',width:150 ,renderCell:(params)=> <Avatar src={params.col.Avatar}/> ,sortable:true,filterable:true},
-    { field: 'name' ,width:300,sortable:true,filterable:true},
-    { field: 'Companyname',width:200,sortable:true,filterable:true },                                    
-    { field: 'Revenue',width:200 ,sortable:true,filterable:true},
-    { field: 'Expenses',width:250,sortable:true,filterable:true },
+  {checkboxSelection: true ,width:40},
+  { field: 'Id' ,width:60,sortable:true,filterable:true},
+  { field: 'ClientId' ,width:100,sortable:true,filterable:true},
+  { field: 'ContactPerson' ,width:200,sortable:true,filterable:true},
+    { field: 'Name' ,width:300,sortable:true,filterable:true},
+    { field: 'Email',width:200,sortable:true,filterable:true },                                    
+    { field: 'PhoneNumber',width:200 ,sortable:true,filterable:true},
+    { field: 'Address',width:250,sortable:true,filterable:true },
 
   ]);
 
@@ -81,6 +93,10 @@ const Customer = () => {
             columnDefs={columnDefs}
           ></AgGridReact>
         </div>
+        <Modal isOpen={modal} toggle={toggle} size="md">
+        <ModalHeader toggle={toggle}>Add Customer</ModalHeader>
+        <ContactAdd click={toggle} />
+      </Modal>
       </ComponentCard>
     </>
   );
