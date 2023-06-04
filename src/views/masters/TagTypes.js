@@ -48,10 +48,10 @@ const TagTypes = () => {
 
   const [columnDefs] = useState([
   {checkboxSelection: true ,width:100},
-    {field: 'Id' ,headername:'Avatar',width:150 ,renderCell:(params)=> <Avatar src={params.col.Avatar}/> ,sortable:true,filterable:true},
+    {field: 'Id' ,headername:'Avatar',width:100 ,renderCell:(params)=> <Avatar src={params.col.Avatar}/> ,sortable:true,filterable:true},
     { field: 'ClientId' ,width:150,sortable:true,filterable:true},
     { field: 'Name',width:350,sortable:true,filterable:true },                                    
-    { field: 'Description',width:500 ,sortable:true,filterable:true},
+    { field: 'Description',width:530 ,sortable:true,filterable:true},
 
   ]);
 

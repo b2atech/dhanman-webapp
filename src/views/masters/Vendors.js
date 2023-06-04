@@ -3,8 +3,9 @@ import BreadCrumbs from '../../layouts/breadcrumbs/BreadCrumbs';
 import { AgGridReact, } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Button, } from 'reactstrap';
+import { Button, Modal, ModalHeader } from 'reactstrap';
 import ComponentCard from '../../components/ComponentCard';
+import ContactAdd from '../../components/apps/contact/ContactAdd';
 
 const vendors = () => {
     const [rowData] = useState([
@@ -70,14 +71,14 @@ const vendors = () => {
 ]);       
 
   const [columnDefs] = useState([
-  {checkboxSelection: true ,width:60},
-    {field: 'Id' ,sortable:true,filterable:true,width:60},
+  {checkboxSelection: true ,width:30},
+    {field: 'Id' ,sortable:true,filterable:true,width:50},
     { field: 'Name' ,width:200,sortable:true,filterable:true},
-    { field: 'ContactPerson',width:200,sortable:true,filterable:true },                                    
+    { field: 'ContactPerson',width:150,sortable:true,filterable:true },                                    
     { field: 'Email',width:200 ,sortable:true,filterable:true},
     { field: 'PhoneNumber',width:150,sortable:true,filterable:true },
-    { field: 'Address',width:300,sortable:true,filterable:true },
-    { field: 'ClientId',width:150,sortable:true,filterable:true },
+    { field: 'Address',width:350,sortable:true,filterable:true },
+    { field: 'ClientId',width:90,sortable:true,filterable:true },
 
   ]);
 
@@ -112,6 +113,10 @@ const vendors = () => {
             columnDefs={columnDefs}
           ></AgGridReact>
         </div>
+        <Modal isOpen={modal} toggle={toggle} size="md">
+        <ModalHeader toggle={toggle}>Add Customer</ModalHeader>
+        <ContactAdd click={toggle} />
+      </Modal>
       </ComponentCard>
     </>
   );

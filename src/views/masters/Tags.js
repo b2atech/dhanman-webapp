@@ -48,54 +48,15 @@ const Tags = () => {
             TagTypeId:5,
 
           },
-          {
-            Id: 6,
-            ClientId:6,
-            Name: 'Juan Granado',
-            Description: 'Multi-Tiered Coherent Workforce',
-            TagTypeId:6,
-
-          },
-          {
-            Id: 7,
-            ClientId:7,
-            Name: 'Reva Allen',
-            Description: 'Upgradable 6Thgeneration Pricingstructure',
-            TagTypeId:7,
-
-          },
-          {
-            Id: 8,
-            ClientId:8,
-            Name: 'Jule Huseman',
-            Description: 'Optimized Dedicated Toolset',
-            TagTypeId:8,
-
-          },
-          {
-            Id: 9,
-            Name: 'Bridgette Phung',
-            ClientId:9,
-            Description: 'Optimized Dedicated Toolset',
-            TagTypeId:9,
-
-          },
-          {
-            Id: 10,
-            ClientId:10,
-            Name: 'Ernest Cousins',
-            Description: 'Progressive Systematic Application',
-            TagTypeId:10,
-
-          },
+         
 ]);       
 
   const [columnDefs] = useState([
   {checkboxSelection: true ,width:100},
-    {field: 'Id' ,headername:'Avatar',width:150 ,renderCell:(params)=> <Avatar src={params.col.Avatar}/> ,sortable:true,filterable:true},
-    { field: 'ClientId' ,width:150,sortable:true,filterable:true},
+    {field: 'Id' ,headername:'Avatar',width:100 ,renderCell:(params)=> <Avatar src={params.col.Avatar}/> ,sortable:true,filterable:true},
+    { field: 'ClientId' ,width:120,sortable:true,filterable:true},
     { field: 'Name',width:300,sortable:true,filterable:true },                                    
-    { field: 'Description',width:350 ,sortable:true,filterable:true},
+    { field: 'Description',width:450 ,sortable:true,filterable:true},
     { field: 'TagTypeId',width:150,sortable:true,filterable:true },
 
   ]);
