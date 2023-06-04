@@ -24,6 +24,7 @@ const BlankLayout = Loadable(lazy(() => import('../layouts/BlankLayout')));
 /***** Master Pages ****/
 const ChartOfAccounts = Loadable(lazy(() => import('../views/masters/coa')));
 const Contact = Loadable(lazy(() => import('../views/masters/contact')));
+const Vendors = Loadable(lazy(() => import('../views/masters/Vendors')));
 
 const Dashboard1 = Loadable(lazy(() => import('../views/dashboards/Dashboard1')));
 const Dashboard2 = Loadable(lazy(() => import('../views/dashboards/Dashboard2')));
@@ -131,6 +132,8 @@ const ThemeRoutes = [
       { path: '/masters/Invoice', name: 'Invoice', exact: true, element: <InvoiceStatus /> },
       { path: '/masters/AccountCategories', name: 'AccountCategories', exact: true, element: <AccountCategories /> },
       { path: '/masters/Currencies', name: 'Currencies', exact: true, element: <Currencies /> },
+      { path: '/masters/Vendors', name: 'vendors', exact: true, element: <Vendors /> },
+
       { path: '/masters/contact', name: 'Contact', exact: true, element: <Contact/> },
       { path: '/masters/Invoices', name: 'Invoices', exact: true, element: <Invoices/> },
       { path: '/masters/Transactions', name: 'Transactions', exact: true, element: <Transactions/> },
