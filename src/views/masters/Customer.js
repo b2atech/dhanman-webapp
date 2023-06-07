@@ -21,8 +21,8 @@ const Customer = () => {
            
            },
            {
-            Id: 1,
-            ClientId: 1,
+            Id: 2,
+            ClientId: 2,
             Name: 'Jantara HighSchool Jsp',
             ContactPerson:'HeadSir',
             Email: 'jhj@gmail.com',
@@ -30,8 +30,8 @@ const Customer = () => {
             Address: 'near Bsnl office, Jsp',
            },
            {
-            Id: 1,
-            ClientId: 1,
+            Id: 3,
+            ClientId: 3,
             Name: 'John Smith',
             ContactPerson:'John',
             Email: 'johnsmith@example.com',
@@ -40,8 +40,8 @@ const Customer = () => {
            
            },
            {
-            Id: 1,
-            ClientId: 1,
+            Id: 4,
+            ClientId: 4,
             Name: 'Microsoft',
             ContactPerson:'Microsoft',
             Email: 'Microsoft@gmail.com',
@@ -51,13 +51,13 @@ const Customer = () => {
 ]);       
 
   const [columnDefs] = useState([
-  {checkboxSelection: true ,width:40},
-  { field: 'Id' ,width:60,sortable:true,filterable:true},
-  { field: 'ClientId' ,width:100,sortable:true,filterable:true},
-  { field: 'ContactPerson' ,width:200,sortable:true,filterable:true},
+  {checkboxSelection: true ,width:30},
+  { field: 'Id' ,width:50,sortable:true,filterable:true},
+  { field: 'ClientId' ,width:90,sortable:true,filterable:true},
+  { field: 'ContactPerson' ,width:150,sortable:true,filterable:true},
     { field: 'Name' ,width:300,sortable:true,filterable:true},
     { field: 'Email',width:200,sortable:true,filterable:true },                                    
-    { field: 'PhoneNumber',width:200 ,sortable:true,filterable:true},
+    { field: 'PhoneNumber',width:150 ,sortable:true,filterable:true},
     { field: 'Address',width:250,sortable:true,filterable:true },
 
   ]);

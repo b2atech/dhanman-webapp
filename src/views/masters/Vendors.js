@@ -71,14 +71,14 @@ const vendors = () => {
 ]);       
 
   const [columnDefs] = useState([
-  {checkboxSelection: true ,width:60},
-    {field: 'Id' ,sortable:true,filterable:true,width:60},
-    { field: 'Name' ,width:200,sortable:true,filterable:true},
-    { field: 'ContactPerson',width:200,sortable:true,filterable:true },                                    
+  {checkboxSelection: true ,width:40},
+    {field: 'Id' ,sortable:true,filterable:true,width:50},
+    { field: 'ClientId',width:100,sortable:true,filterable:true },
+    { field: 'Name' ,width:250,sortable:true,filterable:true},
+    { field: 'ContactPerson',width:150,sortable:true,filterable:true },                                    
     { field: 'Email',width:200 ,sortable:true,filterable:true},
-    { field: 'PhoneNumber',width:150,sortable:true,filterable:true },
-    { field: 'Address',width:300,sortable:true,filterable:true },
-    { field: 'ClientId',width:150,sortable:true,filterable:true },
+    { field: 'PhoneNumber',width:120,sortable:true,filterable:true },
+    { field: 'Address',width:320,sortable:true,filterable:true },
 
   ]);
 
@@ -114,7 +114,7 @@ const vendors = () => {
           ></AgGridReact>
         </div>
         <Modal isOpen={modal} toggle={toggle} size="md">
-        <ModalHeader toggle={toggle}>Add Customer</ModalHeader>
+        <ModalHeader toggle={toggle}>Add Vendors</ModalHeader>
         <ContactAdd click={toggle} />
       </Modal>
       </ComponentCard>
