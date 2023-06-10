@@ -86,7 +86,13 @@ const Customer = () => {
           </div>
         }
         
-        title="Customer">
+        title="Customer"
+           subtitle={
+          <p>
+            A <strong>Chart Of Accounts (COA)</strong> is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions
+          </p>
+          }
+          >
         <div className="ag-theme-alpine" style={{height: 400}}>
           <AgGridReact
             rowData={rowData}
