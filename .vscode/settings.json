@@ -1,0 +1,5 @@
+{
+    "scm.providerCountBadge": "visible",
+    "scm.alwaysShowRepositories": true,
+    "scm.alwaysShowActions": true
+}

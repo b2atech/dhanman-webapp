@@ -15,9 +15,12 @@ const Contacts = () => {
     {make: "Ford", model: "Mondeo", price: 32000},
     {make: "Porsche", model: "Boxster", price: 72000}
   ]);
-
+  const defaultColDef = {
+    sortable: true
+  };
   const [columnDefs] = useState([
-    { field: 'make' },
+
+    { field: 'make', sort: 'asc'},
     { field: 'model' },
     { field: 'price' }
   ])
@@ -48,14 +51,16 @@ const Contacts = () => {
         title="Contact"
         subtitle={
           <p>
-            Use <code>Contact</code> to add zebra-striping to any table row within the{' '}
-            <code>&lt;tbody&gt;</code>.
+            A <strong>customer</strong> is an entity that buys goods or services from third parties. 
+            Accumulating a profitable and recurring group of customers is the primary goal of a business,
+             since this group generates revenue for the business.
           </p>
         }
       >
        <div className="ag-theme-alpine" style={{height: 400}}>
            <AgGridReact
                rowData={rowData}
+               defaultColDef={defaultColDef} 
                columnDefs={columnDefs}>
            </AgGridReact>
        </div>

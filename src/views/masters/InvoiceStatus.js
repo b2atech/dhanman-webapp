@@ -7,8 +7,21 @@ import { Button, Modal, ModalHeader } from 'reactstrap';
 import ComponentCard from '../../components/ComponentCard';
 import ContactAdd from '../../components/apps/contact/ContactAdd';
 
-const COA = () => {
+const InvoiceStatus = () => {
+  const [rowData] = useState([
+    { accountstatusid: "001", accountstatusname: "Ram Kadam", accountstatusdiscription: "discriptionone" },
+    { accountstatusid: "002", accountstatusname: "Pratik Patil", accountstatusdiscription: "discriptiontwo"},
+    { accountstatusid: "003", accountstatusname: "Subhash Chavan", accountstatusdiscription: "discriptionthree" },
+    { accountstatusid: "004", accountstatusname: "Priya Mane", accountstatusdiscription: "discriptionfour" },
+    { accountstatusid: "005", accountstatusname: "Samrath Koli", accountstatusdiscription: "discriptionfive" }
+  ]);
 
+  const [columnDefs] = useState([
+    { checkboxSelection: true, width: 50 },
+    { field: 'accountstatusid', headerName: 'Id' },
+    { field: 'accountstatusname', headerName: 'Name' },
+    { field: 'accountstatusdiscription', headerName: 'Description'},
+  ]);
 
   const [modal, setModal] = React.useState(false);
   const toggle = () => {
@@ -32,10 +45,10 @@ const COA = () => {
             </Button>
           </div>
         }
-        title="Chart of Accounts"
+        title="Invoices status"
         subtitle={
           <p>
-            A <strong>Chart Of Accounts (COA)</strong> is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions
+           <strong>Invoice Status</strong> refers to the current state or condition of an invoice within the accounting process. It helps track and manage the progress of invoices from creation to payment
           </p>
         }
       >
@@ -47,11 +60,11 @@ const COA = () => {
         </div>
       </ComponentCard>
       <Modal isOpen={modal} toggle={toggle} size="md">
-        <ModalHeader toggle={toggle}>Add Chart of Accounts</ModalHeader>
+        <ModalHeader toggle={toggle}>Add Invoices status</ModalHeader>
         <ContactAdd click={toggle} />
       </Modal>
     </>
   );
 };
 
-export default COA;
+export default InvoiceStatus;

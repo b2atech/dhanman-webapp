@@ -7,8 +7,23 @@ import { Button, Modal, ModalHeader } from 'reactstrap';
 import ComponentCard from '../../components/ComponentCard';
 import ContactAdd from '../../components/apps/contact/ContactAdd';
 
-const COA = () => {
+const Currencies = () => {
+  const [rowData] = useState([
+    { currencyid: "001", currencycode:"INR",  currencyname: "Rupee", currencysymbol : "₹", exchangerate: "01.00"},
+    { currencyid: "002", currencycode:"USD", currencyname: "Doller", currencysymbol : "$", exchangerate: "82.29" },
+    { currencyid: "003", currencycode:"GBP", currencyname: "Pound" , currencysymbol : "£", exchangerate: "0.009"},
+    { currencyid: "004", currencycode:"EUR", currencyname: "Euro", currencysymbol : "€", exchangerate: "0.011" },
+    { currencyid: "005", currencycode:"RUB", currencyname: "Ruble", currencysymbol : "₽", exchangerate: "0.98"}
+  ]);
 
+  const [columnDefs] = useState([
+    { checkboxSelection: true, width: 50 },
+    { field: 'currencyid', headerName: 'Id' },
+    { field: 'currencycode', headerName: 'Currency Code' },
+    { field: 'currencyname', headerName: 'Currency Name' },
+    { field: 'currencysymbol', headerName: 'Symbol' },
+    { field: 'exchangerate', headerName: 'Exchange Rate' },
+  ]);
 
   const [modal, setModal] = React.useState(false);
   const toggle = () => {
@@ -32,10 +47,10 @@ const COA = () => {
             </Button>
           </div>
         }
-        title="Chart of Accounts"
+        title="Currencies"
         subtitle={
           <p>
-            A <strong>Chart Of Accounts (COA)</strong> is a categorized list of all the financial accounts used by a business or organization to record and track its financial transactions
+            In accounting, <strong>Currencies</strong> refer to the units of money used to measure and express the value of financial transactions.
           </p>
         }
       >
@@ -47,11 +62,11 @@ const COA = () => {
         </div>
       </ComponentCard>
       <Modal isOpen={modal} toggle={toggle} size="md">
-        <ModalHeader toggle={toggle}>Add Chart of Accounts</ModalHeader>
+        <ModalHeader toggle={toggle}>Add Currencies</ModalHeader>
         <ContactAdd click={toggle} />
       </Modal>
     </>
   );
 };
 
-export default COA;
+export default Currencies;
