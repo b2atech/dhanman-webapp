@@ -1,6 +1,7 @@
 {
-  "name": "mantis-react-ts",
-  "version": "2.1.0",
+  "name": "dhanman",
+  "homepage": "http://dhanman.com",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@ant-design/colors": "^7.0.0",
