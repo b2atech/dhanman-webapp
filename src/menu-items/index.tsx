@@ -8,7 +8,7 @@ import { NavItemType } from 'types/menu';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-  items: [other,master]
+  items: [other, master]
 };
 
 export default menuItems;
