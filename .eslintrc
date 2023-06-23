@@ -1,51 +1,61 @@
 {
-  "root": true,
-  "env": {
-    "browser": true,
-    "node": true
+  "plugins": ["prettier", "@typescript-eslint"],
+  "extends": ["react-app", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
   },
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".mdx"
-        ]
+        "moduleDirectory": ["node_modules", "src/"]
+      },
+      "typescript": {
+        "alwaysTryTypes": true
       }
     }
   },
-  "extends": [
-    "prettier"
-  ],
-  "plugins": [
-    "prettier",
-    "react",
-    "react-hooks"
-  ],
   "rules": {
-    "comma-dangle": "off",
-    "import/no-unresolved": "off",
-    "jsx-a11y/anchor-is-valid": "off",
-    "jsx-a11y/click-events-have-key-events": "off",
-    "jsx-a11y/control-has-associated-label": "off",
-    "jsx-a11y/no-static-element-interactions": "off",
-    "no-console": "off",
-    "no-plusplus": "off",
-    "no-param-reassign": 0,
-    "react/no-danger": "off",
-    "arrow-body-style": "off",
-    "spaced-comment":"off",
-    "react/self-closing-comp": "off",
-    "react-hooks/exhaustive-deps": "off",
-    "react/forbid-prop-types": "off",
     "react/jsx-filename-extension": "off",
-    "react/jsx-props-no-spreading": "off",
+    "no-param-reassign": "off",
+    "react/prop-types": "off",
     "react/require-default-props": "off",
-    "react/jsx-no-bind":"off",
-    "no-nested-ternary": "off",
+    "react/no-array-index-key": "off",
     "react/react-in-jsx-scope": "off",
-    "react/destructuring-assignment": "off"
+    "react/jsx-props-no-spreading": "off",
+    "import/order": "off",
+    "no-console": "off",
+    "no-shadow": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "import/no-cycle": "off",
+    "import/no-extraneous-dependencies": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": ["@mui/*/*/*", "!@mui/material/test-utils/*"]
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "none"
+      }
+    ],
+    "prettier/prettier": [
+      "warn",
+      {
+        "bracketSpacing": true,
+        "printWidth": 140,
+        "singleQuote": true,
+        "trailingComma": "none",
+        "tabWidth": 2,
+        "useTabs": false,
+        "endOfLine": "auto"
+      }
+    ]
   }
 }
-
