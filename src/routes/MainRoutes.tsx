@@ -5,6 +5,7 @@ import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
+import StatusPage from 'pages/master/status';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -31,9 +32,9 @@ const MainRoutes = {
       children: [
         {
           path: 'sample-page',
-          element: <SamplePage />
-        }
-      ]
+          element: <SamplePage />,
+        },
+      ],
     },
     {
       path: '/maintenance',
@@ -41,21 +42,21 @@ const MainRoutes = {
       children: [
         {
           path: '404',
-          element: <MaintenanceError />
+          element: <MaintenanceError />,
         },
         {
           path: '500',
-          element: <MaintenanceError500 />
+          element: <MaintenanceError500 />,
         },
         {
           path: 'under-construction',
-          element: <MaintenanceUnderConstruction />
+          element: <MaintenanceUnderConstruction />,
         },
         {
           path: 'coming-soon',
-          element: <MaintenanceComingSoon />
-        }
-      ]
+          element: <MaintenanceComingSoon />,
+        },
+      ],
     },
     {
       path: '/master',
@@ -67,11 +68,15 @@ const MainRoutes = {
       children: [
         {
           path: 'customers',
-          element: <Customers />
-        }
-      ]
-    }
-  ]
+          element: <Customers />,
+        },
+        {
+          path: 'status',
+          element: <StatusPage />,
+        },
+      ],
+    },
+  ],
 };
 
 export default MainRoutes;

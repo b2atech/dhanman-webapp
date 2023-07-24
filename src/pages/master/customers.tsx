@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 // material-ui
-import { Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 
 // third-party
 import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
@@ -10,22 +10,14 @@ import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell }
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport, EmptyTable } from 'components/third-party/ReactTable';
-import LinearWithLabel from 'components/@extended/progress/LinearWithLabel';
+import { BillAPI } from 'api/services/BillService';
 
-import makeData from 'data/react-table';
-import {
-  GlobalFilter,
-  DefaultColumnFilter,
-  SelectColumnFilter,
-  SliderColumnFilter,
-  NumberRangeColumnFilter,
-  renderFilterTypes,
-  filterGreaterThan
-} from 'utils/react-table';
+import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
+import { IVendor } from 'types/bill';
 
 // ==============================|| REACT TABLE ||============================== //
 
-function ReactTable({ columns, data }: { columns: Column[]; data: [] }) {
+function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const defaultColumn = useMemo(() => ({ Filter: DefaultColumnFilter }), []);
   const initialState = useMemo(() => ({ filters: [{ id: 'status', value: '' }] }), []);
@@ -94,61 +86,22 @@ function ReactTable({ columns, data }: { columns: Column[]; data: [] }) {
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 
 const Customers = () => {
-  const data = useMemo(() => makeData(2000), []);
+  const [vendors, setVendors] = useState([]);
+  //var vendors: IVendor[] = [];
+ 
+  useEffect(() => {
+    BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
+  }, []);
+
+  debugger;
+  //const data = useMemo(() => vendors, []);
 
   const columns = useMemo(
     () =>
       [
         {
           Header: 'First Name',
-          accessor: 'firstName'
-        },
-        {
-          Header: 'Last Name',
-          accessor: 'lastName',
-          filter: 'fuzzyText'
-        },
-        {
-          Header: 'Email',
-          accessor: 'email'
-        },
-        {
-          Header: 'Age',
-          accessor: 'age',
-          className: 'cell-right',
-          Filter: SliderColumnFilter,
-          filter: 'equals'
-        },
-        {
-          Header: 'Visits',
-          accessor: 'visits',
-          className: 'cell-right',
-          Filter: NumberRangeColumnFilter,
-          filter: 'between'
-        },
-        {
-          Header: 'Status',
-          accessor: 'status',
-          Filter: SelectColumnFilter,
-          filter: 'includes',
-          Cell: ({ value }: { value: string }) => {
-            switch (value) {
-              case 'Complicated':
-                return <Chip color="error" label="Complicated" size="small" variant="light" />;
-              case 'Relationship':
-                return <Chip color="success" label="Relationship" size="small" variant="light" />;
-              case 'Single':
-              default:
-                return <Chip color="info" label="Single" size="small" variant="light" />;
-            }
-          }
-        },
-        {
-          Header: 'Profile Progress',
-          accessor: 'progress',
-          Filter: SliderColumnFilter,
-          filter: filterGreaterThan,
-          Cell: ({ value }: { value: number }) => <LinearWithLabel value={value} sx={{ minWidth: 75 }} />
+          accessor: 'name'
         }
       ] as Column[],
     []
@@ -157,7 +110,7 @@ const Customers = () => {
   return (
     <MainCard content={false}>
       <ScrollX>
-        <ReactTable columns={columns} data={data} />
+        <ReactTable columns={columns} data={vendors} />
       </ScrollX>
     </MainCard>
   );
