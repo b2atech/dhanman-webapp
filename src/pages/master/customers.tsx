@@ -87,8 +87,6 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 
 const Customers = () => {
   const [vendors, setVendors] = useState([]);
-  //var vendors: IVendor[] = [];
- 
   useEffect(() => {
     BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
   }, []);
