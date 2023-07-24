@@ -32,9 +32,9 @@ const MainRoutes = {
       children: [
         {
           path: 'sample-page',
-          element: <SamplePage />,
-        },
-      ],
+          element: <SamplePage />
+        }
+      ]
     },
     {
       path: '/maintenance',
@@ -42,21 +42,21 @@ const MainRoutes = {
       children: [
         {
           path: '404',
-          element: <MaintenanceError />,
+          element: <MaintenanceError />
         },
         {
           path: '500',
-          element: <MaintenanceError500 />,
+          element: <MaintenanceError500 />
         },
         {
           path: 'under-construction',
-          element: <MaintenanceUnderConstruction />,
+          element: <MaintenanceUnderConstruction />
         },
         {
           path: 'coming-soon',
-          element: <MaintenanceComingSoon />,
-        },
-      ],
+          element: <MaintenanceComingSoon />
+        }
+      ]
     },
     {
       path: '/master',
@@ -68,15 +68,15 @@ const MainRoutes = {
       children: [
         {
           path: 'customers',
-          element: <Customers />,
+          element: <Customers />
         },
         {
           path: 'status',
-          element: <StatusPage />,
-        },
-      ],
-    },
-  ],
+          element: <StatusPage />
+        }
+      ]
+    }
+  ]
 };
 
 export default MainRoutes;
