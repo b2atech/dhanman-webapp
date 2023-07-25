@@ -6,13 +6,14 @@ import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import StatusPage from 'pages/master/status';
+import Vendors from 'pages/master/vendors';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/500')));
 const MaintenanceUnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
 const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/coming-soon')));
-const Customers = Loadable(lazy(() => import('pages/master/customers')));
+// const Customers = Loadable(lazy(() => import('pages/master/vendors')));
 
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
@@ -67,8 +68,8 @@ const MainRoutes = {
       ),
       children: [
         {
-          path: 'customers',
-          element: <Customers />
+          path: 'vendors',
+          element: <Vendors />
         },
         {
           path: 'status',

@@ -22,10 +22,10 @@ const master: NavItemType = {
   type: 'group',
   children: [
     {
-      id: 'customers',
-      title: <FormattedMessage id="customers" />,
+      id: 'vendors',
+      title: <FormattedMessage id="Vendors" />,
       type: 'item',
-      url: '/master/customers',
+      url: '/master/vendors',
       icon: icons.ChromeOutlined
     },
     {

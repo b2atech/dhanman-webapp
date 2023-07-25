@@ -85,7 +85,7 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 
-const Customers = () => {
+const Vendors = () => {
   const [vendors, setVendors] = useState([]);
   useEffect(() => {
     BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
@@ -98,8 +98,28 @@ const Customers = () => {
     () =>
       [
         {
-          Header: 'First Name',
+          Header: 'Customer ID',
+          accessor: 'id'
+        },
+        {
+          Header: 'Name',
           accessor: 'name'
+        },
+        {
+          Header: 'Contact Person',
+          accessor: 'contactPerson'
+        },
+        {
+          Header: 'Email',
+          accessor: 'email'
+        },
+        {
+          Header: 'Phone Number',
+          accessor: 'phoneNumber'
+        },
+        {
+          Header: 'Address',
+          accessor: 'address'
         }
       ] as Column[],
     []
@@ -114,4 +134,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default Vendors;
