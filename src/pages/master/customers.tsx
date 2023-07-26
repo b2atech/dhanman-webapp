@@ -98,8 +98,28 @@ const Customers = () => {
     () =>
       [
         {
-          Header: 'First Name',
+          Header: 'Customer ID',
+          accessor: 'id'
+        },
+        {
+          Header: 'Name',
           accessor: 'name'
+        },
+        {
+          Header: 'Contact Person',
+          accessor: 'contactPerson'
+        },
+        {
+          Header: 'Email',
+          accessor: 'email'
+        },
+        {
+          Header: 'Phone Number',
+          accessor: 'phoneNumber'
+        },
+        {
+          Header: 'Address',
+          accessor: 'address'
         }
       ] as Column[],
     []
