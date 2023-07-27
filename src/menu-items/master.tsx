@@ -29,6 +29,13 @@ const master: NavItemType = {
       icon: icons.ChromeOutlined
     },
     {
+      id: 'vendors',
+      title: <FormattedMessage id="Vendors" />,
+      type: 'item',
+      url: '/master/vendors',
+      icon: icons.ChromeOutlined
+    },
+    {
       id: 'suppliers',
       title: <FormattedMessage id="suppliers" />,
       type: 'item',
