@@ -7,6 +7,10 @@ import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import StatusPage from 'pages/master/status';
 import Vendors from 'pages/master/vendors';
+import Createinvoice from 'pages/master/createinvoice';
+import Invoicedetails from 'pages/master/invoicedetails';
+import Invoicelist from 'pages/master/invoicelist';
+import Invoiceedit from 'pages/master/invoiceedit';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -74,6 +78,22 @@ const MainRoutes = {
         {
           path: 'vendors',
           element: <Vendors />
+        },
+        {
+          path: 'createinvoice',
+          element: <Createinvoice />
+        },
+        {
+          path: 'invoicedetails',
+          element: <Invoicedetails />
+        },
+        {
+          path: 'invoicelist',
+          element: <Invoicelist />
+        },
+        {
+          path: 'invoiceedit',
+          element: <Invoiceedit />
         },
         {
           path: 'status',
