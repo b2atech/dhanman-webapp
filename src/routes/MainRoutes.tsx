@@ -7,10 +7,14 @@ import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import StatusPage from 'pages/master/status';
 import Vendors from 'pages/master/vendors';
-import Createinvoice from 'pages/master/createinvoice';
-import Invoicedetails from 'pages/master/invoicedetails';
-import Invoicelist from 'pages/master/invoicelist';
-import Invoiceedit from 'pages/master/invoiceedit';
+import Createinvoice from 'pages/master/createinvoice/createinvoice';
+import Invoicedetails from 'pages/master/createinvoice/invoicedetails';
+import Invoicelist from 'pages/master/createinvoice/invoicelist';
+import Invoiceedit from 'pages/master/createinvoice/invoiceedit';
+import CreateBills from 'pages/master/createbills/createbills';
+import BillsDetails from 'pages/master/createbills/billsdetails';
+import BillsList from 'pages/master/createbills/billslist';
+import EditBill from 'pages/master/createbills/editbill';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -94,6 +98,22 @@ const MainRoutes = {
         {
           path: 'invoiceedit',
           element: <Invoiceedit />
+        },
+        {
+          path: 'createbills',
+          element: <CreateBills />
+        },
+        {
+          path: 'billsdetails',
+          element: <BillsDetails />
+        },
+        {
+          path: 'billslist',
+          element: <BillsList />
+        },
+        {
+          path: 'editbill',
+          element: <EditBill />
         },
         {
           path: 'status',

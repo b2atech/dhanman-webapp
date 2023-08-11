@@ -64,6 +64,34 @@ const master: NavItemType = {
       icon: icons.ChromeOutlined
     },
     {
+      id: 'createbills',
+      title: <FormattedMessage id="createbills" />,
+      type: 'item',
+      url: '/master/createbills',
+      icon: icons.ChromeOutlined
+    },
+    {
+      id: 'billsdetails',
+      title: <FormattedMessage id="billsdetails" />,
+      type: 'item',
+      url: '/master/billsdetails',
+      icon: icons.ChromeOutlined
+    },
+    {
+      id: 'billslist',
+      title: <FormattedMessage id="billslist" />,
+      type: 'item',
+      url: '/master/billslist',
+      icon: icons.ChromeOutlined
+    },
+    {
+      id: 'editbill',
+      title: <FormattedMessage id="editbill" />,
+      type: 'item',
+      url: '/master/editbill',
+      icon: icons.ChromeOutlined
+    },
+    {
       id: 'suppliers',
       title: <FormattedMessage id="suppliers" />,
       type: 'item',
