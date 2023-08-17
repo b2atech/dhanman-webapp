@@ -37,14 +37,6 @@ export default function AlertColumnDelete({ title, open, handleClose }: Props) {
             <Typography variant="h4" align="center">
               Are you sure you want to delete?
             </Typography>
-            <Typography align="center">
-              By deleting
-              <Typography variant="subtitle1" component="span">
-                {' '}
-                "{title}"{' '}
-              </Typography>
-              column, all task inside that column will also be deleted.
-            </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>

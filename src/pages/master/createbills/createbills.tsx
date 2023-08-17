@@ -11,8 +11,8 @@ import {
   FormHelperText,
   Grid,
   InputLabel,
-  MenuItem,
-  Select,
+  // MenuItem,
+  // Select,
   Stack,
   Table,
   TableBody,
@@ -205,7 +205,7 @@ const CreateBills = () => {
                     </FormControl>
                   </Stack>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                {/* <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
                     <InputLabel>Status</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
@@ -233,7 +233,7 @@ const CreateBills = () => {
                     </FormControl>
                   </Stack>
                   {touched.status && errors.status && <FormHelperText error={true}>{errors.status}</FormHelperText>}
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
                     <InputLabel>Date</InputLabel>
