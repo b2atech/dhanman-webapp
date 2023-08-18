@@ -36,7 +36,7 @@ import { getInvoiceSingleList } from 'store/reducers/invoice';
 
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
-import { getAddress } from 'api/services/BillService';
+import { getAllBillDetail } from 'api/services/BillService';
 //import { Bill_Detail_API } from 'api/services/BillService';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
@@ -44,7 +44,7 @@ import { getAddress } from 'api/services/BillService';
 const BillsDetails = () => {
   const [bills, setbills] = useState([]);
   useEffect(() => {
-    getAddress('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((billList) => setbills(billList));
+    getAllBillDetail('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((billList) => setbills(billList));
   }, []);
 
   const theme = useTheme();

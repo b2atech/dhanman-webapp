@@ -18,7 +18,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getBillAddCustomer } from 'api/services/BillService';
+import { getAllVendors } from 'api/services/BillService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,15 +89,15 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [address, setAddress] = useState([]);
   useEffect(() => {
-    getBillAddCustomer('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddress(addressList));
+    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddress(addressList));
   }, []);
 
   return (
     <>
-      {address.map((pst: any) => (
+      {address.map((customer: any) => (
         <Box
-          onClick={() => handlerAddress(pst)}
-          key={pst.email}
+          onClick={() => handlerAddress(customer)}
+          key={customer.email}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -111,20 +111,20 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {pst.name}
+            {customer.name}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.id}
+              {customer.id}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.address}
+              {customer.address}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.phoneNumber}
+              {customer.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.email}
+              {customer.email}
             </Typography>
           </Stack>
         </Box>

@@ -10,10 +10,10 @@ import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell }
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport, EmptyTable } from 'components/third-party/ReactTable';
-import { BillAPI } from 'api/services/BillService';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
+import { getAllVendors } from 'api/services/BillService';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -88,7 +88,7 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 const Vendors = () => {
   const [vendors, setVendors] = useState([]);
   useEffect(() => {
-    BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
+    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
   }, []);
 
   debugger;

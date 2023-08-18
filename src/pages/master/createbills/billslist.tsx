@@ -386,7 +386,7 @@ const BillsList = () => {
                   color="primary"
                   onClick={(e: any) => {
                     e.stopPropagation();
-                    navigation(`/master/editbill/${row.values.clientId}`);
+                    navigation('/master/editbill/');
                   }}
                 >
                   <EditTwoTone twoToneColor={theme.palette.primary.main} />

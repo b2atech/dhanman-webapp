@@ -18,7 +18,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getIvoiceAddCustomer } from 'api/services/BillService';
+import { getAllVendors } from 'api/services/BillService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,15 +89,15 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [addressModel, setAddressModel] = useState([]);
   useEffect(() => {
-    getIvoiceAddCustomer('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddressModel(addressList));
+    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddressModel(addressList));
   }, []);
 
   return (
     <>
-      {addressModel.map((address: any) => (
+      {addressModel.map((vendor: any) => (
         <Box
-          onClick={() => handlerAddress(address)}
-          key={address.email}
+          onClick={() => handlerAddress(vendor)}
+          key={vendor.email}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -111,20 +111,20 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {address.name}
+            {vendor.name}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.id}
+              {vendor.id}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.address}
+              {vendor.address}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.phoneNumber}
+              {vendor.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.email}
+              {vendor.email}
             </Typography>
           </Stack>
         </Box>
