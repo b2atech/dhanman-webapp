@@ -11,8 +11,6 @@ import {
   FormHelperText,
   Grid,
   InputLabel,
-  // MenuItem,
-  // Select,
   Stack,
   Table,
   TableBody,
@@ -205,35 +203,6 @@ const CreateBills = () => {
                     </FormControl>
                   </Stack>
                 </Grid>
-                {/* <Grid item xs={12} sm={6} md={3}>
-                  <Stack spacing={1}>
-                    <InputLabel>Status</InputLabel>
-                    <FormControl sx={{ width: '100%' }}>
-                      <Select
-                        value={values.status}
-                        displayEmpty
-                        name="status"
-                        renderValue={(selected) => {
-                          if (selected.length === 0) {
-                            return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
-                          }
-                          return selected;
-                          // return selected.join(', ');
-                        }}
-                        onChange={handleChange}
-                        error={Boolean(errors.status && touched.status)}
-                      >
-                        <MenuItem disabled value="">
-                          Select status
-                        </MenuItem>
-                        <MenuItem value="Paid">Paid</MenuItem>
-                        <MenuItem value="Unpaid">Unpaid</MenuItem>
-                        <MenuItem value="Cancelled">Cancelled</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                  {touched.status && errors.status && <FormHelperText error={true}>{errors.status}</FormHelperText>}
-                </Grid> */}
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
                     <InputLabel>Date</InputLabel>

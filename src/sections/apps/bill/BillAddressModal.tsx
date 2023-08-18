@@ -18,7 +18,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { BILLADDRESSMODELAPI } from 'api/services/BillService';
+import { getBillAddCustomer } from 'api/services/BillService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,7 +89,7 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [address, setAddress] = useState([]);
   useEffect(() => {
-    BILLADDRESSMODELAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setAddress(vendorList));
+    getBillAddCustomer('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddress(addressList));
   }, []);
 
   return (

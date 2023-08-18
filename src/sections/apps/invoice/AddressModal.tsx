@@ -18,7 +18,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { INVOICEADDRESSMODELAPI } from 'api/services/BillService';
+import { getIvoiceAddCustomer } from 'api/services/BillService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,15 +89,15 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [addressModel, setAddressModel] = useState([]);
   useEffect(() => {
-    INVOICEADDRESSMODELAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setAddressModel(vendorList));
+    getIvoiceAddCustomer('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddressModel(addressList));
   }, []);
 
   return (
     <>
-      {addressModel.map((pst: any) => (
+      {addressModel.map((address: any) => (
         <Box
-          onClick={() => handlerAddress(pst)}
-          key={pst.email}
+          onClick={() => handlerAddress(address)}
+          key={address.email}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -111,20 +111,20 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {pst.name}
+            {address.name}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.id}
+              {address.id}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.address}
+              {address.address}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.phoneNumber}
+              {address.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {pst.email}
+              {address.email}
             </Typography>
           </Stack>
         </Box>

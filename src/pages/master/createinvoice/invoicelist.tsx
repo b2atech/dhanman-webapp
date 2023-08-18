@@ -47,7 +47,7 @@ import IconButton from 'components/@extended/IconButton';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import { CSVExport, HeaderSort, IndeterminateCheckbox, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
-import AlertColumnDelete from 'sections/apps/kanban/Board/AlertColumnDelete';
+import AlertColumnDelete from 'sections/apps/invoice/AlertColumnDelete';
 
 import { dispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';

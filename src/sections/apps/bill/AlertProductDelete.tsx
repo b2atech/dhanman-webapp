@@ -35,7 +35,7 @@ export default function AlertProductDelete({ title, open, handleClose }: Props) 
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete?
+              Are you sure you want to delete the selected bill item?
             </Typography>
           </Stack>
 
