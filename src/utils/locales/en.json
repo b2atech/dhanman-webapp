@@ -41,6 +41,7 @@
   "createbills": "Create Bill",
   "billsdetails": "Bills Details",
   "editbill": "Edit Bill",
+  "purchase" : "Purchase",
   "dashboard": "Dashboard",
   "data": "Data",
   "data-display": "Data Display",
@@ -70,6 +71,9 @@
   "grouping": "Grouping",
   "inputs": "Inputs",
   "layout": "Layout",
+  "sales": "Sales",
+  "master" : "Masters",
+  "bills" : "Bills",
   "level": "Level",
   "list": "List",
   "login": "Login",
@@ -112,7 +116,7 @@
   "vendors": "Vendors",
   "createinvoice": "Create Invoice",
   "invoicedetails": "Invoice Details",
-  "invoicelist": "Invoice List",
+  "invoices": "Invoices",
   "invoiceedit": "Invoice Edit",
   "select": "Select",
   "shadow": "Shadow",
@@ -138,5 +142,6 @@
   "user-profile": "User Profile",
   "virtualized": "Virtualized",
   "utils": "Utils",
-  "widgets": "Widgets"
+  "widgets": "Widgets",
+  "invoice": "Invoice"
 }

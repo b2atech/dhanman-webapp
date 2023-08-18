@@ -86,13 +86,12 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 
 const Customers = () => {
-  const [vendors, setVendors] = useState([]);
+  const [customer, setCustomers] = useState([]);
   useEffect(() => {
-    BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
+    BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
   }, []);
 
   debugger;
-  //const data = useMemo(() => vendors, []);
 
   const columns = useMemo(
     () =>
@@ -128,7 +127,7 @@ const Customers = () => {
   return (
     <MainCard content={false}>
       <ScrollX>
-        <ReactTable columns={columns} data={vendors} />
+        <ReactTable columns={columns} data={customer} />
       </ScrollX>
     </MainCard>
   );

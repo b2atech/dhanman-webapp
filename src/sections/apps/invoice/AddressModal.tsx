@@ -17,6 +17,8 @@ import {
 
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import { getAllVendors } from 'api/services/BillService';
 
 type AddressModalType = {
   open: boolean;
@@ -85,32 +87,17 @@ type AddressProps = {
 };
 const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
-
-  const addressData = [
-    {
-      name: 'Ian Carpenter',
-      address: '1754 Ureate, RhodSA5 5BO',
-      phone: '+91 1234567890',
-      email: 'iacrpt65@gmail.com'
-    },
-    { name: 'Belle J. Richter', address: '1300 Mine RoadQuemado, NM 87829', phone: '305-829-7809', email: 'belljrc23@gmail.com' },
-    { name: 'Ritika Yohannan', address: '3488 Arbutus DriveMiami, FL', phone: '+91 1234567890', email: 'rtyhn65@gmail.com' },
-    { name: 'Jesse G. Hassen', address: '3488 Arbutus DriveMiami, FL 33012', phone: '+91 1234567890', email: 'jessghs78@gmail.com' },
-    {
-      name: 'Christopher P. Iacovelli',
-      address: '4388 House DriveWesrville, OH',
-      phone: '+91 1234567890',
-      email: 'crpthl643@gmail.com'
-    },
-    { name: 'Thomas D. Johnson', address: '4388 House DriveWestville, OH +91', phone: '1234567890', email: 'thomshj56@gmail.com' }
-  ];
+  const [addressModel, setAddressModel] = useState([]);
+  useEffect(() => {
+    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddressModel(addressList));
+  }, []);
 
   return (
     <>
-      {addressData.map((address: any) => (
+      {addressModel.map((vendor: any) => (
         <Box
-          onClick={() => handlerAddress(address)}
-          key={address.email}
+          onClick={() => handlerAddress(vendor)}
+          key={vendor.email}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -124,17 +111,20 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {address.name}
+            {vendor.name}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.address}
+              {vendor.id}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.phone}
+              {vendor.address}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {address.email}
+              {vendor.phoneNumber}
+            </Typography>
+            <Typography textAlign="left" variant="body2" color="secondary">
+              {vendor.email}
             </Typography>
           </Stack>
         </Box>

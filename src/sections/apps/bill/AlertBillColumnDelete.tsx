@@ -17,7 +17,7 @@ interface Props {
 
 // ==============================|| KANBAN BOARD - COLUMN DELETE ||============================== //
 
-export default function AlertColumnDelete({ title, open, handleClose }: Props) {
+export default function AlertBillColumnDelete({ title, open, handleClose }: Props) {
   return (
     <Dialog
       open={open}
@@ -35,15 +35,7 @@ export default function AlertColumnDelete({ title, open, handleClose }: Props) {
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete?
-            </Typography>
-            <Typography align="center">
-              By deleting
-              <Typography variant="subtitle1" component="span">
-                {' '}
-                "{title}"{' '}
-              </Typography>
-              column, all task inside that column will also be deleted.
+              Are you sure you want to delete the selected bill?
             </Typography>
           </Stack>
 

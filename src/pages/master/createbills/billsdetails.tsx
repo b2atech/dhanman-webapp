@@ -36,10 +36,17 @@ import { getInvoiceSingleList } from 'store/reducers/invoice';
 
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
+import { getAllBillDetail } from 'api/services/BillService';
+//import { Bill_Detail_API } from 'api/services/BillService';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
 
 const BillsDetails = () => {
+  const [bills, setbills] = useState([]);
+  useEffect(() => {
+    getAllBillDetail('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((billList) => setbills(billList));
+  }, []);
+
   const theme = useTheme();
   const { id } = useParams();
   const navigation = useNavigate();
@@ -64,13 +71,13 @@ const BillsDetails = () => {
     year: 'numeric'
   });
 
-  const subtotal = list?.invoice_detail?.reduce((prev: any, curr: any) => {
-    if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
+  const subtotal = bills.reduce((prev: any, curr: any) => {
+    if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
     else return prev;
   }, 0);
 
-  const taxRate = (Number(list?.tax) * subtotal) / 100;
-  const discountRate = (Number(list?.discount) * subtotal) / 100;
+  const taxRate = (Number(12) * subtotal) / 100;
+  const discountRate = (Number(5) * subtotal) / 100;
   const total = subtotal - discountRate + taxRate;
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
@@ -169,14 +176,14 @@ const BillsDetails = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {list?.invoice_detail?.map((row: any, index) => (
+                    {bills.map((row: any, index) => (
                       <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>
-                        <TableCell align="right">{row.qty}</TableCell>
+                        <TableCell align="right">{row.quantity}</TableCell>
                         <TableCell align="right">{country?.prefix + '' + Number(row.price).toFixed(2)}</TableCell>
-                        <TableCell align="right">{country?.prefix + '' + Number(row.price * row.qty).toFixed(2)}</TableCell>
+                        <TableCell align="right">{country?.prefix + '' + Number(row.price * row.quantity).toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

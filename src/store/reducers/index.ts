@@ -10,7 +10,6 @@ import menu from './menu';
 import snackbar from './snackbar';
 import productReducer from './product';
 import cartReducer from './cart';
-import kanban from './kanban';
 import invoice from './invoice';
 
 // ==============================|| COMBINE REDUCERS ||============================== //
@@ -29,7 +28,6 @@ const reducers = combineReducers({
     cartReducer
   ),
   product: productReducer,
-  kanban,
   invoice
 });
 

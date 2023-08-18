@@ -15,18 +15,18 @@ interface Props {
   handleClose: (status: boolean) => void;
 }
 
-// ==============================|| INVOICE - PRODUCT DELETE ||============================== //
+// ==============================|| KANBAN BOARD - COLUMN DELETE ||============================== //
 
-export default function AlertProductDelete({ title, open, handleClose }: Props) {
+export default function AlertColumnDelete({ title, open, handleClose }: Props) {
   return (
     <Dialog
       open={open}
       onClose={() => handleClose(false)}
-      TransitionComponent={PopupTransition}
       keepMounted
+      TransitionComponent={PopupTransition}
       maxWidth="xs"
-      aria-labelledby="item-delete-title"
-      aria-describedby="item-delete-description"
+      aria-labelledby="column-delete-title"
+      aria-describedby="column-delete-description"
     >
       <DialogContent sx={{ mt: 2, my: 1 }}>
         <Stack alignItems="center" spacing={3.5}>
@@ -35,7 +35,7 @@ export default function AlertProductDelete({ title, open, handleClose }: Props) 
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete the selected invoice item?
+              Are you sure you want to delete the selected invoice?
             </Typography>
           </Stack>
 
