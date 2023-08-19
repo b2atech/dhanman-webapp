@@ -29,6 +29,15 @@ export const BillAPI = {
     });
 
     return response.data;
+  },
+  getAllBillHeaders = async function (clientId: string, cancel = false) {
+    const response = await api.request({
+      url: `/Bill/GetAllBillHeader/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllBillHeaders.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
   };
 
 const cancelApiObject = defineCancelApiObject(BillAPI);
