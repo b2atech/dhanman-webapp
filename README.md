@@ -17,5 +17,5 @@ This is seed version of Mantis Theme. Seed is very minimal version of theme. It 
 # Dhanman-common Swagger link
 [Dhanman.Common.Api](https://api-dhanman-common-nonprod.azurewebsites.net/swagger/index.html)
 
-#Dhanman-sales Swagger link
+# Dhanman-sales Swagger link
 [Dhanman.Sales.Api](https://api-dhanman-sales-nonprod.azurewebsites.net/swagger/index.html)
