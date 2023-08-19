@@ -41,20 +41,15 @@ import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
 import incrementer from 'utils/incrementer';
 import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
-import {
-  customerPopup,
-  toggleCustomerPopup,
-  selectCountry,
-  getInvoiceInsert,
-  reviewInvoicePopup,
-  getInvoiceList
-} from 'store/reducers/invoice';
+import { customerPopup, toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
 
 // assets
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 // types
-import { CountryType, InvoiceList } from 'types/invoice';
+import { CountryType } from 'types/invoice';
+import { createInvoiceRequest } from 'api/services/BillService';
+import { BillingList } from 'types/billiingDetails';
 
 const validationSchema = yup.object({
   date: yup.date().required('Invoice date is required'),
@@ -90,9 +85,9 @@ const Createinvoice = () => {
   const notesLimit: number = 500;
 
   const handlerCreate = (values: any) => {
-    const NewList: InvoiceList = {
+    const NewList: BillingList = {
       id: Number(incrementer(lists.length)),
-      invoice_id: Number(values.invoice_id),
+      billing_id: Number(values.invoice_id),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
@@ -102,33 +97,48 @@ const Createinvoice = () => {
       due_date: format(values.due_date, 'MM/dd/yyyy'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
-          return sum + i.qty;
+          return sum + i.quantity;
         }, 0)
       ),
       status: values.status,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      invoice_detail: values.invoice_detail,
+      billDetails: values.invoice_detail,
       notes: values.notes
     };
 
-    dispatch(getInvoiceList()).then(() => {
-      dispatch(getInvoiceInsert(NewList)).then(() => {
-        dispatch(
-          openSnackbar({
-            open: true,
-            message: 'Invoice Added successfully',
-            anchorOrigin: { vertical: 'top', horizontal: 'right' },
-            variant: 'alert',
-            alert: {
-              color: 'success'
-            },
-            close: false
-          })
-        );
-        navigation('/apps/invoice/list');
-      });
+    createInvoiceRequest(NewList).then(() => {
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Added successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+      navigation('/apps/invoice/list');
     });
+    // dispatch(getInvoiceList()).then(() => {
+    //   dispatch(getInvoiceInsert(NewList)).then(() => {
+    //     dispatch(
+    //       openSnackbar({
+    //         open: true,
+    //         message: 'Invoice Added successfully',
+    //         anchorOrigin: { vertical: 'top', horizontal: 'right' },
+    //         variant: 'alert',
+    //         alert: {
+    //           color: 'success'
+    //         },
+    //         close: false
+    //       })
+    //     );
+    //     navigation('/apps/invoice/list');
+    //   });
+    // });
   };
 
   const addNextInvoiceHandler = () => {
@@ -165,7 +175,7 @@ const Createinvoice = () => {
               id: UIDV4(),
               name: '',
               description: '',
-              qty: 1,
+              quantity: 1,
               price: '1.00'
             }
           ],
@@ -180,7 +190,7 @@ const Createinvoice = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
@@ -391,7 +401,7 @@ const Createinvoice = () => {
                                       index={index}
                                       name={item.name}
                                       description={item.description}
-                                      qty={item.qty}
+                                      qty={item.quantity}
                                       price={item.price}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
@@ -421,7 +431,7 @@ const Createinvoice = () => {
                                       id: UIDV4(),
                                       name: '',
                                       description: '',
-                                      qty: 1,
+                                      quantity: 1,
                                       price: '1.00'
                                     })
                                   }

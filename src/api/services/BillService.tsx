@@ -1,5 +1,6 @@
 import { api } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
+import { BillingList } from 'types/billiingDetails';
 
 export const BillAPI = {
     get: async function (clientId: string, cancel = false) {
@@ -30,5 +31,14 @@ export const BillAPI = {
 
     return response.data;
   };
+
+export async function createInvoiceRequest(invoice: BillingList) {
+  const response = await api.request({
+    url: `/Bill/CreateBill`,
+    method: 'POST',
+    data: invoice
+  });
+  return response.data;
+}
 
 const cancelApiObject = defineCancelApiObject(BillAPI);
