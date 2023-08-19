@@ -10,3 +10,6 @@ This is seed version of Mantis Theme. Seed is very minimal version of theme. It 
 2. Deployment process
    - Goto root directory and open package.json. Update homepage URL to the production URL
    - Goto root directory and run 'npm run build / yarn build'
+
+# Dhanman-purchase Swagger link
+[Dhanman.Purchase.Api](https://api-dhanman-purchase-nonprod.azurewebsites.net/swagger/index.html)
