@@ -97,7 +97,7 @@ const Createinvoice = () => {
       due_date: format(values.due_date, 'MM/dd/yyyy'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
-          return sum + i.quantity;
+          return sum + i.qty;
         }, 0)
       ),
       status: values.status,
@@ -175,7 +175,7 @@ const Createinvoice = () => {
               id: UIDV4(),
               name: '',
               description: '',
-              quantity: 1,
+              qty: 1,
               price: '1.00'
             }
           ],
@@ -190,7 +190,7 @@ const Createinvoice = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
@@ -401,7 +401,7 @@ const Createinvoice = () => {
                                       index={index}
                                       name={item.name}
                                       description={item.description}
-                                      qty={item.quantity}
+                                      qty={item.qty}
                                       price={item.price}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
@@ -431,7 +431,7 @@ const Createinvoice = () => {
                                       id: UIDV4(),
                                       name: '',
                                       description: '',
-                                      quantity: 1,
+                                      qty: 1,
                                       price: '1.00'
                                     })
                                   }
