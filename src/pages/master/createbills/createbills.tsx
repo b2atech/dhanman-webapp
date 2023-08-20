@@ -39,20 +39,14 @@ import InvoiceModal from 'sections/apps/bill/BillModal';
 import incrementer from 'utils/incrementer';
 import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
-import {
-  customerPopup,
-  toggleCustomerPopup,
-  selectCountry,
-  getInvoiceInsert,
-  reviewInvoicePopup,
-  getInvoiceList
-} from 'store/reducers/invoice';
+import { customerPopup, toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
 
 // assets
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 // types
-import { CountryType, InvoiceList } from 'types/invoice';
+import { createInvoiceRequest } from 'api/services/BillService';
+import { BillingList, CountryType } from 'types/billiingDetails';
 
 const validationSchema = yup.object({
   date: yup.date().required('Invoice date is required'),
@@ -66,7 +60,7 @@ const validationSchema = yup.object({
       name: yup.string().required('Invoice receiver information is required')
     })
     .required('Invoice receiver information is required'),
-  status: yup.string().required('Status selection is required'),
+  // status: yup.string().required('Status selection is required'),
   invoice_detail: yup
     .array()
     .required('Invoice details is required')
@@ -88,9 +82,9 @@ const CreateBills = () => {
   const notesLimit: number = 500;
 
   const handlerCreate = (values: any) => {
-    const NewList: InvoiceList = {
+    const NewList: BillingList = {
       id: Number(incrementer(lists.length)),
-      invoice_id: Number(values.invoice_id),
+      billing_id: Number(values.invoice_id),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
@@ -103,30 +97,46 @@ const CreateBills = () => {
           return sum + i.qty;
         }, 0)
       ),
-      status: values.status,
+      status: '',
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      invoice_detail: values.invoice_detail,
+      billDetails: values.invoice_detail,
       notes: values.notes
     };
 
-    dispatch(getInvoiceList()).then(() => {
-      dispatch(getInvoiceInsert(NewList)).then(() => {
-        dispatch(
-          openSnackbar({
-            open: true,
-            message: 'Invoice Added successfully',
-            anchorOrigin: { vertical: 'top', horizontal: 'right' },
-            variant: 'alert',
-            alert: {
-              color: 'success'
-            },
-            close: false
-          })
-        );
-        navigation('/apps/invoice/list');
-      });
+    createInvoiceRequest(NewList).then(() => {
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Added successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+      navigation('/apps/invoice/list');
     });
+
+    // dispatch(getInvoiceList()).then(() => {
+    //   dispatch(getInvoiceInsert(NewList)).then(() => {
+    //     dispatch(
+    //       openSnackbar({
+    //         open: true,
+    //         message: 'Invoice Added successfully',
+    //         anchorOrigin: { vertical: 'top', horizontal: 'right' },
+    //         variant: 'alert',
+    //         alert: {
+    //           color: 'success'
+    //         },
+    //         close: false
+    //       })
+    //     );
+    //     navigation('/apps/invoice/list');
+    //   });
+    // });
   };
 
   const addNextInvoiceHandler = () => {
@@ -143,7 +153,7 @@ const CreateBills = () => {
         initialValues={{
           id: 120,
           invoice_id: Date.now(),
-          status: '',
+          // status: '',
           date: new Date(),
           due_date: null,
           cashierInfo: {
