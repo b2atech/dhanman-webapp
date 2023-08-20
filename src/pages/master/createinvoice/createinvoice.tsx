@@ -38,7 +38,6 @@ import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
 import AddressModal from 'sections/apps/invoice/AddressModal';
 import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
 
-import incrementer from 'utils/incrementer';
 import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { customerPopup, toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
@@ -49,7 +48,7 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 // types
 import { CountryType } from 'types/invoice';
 import { createInvoiceRequest } from 'api/services/BillService';
-import { BillingList } from 'types/billiingDetails';
+import { BillingList, BillingLine } from 'types/billiingDetails';
 
 const validationSchema = yup.object({
   date: yup.date().required('Invoice date is required'),
@@ -80,21 +79,21 @@ const validationSchema = yup.object({
 const Createinvoice = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { open, isCustomerOpen, countries, country, lists, isOpen } = useSelector((state) => state.invoice);
+  const { open, isCustomerOpen, countries, country, isOpen } = useSelector((state) => state.invoice);
   const navigation = useNavigate();
   const notesLimit: number = 500;
 
   const handlerCreate = (values: any) => {
-    const NewList: BillingList = {
-      id: Number(incrementer(lists.length)),
+    const bill: BillingList = {
+      id: Math.floor(Math.random() * 90000) + 10000,
       billing_id: Number(values.invoice_id),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      date: format(values.date, 'MM/dd/yyyy'),
-      due_date: format(values.due_date, 'MM/dd/yyyy'),
+      date: format(values.date, 'yyyy-MM-dd'),
+      dueDate: format(values.due_date, 'yyyy-MM-dd'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.quantity;
@@ -103,11 +102,36 @@ const Createinvoice = () => {
       status: values.status,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      billDetails: values.invoice_detail,
-      notes: values.notes
+      notes: values.notes,
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      amount: 100,
+      currency: 'INR',
+      paymentTerm: 10,
+      billStatusId: 1,
+      vendorId: 1,
+      coaId: 1,
+      billPaymentId: 1
     };
 
-    createInvoiceRequest(NewList).then(() => {
+    bill.billDetails = values.invoice_detail.map((invoiceItem: any) => {
+      let billingLine = {} as BillingLine;
+      billingLine.clientId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+      billingLine.billHeaderId = bill.id;
+      billingLine.coaId = 1;
+      billingLine.id = 10 * bill.id;
+      billingLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
+      billingLine.name = invoiceItem.name;
+      billingLine.description = invoiceItem.description;
+      billingLine.quantity = invoiceItem.qty;
+      billingLine.price = invoiceItem.price;
+      billingLine.createdBy = 1;
+      billingLine.createdDate = format(new Date(), 'yyyy-MM-dd');
+      billingLine.lastModifiedDate = format(new Date(), 'yyyy-MM-dd');
+      billingLine.isActive = true;
+      return billingLine;
+    });
+
+    createInvoiceRequest(bill).then(() => {
       dispatch(
         openSnackbar({
           open: true,
@@ -120,7 +144,7 @@ const Createinvoice = () => {
           close: false
         })
       );
-      navigation('/apps/invoice/list');
+      navigation('/master/invoicelist');
     });
     // dispatch(getInvoiceList()).then(() => {
     //   dispatch(getInvoiceInsert(NewList)).then(() => {
@@ -172,7 +196,7 @@ const Createinvoice = () => {
           },
           invoice_detail: [
             {
-              id: UIDV4(),
+              clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
               name: '',
               description: '',
               quantity: 1,
