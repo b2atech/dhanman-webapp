@@ -21,13 +21,13 @@ const other: NavItemType = {
   title: <FormattedMessage id="others" />,
   type: 'group',
   children: [
-    {
-      id: 'sample-page',
-      title: <FormattedMessage id="sample-page" />,
-      type: 'item',
-      url: '/sample-page',
-      icon: icons.ChromeOutlined
-    },
+    // {
+    //   id: 'sample-page',
+    //   title: <FormattedMessage id="sample-page" />,
+    //   type: 'item',
+    //   url: '/customers',
+    //   icon: icons.ChromeOutlined
+    // },
     {
       id: 'documentation',
       title: <FormattedMessage id="documentation" />,

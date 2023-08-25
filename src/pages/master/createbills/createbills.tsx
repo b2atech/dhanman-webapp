@@ -91,7 +91,7 @@ const CreateBills = () => {
       discount: Number(values.discount),
       tax: Number(values.tax),
       date: format(values.date, 'MM/dd/yyyy'),
-      due_date: format(values.due_date, 'MM/dd/yyyy'),
+      dueDate: format(values.dueDate, 'MM/dd/yyyy'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
@@ -101,7 +101,15 @@ const CreateBills = () => {
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
       billDetails: values.invoice_detail,
-      notes: values.notes
+      notes: values.notes,
+      clientId: '',
+      amount: null,
+      currency: '',
+      paymentTerm: 0,
+      billStatusId: 0,
+      vendorId: 0,
+      coaId: 0,
+      billPaymentId: null
     };
 
     createInvoiceRequest(NewList).then(() => {

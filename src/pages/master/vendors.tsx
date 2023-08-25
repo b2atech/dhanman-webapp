@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 // material-ui
-import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Typography } from '@mui/material';
 
 // third-party
 import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
@@ -9,7 +9,7 @@ import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell }
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import { CSVExport, EmptyTable } from 'components/third-party/ReactTable';
+import { CSVExport } from 'components/third-party/ReactTable';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
@@ -75,7 +75,12 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
               );
             })
           ) : (
-            <EmptyTable msg="No Data" colSpan={7} />
+            <TableCell colSpan={7} align="center">
+              <Stack spacing={2} justifyContent="center" alignItems="center">
+                <Typography variant="h5">Loading Please Wait !</Typography>
+                <CircularProgress color="success" />
+              </Stack>
+            </TableCell>
           )}
         </TableBody>
       </Table>
