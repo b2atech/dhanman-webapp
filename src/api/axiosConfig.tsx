@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { notification } from 'antd';
 
-export const api = axios.create({
+export const apiPurchase = axios.create({
   baseURL: 'https://api-dhanman-purchase-nonprod.azurewebsites.net/api/'
+});
+// https://api-dhanman-purchase-nonprod.azurewebsites.net/api/Vendor/GetAllVendors/3fa85f64-5717-4562-b3fc-2c963f66afa6
+
+export const apiSales = axios.create({
+  baseURL: 'https://api-dhanman-sales-nonprod.azurewebsites.net/api/'
 });
 
 const errorHandler = (error: any) => {
@@ -27,6 +32,10 @@ const errorHandler = (error: any) => {
 
 // registering the custom error handler to the
 // "api" axios instance
-api.interceptors.response.use(undefined, (error) => {
+apiPurchase.interceptors.response.use(undefined, (error) => {
+  return errorHandler(error);
+});
+
+apiSales.interceptors.response.use(undefined, (error) => {
   return errorHandler(error);
 });

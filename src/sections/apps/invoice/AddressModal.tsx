@@ -111,21 +111,21 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {vendor.name}
+            {vendor.firstName}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
               {vendor.id}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {vendor.address}
+              {vendor.email}
             </Typography>
-            <Typography textAlign="left" variant="body2" color="secondary">
+            {/* <Typography textAlign="left" variant="body2" color="secondary">
               {vendor.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
               {vendor.email}
-            </Typography>
+            </Typography> */}
           </Stack>
         </Box>
       ))}

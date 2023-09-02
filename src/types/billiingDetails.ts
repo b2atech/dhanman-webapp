@@ -16,7 +16,7 @@ export interface CountryType {
 
 export interface BillingLine {
   id: number;
-  clientId: string;
+  // clientId: string;
   createdBy: number;
   createdDate: any;
   lastModifiedBy: number;
@@ -44,7 +44,10 @@ export interface BillingProps {
 }
 
 export interface BillingList {
+  note: String;
+  invoiceDate: Date | string | number;
   clientId: string;
+  customerId: string;
   id: number;
   amount: number | null;
   currency: string;
@@ -53,7 +56,7 @@ export interface BillingList {
   vendorId: number;
   coaId: number;
   billPaymentId: number | null;
-  billing_id: number;
+  invoiceNumber: number;
   customer_name: string;
   email: string;
   avatar: number;
@@ -66,7 +69,7 @@ export interface BillingList {
   discount: number | null;
   tax: number | null;
   customerInfo: InfoType;
-  notes: string;
+  // notes: string;
 }
 
 export interface billingeDetail {

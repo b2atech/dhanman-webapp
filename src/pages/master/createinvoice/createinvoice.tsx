@@ -47,8 +47,11 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 // types
 import { CountryType } from 'types/invoice';
-import { createInvoiceRequest } from 'api/services/BillService';
-import { BillingList, BillingLine } from 'types/billiingDetails';
+import { createInvoiceRequest } from 'api/services/SalesService';
+
+//import { createInvoiceRequest } from 'api/services/InvoiceService';
+
+import { InvoiceHeader, InvoiceLine } from 'types/invoiceDetails';
 
 const validationSchema = yup.object({
   date: yup.date().required('Invoice date is required'),
@@ -84,54 +87,49 @@ const Createinvoice = () => {
   const notesLimit: number = 500;
 
   const handlerCreate = (values: any) => {
-    const bill: BillingList = {
+    const invoice: InvoiceHeader = {
       id: Math.floor(Math.random() * 90000) + 10000,
-      billing_id: Number(values.invoice_id),
+      invoiceNumber: Number(values.invoiceNumber),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      date: format(values.date, 'yyyy-MM-dd'),
-      dueDate: format(values.due_date, 'yyyy-MM-dd'),
+      invoiceDate: format(values.date, 'MM/dd/yyyy'),
+      dueDate: format(values.due_date, 'MM/dd/yyyy'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
         }, 0)
       ),
       status: values.status,
+      totalAmount: values.totalAmount,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      notes: values.notes,
+      note: values.note,
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      amount: 100,
+      // amount: values.amount,
       currency: 'INR',
-      paymentTerm: 10,
-      billStatusId: 1,
+      paymentTerm: values.paymentTerm,
+      billStatusId: values.billStatusId,
       vendorId: 1,
       coaId: 1,
-      billPaymentId: 1
+      billPaymentId: 1,
+      // invoiceDate: values.invoiceDate,
+      customerId: values.customerID
     };
 
-    bill.billDetails = values.invoice_detail.map((invoiceItem: any) => {
-      let billingLine = {} as BillingLine;
-      billingLine.clientId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
-      billingLine.billHeaderId = bill.id;
-      billingLine.coaId = 1;
-      billingLine.id = 10 * bill.id;
-      billingLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
-      billingLine.name = invoiceItem.name;
-      billingLine.description = invoiceItem.description;
-      billingLine.quantity = invoiceItem.qty;
-      billingLine.price = invoiceItem.price;
-      billingLine.createdBy = 1;
-      billingLine.createdDate = format(new Date(), 'yyyy-MM-dd');
-      billingLine.lastModifiedDate = format(new Date(), 'yyyy-MM-dd');
-      billingLine.isActive = true;
-      return billingLine;
+    invoice.invoiceDetails = values.invoice_detail.map((invoiceItem: any) => {
+      let invoiceLine = {} as InvoiceLine;
+      invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
+      invoiceLine.name = invoiceItem.name;
+      invoiceLine.description = invoiceItem.description;
+      invoiceLine.quantity = invoiceItem.qty;
+      invoiceLine.price = invoiceItem.price;
+      return invoiceLine;
     });
 
-    createInvoiceRequest(bill).then(() => {
+    createInvoiceRequest(invoice).then(() => {
       dispatch(
         openSnackbar({
           open: true,
@@ -144,7 +142,7 @@ const Createinvoice = () => {
           close: false
         })
       );
-      navigation('/master/invoicelist');
+      navigation('/master/createinvoice/invoicelist');
     });
     // dispatch(getInvoiceList()).then(() => {
     //   dispatch(getInvoiceInsert(NewList)).then(() => {
@@ -178,10 +176,10 @@ const Createinvoice = () => {
       <Formik
         initialValues={{
           id: 120,
-          invoice_id: Date.now(),
-          status: '',
-          date: new Date(),
-          due_date: null,
+          invoiceNumber: Date.now(),
+          status: 'Cancelled',
+          invoiceDate: new Date(),
+          due_date: '',
           cashierInfo: {
             name: 'Belle J. Richter',
             address: '1300 Cooks Mine, NM 87829',
@@ -189,23 +187,23 @@ const Createinvoice = () => {
             email: 'belljrc23@gmail.com'
           },
           customerInfo: {
-            address: '',
-            email: '',
-            name: '',
-            phone: ''
+            address: 'Plot No 06 Madhavnagar Railwaystation, Sangli',
+            email: 'ybp345@gmail.com',
+            name: 'Yogeshkumar Patil',
+            phone: '9762905956'
           },
           invoice_detail: [
             {
-              clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
               name: '',
               description: '',
-              qty: 1,
-              price: '1.00'
+              qty: 4,
+              price: 100.0,
+              amount: 500
             }
           ],
-          discount: 0,
-          tax: 0,
-          notes: ''
+          discount: 10,
+          tax: 15,
+          note: 'Sugar is Purchased'
         }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
@@ -219,7 +217,7 @@ const Createinvoice = () => {
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
           const discountRate = (values.discount * subtotal) / 100;
-          const total = subtotal - discountRate + taxRate;
+          const totalAmount = subtotal - discountRate + taxRate;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -231,9 +229,9 @@ const Createinvoice = () => {
                         required
                         disabled
                         type="number"
-                        name="invoice_id"
-                        id="invoice_id"
-                        value={values.invoice_id}
+                        name="invoiceNumber"
+                        id="invoiceNumber"
+                        value={values.invoiceNumber}
                         onChange={handleChange}
                       />
                     </FormControl>
@@ -271,13 +269,19 @@ const Createinvoice = () => {
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
                     <InputLabel>Date</InputLabel>
-                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.date && errors.date)}>
+                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.invoiceDate && errors.invoiceDate)}>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker format="dd/MM/yyyy" value={values.date} onChange={(newValue) => setFieldValue('date', newValue)} />
+                        <DatePicker
+                          format="dd/MM/yyyy"
+                          value={values.invoiceDate}
+                          onChange={(newValue) => setFieldValue('invoiceDate', newValue)}
+                        />
                       </LocalizationProvider>
                     </FormControl>
                   </Stack>
-                  {touched.date && errors.date && <FormHelperText error={true}>{errors.date as string}</FormHelperText>}
+                  {touched.invoiceDate && errors.invoiceDate && (
+                    <FormHelperText error={true}>{errors.invoiceDate as string}</FormHelperText>
+                  )}
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
@@ -522,7 +526,9 @@ const Createinvoice = () => {
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography variant="subtitle1">Grand Total:</Typography>
                                     <Typography variant="subtitle1">
-                                      {total % 1 === 0 ? country?.prefix + '' + total : country?.prefix + '' + total.toFixed(2)}
+                                      {totalAmount % 1 === 0
+                                        ? country?.prefix + '' + totalAmount
+                                        : country?.prefix + '' + totalAmount.toFixed(2)}
                                     </Typography>
                                   </Stack>
                                 </Stack>
@@ -540,14 +546,14 @@ const Createinvoice = () => {
                     <TextField
                       placeholder="Address"
                       rows={3}
-                      value={values.notes}
+                      value={values.note}
                       multiline
-                      name="notes"
+                      name="note"
                       onChange={handleChange}
                       inputProps={{
                         maxLength: notesLimit
                       }}
-                      helperText={`${values.notes.length} / ${notesLimit}`}
+                      helperText={`${values.note.length} / ${notesLimit}`}
                       sx={{
                         width: '100%',
                         '& .MuiFormHelperText-root': {
@@ -625,7 +631,7 @@ const Createinvoice = () => {
                     <Button
                       variant="outlined"
                       color="secondary"
-                      // disabled={values.status === '' || !isValid}
+                      disabled={values.status === '' || !isValid}
                       sx={{ color: 'secondary.dark' }}
                       onClick={() =>
                         dispatch(
@@ -652,13 +658,13 @@ const Createinvoice = () => {
                           })
                         )
                       }
-                      key={values.invoice_id}
+                      key={values.invoiceNumber}
                       invoiceInfo={{
                         ...values,
                         subtotal,
                         taxRate,
                         discountRate,
-                        total
+                        totalAmount
                       }}
                       items={values?.invoice_detail}
                       onAddNextInvoice={addNextInvoiceHandler}

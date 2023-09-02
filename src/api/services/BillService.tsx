@@ -1,10 +1,10 @@
-import { api } from '../axiosConfig';
+import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { BillingList } from 'types/billiingDetails';
 
 export const BillAPI = {
     get: async function (clientId: string, cancel = false) {
-      const response = await api.request({
+      const response = await apiPurchase.request({
         url: `/Vendor/GetAllVendors/${clientId}`,
         method: 'GET',
         signal: cancel ? cancelApiObject[this.get.name].handleRequestCancellation().signal : undefined
@@ -14,7 +14,7 @@ export const BillAPI = {
     }
   },
   getAllBillDetail = async function (clientId: string, cancel = false) {
-    const response = await api.request({
+    const response = await apiPurchase.request({
       url: `/Bill/GetAllBillDetail/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllBillDetail.name].handleRequestCancellation().signal : undefined
@@ -23,7 +23,7 @@ export const BillAPI = {
     return response.data;
   },
   getAllVendors = async function (clientId: string, cancel = false) {
-    const response = await api.request({
+    const response = await apiPurchase.request({
       url: `/Vendor/GetAllVendors/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllVendors.name].handleRequestCancellation().signal : undefined
@@ -32,7 +32,7 @@ export const BillAPI = {
     return response.data;
   },
   getAllBillHeaders = async function (clientId: string, cancel = false) {
-    const response = await api.request({
+    const response = await apiPurchase.request({
       url: `/Bill/GetAllBillHeader/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllBillHeaders.name].handleRequestCancellation().signal : undefined
@@ -42,7 +42,7 @@ export const BillAPI = {
   };
 
 export async function createInvoiceRequest(invoice: BillingList) {
-  const response = await api.request({
+  const response = await apiPurchase.request({
     url: `/Bill/CreateBill`,
     method: 'POST',
     data: invoice
