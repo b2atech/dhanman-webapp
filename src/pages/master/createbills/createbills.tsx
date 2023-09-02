@@ -84,7 +84,7 @@ const CreateBills = () => {
   const handlerCreate = (values: any) => {
     const NewList: BillingList = {
       id: Number(incrementer(lists.length)),
-      billing_id: Number(values.invoice_id),
+      invoiceNumber: Number(values.invoice_id),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
@@ -101,7 +101,7 @@ const CreateBills = () => {
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
       billDetails: values.invoice_detail,
-      notes: values.notes,
+      note: values.note,
       clientId: '',
       amount: null,
       currency: '',
@@ -109,7 +109,9 @@ const CreateBills = () => {
       billStatusId: 0,
       vendorId: 0,
       coaId: 0,
-      billPaymentId: null
+      billPaymentId: null,
+      invoiceDate: values.invoiceDate,
+      customerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
     };
 
     createInvoiceRequest(NewList).then(() => {
@@ -187,7 +189,7 @@ const CreateBills = () => {
           ],
           discount: 0,
           tax: 0,
-          notes: ''
+          note: ''
         }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
@@ -493,14 +495,14 @@ const CreateBills = () => {
                     <TextField
                       placeholder="Address"
                       rows={3}
-                      value={values.notes}
+                      value={values.note}
                       multiline
-                      name="notes"
+                      name="note"
                       onChange={handleChange}
                       inputProps={{
                         maxLength: notesLimit
                       }}
-                      helperText={`${values.notes.length} / ${notesLimit}`}
+                      helperText={`${values.note.length} / ${notesLimit}`}
                       sx={{
                         width: '100%',
                         '& .MuiFormHelperText-root': {

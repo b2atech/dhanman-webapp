@@ -10,10 +10,10 @@ import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell }
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport } from 'components/third-party/ReactTable';
-import { BillAPI } from 'api/services/BillService';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
+import { InvoiceAPI } from 'api/services/SalesService';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -93,38 +93,36 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 const Customers = () => {
   const [customer, setCustomers] = useState([]);
   useEffect(() => {
-    BillAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
+    InvoiceAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
   }, []);
-
-  debugger;
 
   const columns = useMemo(
     () =>
       [
         {
-          Header: 'Customer ID',
+          Header: 'ID',
           accessor: 'id'
         },
         {
-          Header: 'Name',
-          accessor: 'name'
+          Header: 'first Name',
+          accessor: 'firstName'
         },
         {
-          Header: 'Contact Person',
-          accessor: 'contactPerson'
+          Header: 'last Name',
+          accessor: 'lastName'
         },
         {
           Header: 'Email',
           accessor: 'email'
-        },
-        {
-          Header: 'Phone Number',
-          accessor: 'phoneNumber'
-        },
-        {
-          Header: 'Address',
-          accessor: 'address'
         }
+        // {
+        //   Header: 'Phone Number',
+        //   accessor: 'phoneNumber'
+        // },
+        // {
+        //   Header: 'Address',
+        //   accessor: 'address'
+        // }
       ] as Column[],
     []
   );
