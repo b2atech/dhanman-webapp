@@ -55,11 +55,11 @@ import { InvoiceHeader, InvoiceLine } from 'types/invoiceDetails';
 
 const validationSchema = yup.object({
   date: yup.date().required('Invoice date is required'),
-  due_date: yup
-    .date()
-    .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
-    .nullable()
-    .required('Due date is required'),
+  // due_date: yup
+  //   .date()
+  //   .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
+  //   .nullable()
+  //   .required('Due date is required'),
   customerInfo: yup
     .object({
       name: yup.string().required('Invoice receiver information is required')
@@ -89,14 +89,14 @@ const Createinvoice = () => {
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader = {
       id: Math.floor(Math.random() * 90000) + 10000,
-      invoiceNumber: Number(values.invoiceNumber),
+      invoiceNumber: String(values.invoiceNumber),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: format(values.date, 'MM/dd/yyyy'),
-      dueDate: format(values.due_date, 'MM/dd/yyyy'),
+      invoiceDate: format(values.invoiceDate, 'dd/MM/yyyy'),
+      dueDate: format(values.due_date, 'dd/MM/yyyy'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
@@ -116,10 +116,12 @@ const Createinvoice = () => {
       coaId: 1,
       billPaymentId: 1,
       // invoiceDate: values.invoiceDate,
-      customerId: values.customerID
+      customerId: values.customerID,
+      invoiceDetails: undefined,
+      invoiceVoucher: ''
     };
 
-    invoice.invoiceDetails = values.invoice_detail.map((invoiceItem: any) => {
+    invoice.lines = values.invoice_detail.map((invoiceItem: any) => {
       let invoiceLine = {} as InvoiceLine;
       invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
       invoiceLine.name = invoiceItem.name;
@@ -144,23 +146,6 @@ const Createinvoice = () => {
       );
       navigation('/master/createinvoice/invoicelist');
     });
-    // dispatch(getInvoiceList()).then(() => {
-    //   dispatch(getInvoiceInsert(NewList)).then(() => {
-    //     dispatch(
-    //       openSnackbar({
-    //         open: true,
-    //         message: 'Invoice Added successfully',
-    //         anchorOrigin: { vertical: 'top', horizontal: 'right' },
-    //         variant: 'alert',
-    //         alert: {
-    //           color: 'success'
-    //         },
-    //         close: false
-    //       })
-    //     );
-    //     navigation('/apps/invoice/list');
-    //   });
-    // });
   };
 
   const addNextInvoiceHandler = () => {
@@ -179,7 +164,7 @@ const Createinvoice = () => {
           invoiceNumber: Date.now(),
           status: 'Cancelled',
           invoiceDate: new Date(),
-          due_date: '',
+          due_date: null,
           cashierInfo: {
             name: 'Belle J. Richter',
             address: '1300 Cooks Mine, NM 87829',
@@ -187,23 +172,23 @@ const Createinvoice = () => {
             email: 'belljrc23@gmail.com'
           },
           customerInfo: {
-            address: 'Plot No 06 Madhavnagar Railwaystation, Sangli',
-            email: 'ybp345@gmail.com',
-            name: 'Yogeshkumar Patil',
-            phone: '9762905956'
+            address: 'City Name XYZ, City Kolhapur, PIN 416 145',
+            email: 'xyz@gamil.com',
+            firstName: 'Xyz Abc',
+            lastName: '9876543214'
           },
           invoice_detail: [
             {
-              name: '',
-              description: '',
-              qty: 4,
-              price: 100.0,
-              amount: 500
+              name: 'Sugar',
+              description: 'Sweet',
+              qty: 3,
+              price: 100,
+              amount: 0
             }
           ],
           discount: 10,
           tax: 15,
-          note: 'Sugar is Purchased'
+          note: 'Sugar Is Purchased'
         }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
@@ -353,9 +338,8 @@ const Createinvoice = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.customerInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.phone}</Typography>
+                            <Typography variant="subtitle1">{values?.customerInfo?.firstName}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.lastName}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
                         </Stack>
@@ -393,7 +377,7 @@ const Createinvoice = () => {
                     </Grid>
                   </MainCard>
                   {touched.customerInfo && errors.customerInfo && (
-                    <FormHelperText error={true}>{errors?.customerInfo?.name as string}</FormHelperText>
+                    <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
                   )}
                 </Grid>
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 // material-ui
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Typography } from '@mui/material';
@@ -13,7 +13,7 @@ import { CSVExport } from 'components/third-party/ReactTable';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
-import { InvoiceAPI } from 'api/services/SalesService';
+// import { InvoiceAPI } from 'api/services/SalesService';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -91,10 +91,10 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 
 const Customers = () => {
-  const [customer, setCustomers] = useState([]);
-  useEffect(() => {
-    InvoiceAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
-  }, []);
+  const [customer] = useState([]);
+  // useEffect(() => {
+  //   InvoiceAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
+  // }, []);
 
   const columns = useMemo(
     () =>
@@ -115,14 +115,6 @@ const Customers = () => {
           Header: 'Email',
           accessor: 'email'
         }
-        // {
-        //   Header: 'Phone Number',
-        //   accessor: 'phoneNumber'
-        // },
-        // {
-        //   Header: 'Address',
-        //   accessor: 'address'
-        // }
       ] as Column[],
     []
   );

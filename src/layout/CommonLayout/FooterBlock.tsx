@@ -19,7 +19,7 @@ import AnimateButton from 'components/@extended/AnimateButton';
 
 // types
 import { ThemeDirection, ThemeMode } from 'types/config';
-
+// @ts-ignore
 const dashImage = require.context('assets/images/landing', true);
 
 // link - custom style

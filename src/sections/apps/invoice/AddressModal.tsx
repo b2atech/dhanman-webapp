@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -18,7 +19,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getAllVendors } from 'api/services/BillService';
+import { getAllCustomers } from 'api/services/SalesService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,15 +90,18 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [addressModel, setAddressModel] = useState([]);
   useEffect(() => {
-    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddressModel(addressList));
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((response) => {
+        setAddressModel(response);
+    });
   }, []);
+
 
   return (
     <>
-      {addressModel.map((vendor: any) => (
+      {addressModel.map((invoice_customer_list: any) => (
         <Box
-          onClick={() => handlerAddress(vendor)}
-          key={vendor.email}
+          onClick={() => handlerAddress(invoice_customer_list)}
+          key={invoice_customer_list.id}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -111,21 +115,15 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {vendor.firstName}
+            {invoice_customer_list.firstName}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {vendor.id}
+              {invoice_customer_list.lastName}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {vendor.email}
+              {invoice_customer_list.email}
             </Typography>
-            {/* <Typography textAlign="left" variant="body2" color="secondary">
-              {vendor.phoneNumber}
-            </Typography>
-            <Typography textAlign="left" variant="body2" color="secondary">
-              {vendor.email}
-            </Typography> */}
           </Stack>
         </Box>
       ))}
