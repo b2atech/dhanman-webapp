@@ -68,6 +68,7 @@ interface InvoiceWidgets {
   chartData: number[];
 }
 
+// @ts-ignore
 const avatarImage = require.context('assets/images/users', true);
 
 // ==============================|| REACT TABLE ||============================== //

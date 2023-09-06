@@ -129,24 +129,6 @@ const CreateBills = () => {
       );
       navigation('/apps/invoice/list');
     });
-
-    // dispatch(getInvoiceList()).then(() => {
-    //   dispatch(getInvoiceInsert(NewList)).then(() => {
-    //     dispatch(
-    //       openSnackbar({
-    //         open: true,
-    //         message: 'Invoice Added successfully',
-    //         anchorOrigin: { vertical: 'top', horizontal: 'right' },
-    //         variant: 'alert',
-    //         alert: {
-    //           color: 'success'
-    //         },
-    //         close: false
-    //       })
-    //     );
-    //     navigation('/apps/invoice/list');
-    //   });
-    // });
   };
 
   const addNextInvoiceHandler = () => {
@@ -175,8 +157,8 @@ const CreateBills = () => {
           customerInfo: {
             address: '',
             email: '',
-            name: '',
-            phone: ''
+            firstName: '',
+            lastName: ''
           },
           invoice_detail: [
             {
@@ -257,10 +239,9 @@ const CreateBills = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
+                            <Typography variant="subtitle1">{values?.customerInfo?.firstName}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.lastName}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
                         </Stack>
                       </Grid>
@@ -304,9 +285,8 @@ const CreateBills = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.customerInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.phone}</Typography>
+                            <Typography variant="subtitle1">{values?.customerInfo?.firstName}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.lastName}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
                         </Stack>
@@ -344,7 +324,7 @@ const CreateBills = () => {
                     </Grid>
                   </MainCard>
                   {touched.customerInfo && errors.customerInfo && (
-                    <FormHelperText error={true}>{errors?.customerInfo?.name as string}</FormHelperText>
+                    <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
                   )}
                 </Grid>
 

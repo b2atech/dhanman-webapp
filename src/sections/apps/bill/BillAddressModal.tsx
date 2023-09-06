@@ -18,7 +18,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getAllVendors } from 'api/services/BillService';
+import { getAllCustomers } from 'api/services/SalesService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,15 +89,15 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [address, setAddress] = useState([]);
   useEffect(() => {
-    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddress(addressList));
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddress(addressList));
   }, []);
 
   return (
     <>
-      {address.map((customer: any) => (
+      {address.map((vendorList: any) => (
         <Box
-          onClick={() => handlerAddress(customer)}
-          key={customer.email}
+          onClick={() => handlerAddress(vendorList)}
+          key={vendorList.id}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -111,20 +111,14 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {customer.name}
+            {vendorList.firstName}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {customer.id}
+              {vendorList.lastName}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {customer.address}
-            </Typography>
-            <Typography textAlign="left" variant="body2" color="secondary">
-              {customer.phoneNumber}
-            </Typography>
-            <Typography textAlign="left" variant="body2" color="secondary">
-              {customer.email}
+              {vendorList.email}
             </Typography>
           </Stack>
         </Box>
