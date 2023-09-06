@@ -98,10 +98,10 @@ const Address = ({ handlerAddress }: AddressProps) => {
 
   return (
     <>
-      {addressModel.map((invoice_customer_list: any) => (
+      {addressModel.map((customerList: any) => (
         <Box
-          onClick={() => handlerAddress(invoice_customer_list)}
-          key={invoice_customer_list.id}
+          onClick={() => handlerAddress(customerList)}
+          key={customerList.id}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -115,14 +115,14 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {invoice_customer_list.firstName}
+            {customerList.firstName}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {invoice_customer_list.lastName}
+              {customerList.lastName}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {invoice_customer_list.email}
+              {customerList.email}
             </Typography>
           </Stack>
         </Box>

@@ -161,10 +161,10 @@ const Createinvoice = () => {
       <Formik
         initialValues={{
           id: 120,
-          invoiceNumber: Date.now(),
+          invoiceNumber: '6644',
           status: 'Cancelled',
           invoiceDate: new Date(),
-          due_date: null,
+          due_date: new Date(),
           cashierInfo: {
             name: 'Belle J. Richter',
             address: '1300 Cooks Mine, NM 87829',

@@ -23,7 +23,7 @@ export const InvoiceAPI = {
   },
   createInvoiceRequest = async function (invoicedata: InvoiceHeader) {
     const response = await apiSales.request({
-      url: `/v1/GetAllcustomers/`,
+      url: `/v1/GetAllInvoices/`,
       method: 'POST',
       data: invoicedata
     });
