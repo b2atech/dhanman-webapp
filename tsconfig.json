@@ -21,7 +21,7 @@
     "noImplicitThis": true,
     "strictNullChecks": true,
     "types": ["node", "jest", "webpack-env"],
-    "typeRoots": ["./types"],
+    "typeRoots": ["./types", "node_modules/@types"],
     "baseUrl": "src",
     "downlevelIteration": true
   },

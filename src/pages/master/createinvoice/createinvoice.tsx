@@ -172,23 +172,23 @@ const Createinvoice = () => {
             email: 'belljrc23@gmail.com'
           },
           customerInfo: {
-            address: 'City Name XYZ, City Kolhapur, PIN 416 145',
-            email: 'xyz@gamil.com',
-            firstName: 'Xyz Abc',
-            lastName: '9876543214'
+            phoneNumber: '',
+            email: '',
+            firstName: '',
+            lastName: ''
           },
           invoice_detail: [
             {
-              name: 'Sugar',
-              description: 'Sweet',
-              qty: 3,
-              price: 100,
+              name: '',
+              description: '',
+              qty: 0,
+              price: 0,
               amount: 0
             }
           ],
-          discount: 10,
-          tax: 15,
-          note: 'Sugar Is Purchased'
+          discount: 0,
+          tax: 0,
+          note: ''
         }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
@@ -338,8 +338,8 @@ const Createinvoice = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.customerInfo?.firstName}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.lastName}</Typography>
+                            <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
                         </Stack>

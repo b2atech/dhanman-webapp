@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 // material-ui
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Typography } from '@mui/material';
@@ -13,7 +13,7 @@ import { CSVExport } from 'components/third-party/ReactTable';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
-// import { InvoiceAPI } from 'api/services/SalesService';
+import { getAllCustomers } from 'api/services/SalesService';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -87,33 +87,55 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
     </>
   );
 }
-
 // ==============================|| REACT TABLE - FILTERING ||============================== //
-
 const Customers = () => {
-  const [customer] = useState([]);
-  // useEffect(() => {
-  //   InvoiceAPI.get('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
-  // }, []);
+  const [customer, setCustomers] = useState([] as IVendor[]); // Initialize as an empty array with the correct type
+
+  useEffect(() => {
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((customerList) => {
+        // Ensure customerList is an array before mapping it
+        if (Array.isArray(customerList)) {
+          const customersWithSequentialId = customerList.map((customer, index) => ({
+            ...customer,
+            sequentialId: index + 1
+          }));
+          setCustomers(customersWithSequentialId);
+        } else {
+          console.error('API response is not an array:', customerList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching customer data:', error);
+      });
+  }, []);
 
   const columns = useMemo(
     () =>
       [
         {
-          Header: 'ID',
-          accessor: 'id'
+          Header: 'Sr. No.',
+          accessor: 'sequentialId'
         },
         {
-          Header: 'first Name',
+          Header: 'First Name',
           accessor: 'firstName'
         },
         {
-          Header: 'last Name',
+          Header: 'Last Name',
           accessor: 'lastName'
         },
         {
           Header: 'Email',
           accessor: 'email'
+        },
+        {
+          Header: 'Phone Number',
+          accessor: 'phoneNumber'
+        },
+        {
+          Header: 'City',
+          accessor: 'city'
         }
       ] as Column[],
     []

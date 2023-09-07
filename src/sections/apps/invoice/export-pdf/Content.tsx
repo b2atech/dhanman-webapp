@@ -176,10 +176,7 @@ const Content = ({ list }: Props) => {
       </View>
       <View style={[styles.row, { alignItems: 'flex-start', marginTop: 20, width: '95%' }]}>
         <Text style={styles.caption}>Notes </Text>
-        <Text style={styles.tableCell}>
-          {' '}
-          It was a pleasure working with you and your team. Thank You!
-        </Text>
+        <Text style={styles.tableCell}> It was a pleasure working with you and your team. Thank You!</Text>
       </View>
     </View>
   );
