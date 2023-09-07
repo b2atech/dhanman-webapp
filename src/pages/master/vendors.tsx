@@ -87,44 +87,46 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
     </>
   );
 }
-
 // ==============================|| REACT TABLE - FILTERING ||============================== //
-
 const Vendors = () => {
-  const [vendors, setVendors] = useState([]);
-  useEffect(() => {
-    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((vendorList) => setVendors(vendorList));
-  }, []);
+  const [vendor, setCustomers] = useState([] as IVendor[]);
 
-  debugger;
-  //const data = useMemo(() => vendors, []);
+  useEffect(() => {
+    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
+      .then((customerList) => {
+        if (Array.isArray(customerList)) {
+          const customersWithSequentialId = customerList.map((customer, index) => ({
+            ...customer,
+            sequentialId: index + 1
+          }));
+          setCustomers(customersWithSequentialId);
+        } else {
+          console.error('API response is not an array:', customerList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching customer data:', error);
+      });
+  }, []);
 
   const columns = useMemo(
     () =>
       [
         {
-          Header: 'Vendor ID',
-          accessor: 'id'
+          Header: 'Sr. No.',
+          accessor: 'sequentialId'
         },
         {
-          Header: 'Name',
-          accessor: 'name'
+          Header: 'First Name',
+          accessor: 'firstName'
         },
         {
-          Header: 'Contact Person',
-          accessor: 'contactPerson'
+          Header: 'Last Name',
+          accessor: 'lastName'
         },
         {
           Header: 'Email',
           accessor: 'email'
-        },
-        {
-          Header: 'Phone Number',
-          accessor: 'phoneNumber'
-        },
-        {
-          Header: 'Address',
-          accessor: 'address'
         }
       ] as Column[],
     []
@@ -133,7 +135,7 @@ const Vendors = () => {
   return (
     <MainCard content={false}>
       <ScrollX>
-        <ReactTable columns={columns} data={vendors} />
+        <ReactTable columns={columns} data={vendor} />
       </ScrollX>
     </MainCard>
   );

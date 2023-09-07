@@ -24,12 +24,12 @@ export const BillAPI = {
   },
   getAllVendors = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `/Vendor/GetAllVendors/${clientId}`,
+      url: `v1/GetAllvendors/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllVendors.name].handleRequestCancellation().signal : undefined
     });
 
-    return response.data;
+    return response.data.items;
   },
   getAllBillHeaders = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
