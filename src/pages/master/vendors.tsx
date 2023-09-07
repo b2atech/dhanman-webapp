@@ -89,12 +89,11 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 }
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 const Vendors = () => {
-  const [customer, setCustomers] = useState([] as IVendor[]); // Initialize as an empty array with the correct type
+  const [vendor, setCustomers] = useState([] as IVendor[]);
 
   useEffect(() => {
     getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
       .then((customerList) => {
-        // Ensure customerList is an array before mapping it
         if (Array.isArray(customerList)) {
           const customersWithSequentialId = customerList.map((customer, index) => ({
             ...customer,
@@ -136,7 +135,7 @@ const Vendors = () => {
   return (
     <MainCard content={false}>
       <ScrollX>
-        <ReactTable columns={columns} data={customer} />
+        <ReactTable columns={columns} data={vendor} />
       </ScrollX>
     </MainCard>
   );
