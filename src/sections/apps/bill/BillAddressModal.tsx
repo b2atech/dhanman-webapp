@@ -87,14 +87,14 @@ type AddressProps = {
 };
 const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
-  const [address, setAddress] = useState([]);
+  const [billAddress, setAddress] = useState([]);
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3').then((addressList) => setAddress(addressList));
+    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3').then((billAddressList) => setAddress(billAddressList));
   }, []);
 
   return (
     <>
-      {address.map((vendorList: any) => (
+      {billAddress.map((vendorList: any) => (
         <Box
           onClick={() => handlerAddress(vendorList)}
           key={vendorList.id}
