@@ -18,7 +18,7 @@ import {
 // third-party
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { getAllCustomers } from 'api/services/SalesService';
+import { getAllVendors } from 'api/services/BillService';
 
 type AddressModalType = {
   open: boolean;
@@ -89,7 +89,7 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
   const [address, setAddress] = useState([]);
   useEffect(() => {
-    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((addressList) => setAddress(addressList));
+    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3').then((addressList) => setAddress(addressList));
   }, []);
 
   return (
@@ -111,12 +111,9 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {vendorList.firstName}
+            {`${vendorList.firstName} ${vendorList.lastName}`}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-            <Typography textAlign="left" variant="body2" color="secondary">
-              {vendorList.lastName}
-            </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
               {vendorList.email}
             </Typography>
