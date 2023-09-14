@@ -15,6 +15,7 @@ import CreateBills from 'pages/master/createbills/createbills';
 import BillsDetails from 'pages/master/createbills/billsdetails';
 import BillsList from 'pages/master/createbills/billslist';
 import EditBill from 'pages/master/createbills/editbill';
+import DebugInvoice from 'pages/master/createinvoice/debuginvoice';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -114,6 +115,10 @@ const MainRoutes = {
         {
           path: 'editbill',
           element: <EditBill />
+        },
+        {
+          path: 'debuginvoice',
+          element: <DebugInvoice />
         },
         {
           path: 'status',

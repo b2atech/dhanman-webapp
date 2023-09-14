@@ -143,5 +143,6 @@
   "virtualized": "Virtualized",
   "utils": "Utils",
   "widgets": "Widgets",
-  "invoice": "Invoice"
+  "invoice": "Invoice",
+  "debuginvoice" : "Debuginvoice"
 }

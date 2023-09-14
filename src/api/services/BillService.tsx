@@ -1,4 +1,5 @@
-import { apiPurchase } from '../axiosConfig';
+import { InvoiceHeader_main } from 'types/invoiceDetails';
+import { apiPurchase, apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { BillingList } from 'types/billiingDetails';
 
@@ -46,6 +47,15 @@ export async function createInvoiceRequest(invoice: BillingList) {
     url: `/Bill/CreateBill`,
     method: 'POST',
     data: invoice
+  });
+  return response.data;
+}
+
+export async function createInvoiceRequest1(invoice1: InvoiceHeader_main) {
+  const response = await apiSales.request({
+    url: `/v1/invoice/`,
+    method: 'POST',
+    data: invoice1
   });
   return response.data;
 }

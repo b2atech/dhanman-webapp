@@ -5,7 +5,7 @@ import { InvoiceHeader } from 'types/invoiceDetails';
 export const InvoiceAPI = {
     get: async function (clientId: string, cancel = false) {
       const response = await apiSales.request({
-        url: `/v1/GetAllcustomers/${clientId}`,
+        url: `//${clientId}`,
         method: 'GET',
         signal: cancel ? cancelApiObject[this.get.name].handleRequestCancellation().signal : undefined
       });
@@ -23,7 +23,7 @@ export const InvoiceAPI = {
   },
   createInvoiceRequest = async function (invoicedata: InvoiceHeader) {
     const response = await apiSales.request({
-      url: `/v1/GetAllInvoices/`,
+      url: `v1/invoice`,
       method: 'POST',
       data: invoicedata
     });
