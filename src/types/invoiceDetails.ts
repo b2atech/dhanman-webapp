@@ -6,6 +6,20 @@ export interface InfoType {
 }
 
 export interface InvoiceHeader {
+  // invoiceNumber: string;
+  // invoiceDate: Date | string | number;
+  // dueDate: Date | string | number;
+  // tax: number | null;
+  // discount: number | null;
+  // id: number;
+  // quantity: number;
+  // customer_name: string;
+  // email: string;
+  // avatar: number;
+  // lines?: InvoiceLine[];
+}
+
+export interface InvoiceHeader_main {
   invoiceDetails: any;
   invoiceNumber: string;
   invoiceVoucher: string;
@@ -21,10 +35,10 @@ export interface InvoiceHeader {
   clientId: string;
   id: number;
   quantity: number;
-  billStatusId: number;
-  vendorId: number;
-  coaId: number;
-  billPaymentId: number | null;
+  billStatusId: string;
+  vendorId: string;
+  coaId: string;
+  billPaymentId: string | null;
   customer_name: string;
   email: string;
   avatar: number;
