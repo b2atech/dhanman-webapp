@@ -10,7 +10,7 @@ export const apiPurchase = axios.create({
 });
 
 export const apiSales = axios.create({
-  baseURL: 'https://localhost:7240/api/'
+  baseURL: 'https://api-dhanman-sales-nonprod.azurewebsites.net/api/'
 });
 
 const errorHandler = (error: any) => {
