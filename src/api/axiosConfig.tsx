@@ -1,12 +1,16 @@
 import axios from 'axios';
 import { notification } from 'antd';
 
+axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*'; // for POST requests
+axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*'; // for POST requests
+axios.defaults.headers.common['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'; // for all requests
+
 export const apiPurchase = axios.create({
   baseURL: 'https://api-dhanman-purchase-nonprod.azurewebsites.net/api/'
 });
 
 export const apiSales = axios.create({
-  baseURL: 'https://api-dhanman-sales-nonprod.azurewebsites.net/api/'
+  baseURL: 'https://localhost:7240/api/'
 });
 
 const errorHandler = (error: any) => {
