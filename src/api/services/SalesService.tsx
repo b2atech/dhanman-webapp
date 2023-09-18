@@ -21,6 +21,15 @@ export const InvoiceAPI = {
 
     return response.data.items;
   },
+  getAllInvoices = async function (clientId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/GetAllInvoices/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
   createInvoiceRequest = async function (invoicedata: InvoiceHeader) {
     const response = await apiSales.request({
       url: `v1/invoice`,

@@ -29,7 +29,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // third party
 import * as yup from 'yup';
 import { v4 as UIDV4 } from 'uuid';
-import { format } from 'date-fns';
+//import { format } from 'date-fns';
 import { FieldArray, Form, Formik } from 'formik';
 
 // project import
@@ -93,8 +93,8 @@ const Createinvoice = () => {
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: format(values.invoiceDate, 'MM/dd/yyyy'),
-      dueDate: format(values.due_date, 'MM/dd/yyyy'),
+      invoiceDate: '2023-09-12', //format(values.invoiceDate, 'yyyy-MM-dd'),
+      dueDate: '2023-09-12', //format(values.due_date, 'yyyy-MM-dd'),
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
@@ -104,7 +104,7 @@ const Createinvoice = () => {
       totalAmount: 1000,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      note: 'good',
+      note: values.note,
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       currency: 'INR',
       paymentTerm: 10,

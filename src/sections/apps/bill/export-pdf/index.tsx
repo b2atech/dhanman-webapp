@@ -6,7 +6,7 @@ import Header from './Header';
 import Content from './Content';
 
 // types
-import { InvoiceList } from 'types/invoice';
+import { IInvoice } from 'types/invoice';
 
 const styles = StyleSheet.create({
   page: {
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 // ==============================|| INVOICE EXPORT  ||============================== //
 
 interface Props {
-  list: InvoiceList | any;
+  list: IInvoice | any;
 }
 
 const ExportPDFView = ({ list }: Props) => {

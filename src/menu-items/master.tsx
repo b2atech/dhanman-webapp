@@ -82,7 +82,7 @@ const master: NavItemType = {
           id: 'invoicelist',
           title: <FormattedMessage id="invoices" />,
           type: 'item',
-          url: '/master/invoicelist',
+          url: '/invoice/list',
           icon: icons.UnorderedListOutlined
         },
         {

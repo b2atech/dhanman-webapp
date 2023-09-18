@@ -69,6 +69,60 @@ const MainRoutes = {
       ]
     },
     {
+      path: '/invoice',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'list',
+          element: <Invoicelist />
+        },
+        {
+          path: 'vendors',
+          element: <Vendors />
+        },
+        {
+          path: 'createinvoice',
+          element: <Createinvoice />
+        },
+        {
+          path: 'invoicedetails',
+          element: <Invoicedetails />
+        },
+        {
+          path: 'invoiceedit',
+          element: <Invoiceedit />
+        },
+        {
+          path: 'createbills',
+          element: <CreateBills />
+        },
+        {
+          path: 'billsdetails',
+          element: <BillsDetails />
+        },
+        {
+          path: 'billslist',
+          element: <BillsList />
+        },
+        {
+          path: 'editbill',
+          element: <EditBill />
+        },
+        {
+          path: 'debuginvoice',
+          element: <DebugInvoice />
+        },
+        {
+          path: 'status',
+          element: <StatusPage />
+        }
+      ]
+    },
+    {
       path: '/master',
       element: (
         <AuthGuard>
@@ -91,10 +145,6 @@ const MainRoutes = {
         {
           path: 'invoicedetails',
           element: <Invoicedetails />
-        },
-        {
-          path: 'invoicelist',
-          element: <Invoicelist />
         },
         {
           path: 'invoiceedit',

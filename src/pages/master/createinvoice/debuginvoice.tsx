@@ -37,6 +37,7 @@ import { CountryType } from 'types/invoice';
 import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
 // third party
 // import * as yup from 'yup';
+import { format } from 'date-fns';
 
 import { FieldArray, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router';
@@ -77,19 +78,19 @@ const DebugInvoice = () => {
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: '2023-09-12', // Replace with your desired date
-      dueDate: '2023-09-12', // Replace with your desired date
+      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'), // Replace with your desired date
+      dueDate: format(values.due_date, 'yyyy-MM-dd'), // Replace with your desired date
 
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
         }, 0)
       ),
-      status: 'paid',
+      status: values.status,
       totalAmount: 1000,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      note: 'good',
+      note: values.note,
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       currency: 'INR',
       paymentTerm: 10,
@@ -125,7 +126,7 @@ const DebugInvoice = () => {
           close: false
         })
       );
-      navigation('/invoicelist');
+      navigation('/invoice/list');
     });
   };
 

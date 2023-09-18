@@ -52,7 +52,7 @@ import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
 // types
-import { CountryType, InvoiceList } from 'types/invoice';
+import { CountryType, IInvoice } from 'types/invoice';
 
 //asset
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
@@ -97,7 +97,7 @@ const EditBill = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const invoiceSingleList: InvoiceList['cashierInfo'] = {
+  const invoiceSingleList: IInvoice['cashierInfo'] = {
     name: '',
     address: '',
     phone: '',
@@ -107,7 +107,7 @@ const EditBill = () => {
   const notesLimit: number = 500;
 
   const handlerEdit = (values: any) => {
-    const NewList: InvoiceList = {
+    const NewList: IInvoice = {
       id: Number(list?.id),
       invoice_id: Number(values.invoice_id),
       customer_name: values.cashierInfo?.name,

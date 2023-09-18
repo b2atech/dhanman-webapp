@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { Text, View, StyleSheet } from '@react-pdf/renderer';
 
 // types
-import { InvoiceList } from 'types/invoice';
+import { IInvoice } from 'types/invoice';
 
 const textPrimary = '#262626';
 const textSecondary = '#8c8c8c';
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  list: InvoiceList | null;
+  list: IInvoice | null;
 }
 
 // ==============================|| INVOICE EXPORT - CONTENT  ||============================== //

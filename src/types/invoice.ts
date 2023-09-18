@@ -28,13 +28,13 @@ export interface InvoiceProps {
   open: boolean;
   country: CountryType | null;
   countries: CountryType[];
-  lists: InvoiceList[];
-  list: InvoiceList | null;
+  lists: IInvoice[];
+  list: IInvoice | null;
   error: object | string | null;
   alertPopup: boolean;
 }
 
-export interface InvoiceList {
+export interface IInvoice {
   id: number;
   invoice_id: number;
   customer_name: string;

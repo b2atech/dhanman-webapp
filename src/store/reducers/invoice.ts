@@ -6,7 +6,7 @@ import { dispatch } from 'store';
 import { createSlice } from '@reduxjs/toolkit';
 
 // types
-import { CountryType, InvoiceList, InvoiceProps } from 'types/invoice';
+import { CountryType, IInvoice, InvoiceProps } from 'types/invoice';
 
 const countries: CountryType[] = [
   { code: 'US', label: 'United States Dollar', currency: 'Dollar', prefix: '$' },
@@ -113,7 +113,7 @@ export function getInvoiceList() {
   };
 }
 
-export function getInvoiceInsert(NewLists: InvoiceList) {
+export function getInvoiceInsert(NewLists: IInvoice) {
   return async () => {
     try {
       const response = await axios.post('/api/invoice/insert', { list: NewLists });
@@ -124,7 +124,7 @@ export function getInvoiceInsert(NewLists: InvoiceList) {
   };
 }
 
-export function getInvoiceUpdate(NewLists: InvoiceList) {
+export function getInvoiceUpdate(NewLists: IInvoice) {
   return async () => {
     try {
       const response = await axios.post('/api/invoice/update', NewLists);
