@@ -1,88 +1,73 @@
-import { useNavigate } from 'react-router';
+import { Button, Grid, Stack } from '@mui/material';
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
+import MainCard from 'components/MainCard';
+
 import {
   Autocomplete,
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  FormHelperText,
-  Grid,
   InputLabel,
+  FormControl,
+  TextField,
   MenuItem,
+  Box,
   Select,
-  Stack,
-  Table,
-  TableBody,
+  FormHelperText,
+  Typography,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  Typography
+  TableContainer,
+  TableBody,
+  Table,
+  Divider
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-
-// third party
-import * as yup from 'yup';
-import { v4 as UIDV4 } from 'uuid';
-//import { format } from 'date-fns';
-import { FieldArray, Form, Formik } from 'formik';
-
-// project import
-import MainCard from 'components/MainCard';
-import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
 import AddressModal from 'sections/apps/invoice/AddressModal';
-import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
-
-import { useDispatch, useSelector } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-import { customerPopup, toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
-
-// assets
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-
-// types
-import { CountryType } from 'types/invoice';
-import { createInvoiceRequest } from 'api/services/SalesService';
-
+import { useDispatch, useSelector } from 'store';
+import { toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
+import { customerPopup } from 'store/reducers/invoice';
+import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
+import { useTheme } from '@mui/material/styles';
+import { v4 as UIDV4 } from 'uuid';
 import { InvoiceHeader_main, InvoiceLine } from 'types/invoiceDetails';
+import { createInvoiceRequest } from 'api/services/SalesService';
+import { openSnackbar } from 'store/reducers/snackbar';
+import { CountryType } from 'types/invoice';
+import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
+// third party
+// import * as yup from 'yup';
+import { format } from 'date-fns';
 
-const validationSchema = yup.object({
-  //date: yup.date().required('Invoice date is required'),
-  // due_date: yup
-  //   .date()
-  //   .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
-  //   .nullable()
-  //   .required('Due date is required'),
-  customerInfo: yup
-    .object({
-      name: yup.string().required('Invoice receiver information is required')
-    })
-    .required('Invoice receiver information is required'),
-  status: yup.string().required('Status selection is required'),
-  invoice_detail: yup
-    .array()
-    .required('Invoice details is required')
-    .of(
-      yup.object().shape({
-        name: yup.string().required('Product name is required')
-      })
-    )
-    .min(1, 'Invoice must have at least 1 items')
-});
+import { FieldArray, Form, Formik } from 'formik';
+import { useNavigate } from 'react-router';
+
+// const validationSchema = yup.object({
+//   customerInfo: yup
+//     .object({
+//       name: yup.string().required('Invoice receiver information is required')
+//     })
+//     .required('Invoice receiver information is required'),
+//   status: yup.string().required('Status selection is required'),
+//   invoice_detail: yup
+//     .array()
+//     .required('Invoice details is required')
+//     .of(
+//       yup.object().shape({
+//         name: yup.string().required('Product name is required')
+//       })
+//     )
+//     .min(1, 'Invoice must have at least 1 items')
+// });
 
 // ==============================|| INVOICE - CREATE ||============================== //
 
 const Createinvoice = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { open, isCustomerOpen, countries, country, isOpen } = useSelector((state) => state.invoice);
-  const navigation = useNavigate();
+  const { open, isCustomerOpen, country, countries, isOpen } = useSelector((state) => state.invoice);
   const notesLimit: number = 500;
+  const navigation = useNavigate();
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -93,14 +78,15 @@ const Createinvoice = () => {
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: '2023-09-12', //format(values.invoiceDate, 'yyyy-MM-dd'),
-      dueDate: '2023-09-12', //format(values.due_date, 'yyyy-MM-dd'),
+      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'), // Replace with your desired date
+      dueDate: format(values.due_date, 'yyyy-MM-dd'), // Replace with your desired date
+
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
         }, 0)
       ),
-      status: 'paid',
+      status: values.status,
       totalAmount: 1000,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
@@ -122,7 +108,7 @@ const Createinvoice = () => {
       invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
       invoiceLine.name = invoiceItem.name;
       invoiceLine.description = invoiceItem.description;
-      invoiceLine.quantity = invoiceItem.quantity;
+      invoiceLine.quantity = invoiceItem.qty;
       invoiceLine.price = invoiceItem.price;
       return invoiceLine;
     });
@@ -140,7 +126,7 @@ const Createinvoice = () => {
           close: false
         })
       );
-      navigation('/master/createinvoice/invoicelist');
+      navigation('/invoice/list');
     });
   };
 
@@ -186,7 +172,6 @@ const Createinvoice = () => {
           tax: 0,
           note: ''
         }}
-        validationSchema={validationSchema}
         onSubmit={(values) => {
           handlerCreate(values);
         }}
@@ -208,7 +193,7 @@ const Createinvoice = () => {
                     <FormControl sx={{ width: '100%' }}>
                       <TextField
                         required
-                        // disabled
+                        //   disabled
                         type="number"
                         name="invoiceNumber"
                         id="invoiceNumber"
@@ -327,6 +312,7 @@ const Createinvoice = () => {
                     </Grid>
                   </MainCard>
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
                     <Grid container spacing={2}>
@@ -380,6 +366,7 @@ const Createinvoice = () => {
                 <Grid item xs={12}>
                   <Typography variant="h5">Detail</Typography>
                 </Grid>
+
                 <Grid item xs={12}>
                   <FieldArray
                     name="invoice_detail"
@@ -606,12 +593,13 @@ const Createinvoice = () => {
                     </FormControl>
                   </Stack>
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
                     <Button
                       variant="outlined"
                       color="secondary"
-                      disabled={values.status === '' || !isValid}
+                      // disabled={values.status === '' || !isValid}
                       sx={{ color: 'secondary.dark' }}
                       onClick={() =>
                         dispatch(

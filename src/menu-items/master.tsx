@@ -84,13 +84,6 @@ const master: NavItemType = {
           type: 'item',
           url: '/invoice/list',
           icon: icons.UnorderedListOutlined
-        },
-        {
-          id: 'debuginvoice',
-          title: <FormattedMessage id="debuginvoice" />,
-          type: 'item',
-          url: '/master/debuginvoice',
-          icon: icons.UnorderedListOutlined
         }
       ]
     },
