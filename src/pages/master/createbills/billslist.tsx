@@ -5,19 +5,19 @@ import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgre
 
 // third-party
 import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
-
+import moment from 'moment';
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport } from 'components/third-party/ReactTable';
-import { getAllBillHeaders } from 'api/services/BillService';
+import { getAllBills } from 'api/services/BillService';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
-import { IVendor } from 'types/bill';
+import { IBill } from 'types/bill';
 
 // ==============================|| REACT TABLE ||============================== //
 
-function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
+function ReactTable({ columns, data }: { columns: Column[]; data: IBill[] }) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const defaultColumn = useMemo(() => ({ Filter: DefaultColumnFilter }), []);
   const initialState = useMemo(() => ({ filters: [{ id: 'status', value: '' }] }), []);
@@ -88,42 +88,61 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
   );
 }
 
-// ==============================|| REACT TABLE - FILTERING ||============================== //
+// ==============================|| BILL - LIST ||============================== //
 
-const BillList = () => {
-  const [customer, setCustomers] = useState([]);
+const Bills = () => {
+  const [bill, setBills] = useState([] as IBill[]);
+
   useEffect(() => {
-    getAllBillHeaders('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => setCustomers(customerList));
+    getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((billList) => {
+        if (Array.isArray(billList)) {
+          const billsWithSequentialId = billList.map((bill, index) => ({
+            ...bill,
+            billsequentialId: index + 1
+          }));
+          setBills(billsWithSequentialId);
+        } else {
+          console.error('API response is not an array:', billList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching vendor data:', error);
+      });
   }, []);
-
-  debugger;
 
   const columns = useMemo(
     () =>
       [
         {
-          Header: 'ID',
-          accessor: 'id'
+          Header: 'Sr. No.',
+          accessor: 'billsequentialId'
         },
         {
-          Header: 'dueDate',
-          accessor: 'dueDate'
+          Header: 'Date',
+          accessor: 'billDate',
+          Cell: (props) => {
+            return moment(props.value).format('DD-MMM-YYYY');
+          }
         },
         {
-          Header: 'amount',
+          Header: 'bill Number',
+          accessor: 'billNumber'
+        },
+        {
+          Header: 'Vendor Name',
+          accessor: 'vendorName'
+        },
+        {
+          Header: 'Due Date',
+          accessor: 'dueDate',
+          Cell: (props) => {
+            return moment(props.value).format('DD-MMM-YYYY');
+          }
+        },
+        {
+          Header: 'Amount',
           accessor: 'amount'
-        },
-        {
-          Header: 'currency',
-          accessor: 'currency'
-        },
-        {
-          Header: 'paymentTerm',
-          accessor: 'paymentTerm'
-        },
-        {
-          Header: 'status',
-          accessor: 'billStatusId'
         }
       ] as Column[],
     []
@@ -132,10 +151,10 @@ const BillList = () => {
   return (
     <MainCard content={false}>
       <ScrollX>
-        <ReactTable columns={columns} data={customer} />
+        <ReactTable columns={columns} data={bill} />
       </ScrollX>
     </MainCard>
   );
 };
 
-export default BillList;
+export default Bills;

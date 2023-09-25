@@ -42,7 +42,41 @@ export interface BillingProps {
   error: object | string | null;
   alertPopup: boolean;
 }
+export interface BillHeader_main {
+  billDetails: any;
+  billNumber: string;
+  billVoucher: string;
+  billDate: Date | string | number;
+  paymentTerm: number;
+  dueDate: Date | string | number;
+  totalAmount: number;
+  currency: string;
+  tax: number | null;
+  discount: number | null;
+  note: String;
+  clientId: string;
+  id: number;
+  quantity: number;
+  billStatusId: string;
+  vendorId: string;
+  coaId: string;
+  billPaymentId: string | null;
+  customer_name: string;
+  email: string;
+  avatar: number;
+  status: string;
+  lines?: BillLine[];
+  cashierInfo: InfoType;
+  customerInfo: InfoType;
+}
 
+export interface BillLine {
+  name: string;
+  description: string;
+  price: string | number;
+  quantity: number;
+  amount: string | number;
+}
 export interface BillingList {
   note: String;
   invoiceDate: Date | string | number;
@@ -70,6 +104,20 @@ export interface BillingList {
   tax: number | null;
   customerInfo: InfoType;
   // notes: string;
+}
+
+export interface BillHeader {
+  // invoiceNumber: string;
+  // invoiceDate: Date | string | number;
+  // dueDate: Date | string | number;
+  // tax: number | null;
+  // discount: number | null;
+  // id: number;
+  // quantity: number;
+  // customer_name: string;
+  // email: string;
+  // avatar: number;
+  // lines?: InvoiceLine[];
 }
 
 export interface billingeDetail {

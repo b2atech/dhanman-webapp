@@ -1,7 +1,6 @@
-import { InvoiceHeader_main } from 'types/invoiceDetails';
-import { apiPurchase, apiSales } from '../axiosConfig';
+import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
-import { BillingList } from 'types/billiingDetails';
+import { BillHeader } from 'types/billiingDetails';
 
 export const BillAPI = {
     get: async function (clientId: string, cancel = false) {
@@ -25,37 +24,28 @@ export const BillAPI = {
   },
   getAllVendors = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/GetAllvendors/${clientId}`,
+      url: `v1/GetAllVendors/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllVendors.name].handleRequestCancellation().signal : undefined
     });
 
     return response.data.items;
   },
-  getAllBillHeaders = async function (clientId: string, cancel = false) {
+  getAllBills = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `/Bill/GetAllBillHeader/${clientId}`,
+      url: `v1/GetAllBills/${clientId}`,
       method: 'GET',
-      signal: cancel ? cancelApiObject[getAllBillHeaders.name].handleRequestCancellation().signal : undefined
+      signal: cancel ? cancelApiObject[getAllBills.name].handleRequestCancellation().signal : undefined
     });
 
-    return response.data;
+    return response.data.items;
   };
 
-export async function createInvoiceRequest(invoice: BillingList) {
+export async function createBillRequest(billdata: BillHeader) {
   const response = await apiPurchase.request({
-    url: `/Bill/CreateBill`,
+    url: `v1/bill/`,
     method: 'POST',
-    data: invoice
-  });
-  return response.data;
-}
-
-export async function createInvoiceRequest1(invoice1: InvoiceHeader_main) {
-  const response = await apiSales.request({
-    url: `/v1/invoice/`,
-    method: 'POST',
-    data: invoice1
+    data: billdata
   });
   return response.data;
 }

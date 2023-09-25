@@ -30,7 +30,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 
 // ==============================|| INVOICE - PREVIEW ||============================== //
 
-const InvoiceModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: any) => {
+const BillModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: any) => {
   const theme = useTheme();
   function closeModal() {
     setIsOpen(false);
@@ -207,4 +207,4 @@ const InvoiceModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice 
   );
 };
 
-export default InvoiceModal;
+export default BillModal;
