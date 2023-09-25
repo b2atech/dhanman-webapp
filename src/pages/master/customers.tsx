@@ -5,15 +5,18 @@ import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgre
 
 // third-party
 import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
+import Button from '@mui/material/Button';
 
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import { CSVExport } from 'components/third-party/ReactTable';
+import { useNavigate } from 'react-router';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
 import { getAllCustomers } from 'api/services/SalesService';
+import { PlusOutlined } from '@ant-design/icons';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -35,12 +38,20 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
   );
 
   const sortingRow = rows.slice(0, 10);
-
+  const navigation = useNavigate();
+  let navigateToAddCustomer = () => {
+    navigation('/master/AddCustomerForm');
+  };
   return (
     <>
       <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
         <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
-        <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
+        <Stack direction="row" spacing={2}>
+          <Button variant="contained" startIcon={<PlusOutlined />} onClick={navigateToAddCustomer}>
+            Add Customer
+          </Button>
+          <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
+        </Stack>
       </Stack>
 
       <Table {...getTableProps()}>
