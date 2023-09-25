@@ -26,7 +26,7 @@ type AddressModalType = {
   handlerAddress: (a: any) => void;
 };
 
-// ==============================|| INVOICE - SELECT ADDRESS ||============================== //
+// ==============================|| BILL - SELECT ADDRESS ||============================== //
 
 const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
   function closeAddressModal() {

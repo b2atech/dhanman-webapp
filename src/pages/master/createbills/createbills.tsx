@@ -1,124 +1,123 @@
-import { useNavigate } from 'react-router';
+import { Button, Grid, Stack } from '@mui/material';
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
+import MainCard from 'components/MainCard';
+
 import {
   Autocomplete,
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  FormHelperText,
-  Grid,
   InputLabel,
-  Stack,
-  Table,
-  TableBody,
+  FormControl,
+  TextField,
+  MenuItem,
+  Box,
+  Select,
+  FormHelperText,
+  Typography,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  Typography
+  TableContainer,
+  TableBody,
+  Table,
+  Divider
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-
-// third party
-import * as yup from 'yup';
-import { v4 as UIDV4 } from 'uuid';
-import { format } from 'date-fns';
-import { FieldArray, Form, Formik } from 'formik';
-
-// project import
-import MainCard from 'components/MainCard';
-import InvoiceItem from 'sections/apps/bill/billItem';
-import AddressModal from 'sections/apps/bill/BillAddressModal';
-import InvoiceModal from 'sections/apps/bill/BillModal';
-
-import incrementer from 'utils/incrementer';
-import { useDispatch, useSelector } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-import { customerPopup, toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
-
-// assets
+import BillAddressModal from 'sections/apps/bill/BillAddressModal';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'store';
+import { toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
+import { customerPopup } from 'store/reducers/invoice';
+import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
+import { useTheme } from '@mui/material/styles';
+import { v4 as UIDV4 } from 'uuid';
+import { openSnackbar } from 'store/reducers/snackbar';
+import { CountryType } from 'types/invoice';
+// third party
+// import * as yup from 'yup';
+import { format } from 'date-fns';
 
-// types
-import { createInvoiceRequest } from 'api/services/BillService';
-import { BillingList, CountryType } from 'types/billiingDetails';
+import { FieldArray, Form, Formik } from 'formik';
+import { useNavigate } from 'react-router';
+import { BillHeader_main, BillLine } from 'types/billiingDetails';
+import { createBillRequest } from 'api/services/BillService';
+import BillModal from 'sections/apps/bill/BillModal';
+import AddressBillModal from 'sections/apps/bill/BillAddressModal';
 
-const validationSchema = yup.object({
-  date: yup.date().required('Invoice date is required'),
-  due_date: yup
-    .date()
-    .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
-    .nullable()
-    .required('Due date is required'),
-  customerInfo: yup
-    .object({
-      name: yup.string().required('Invoice receiver information is required')
-    })
-    .required('Invoice receiver information is required'),
-  // status: yup.string().required('Status selection is required'),
-  invoice_detail: yup
-    .array()
-    .required('Invoice details is required')
-    .of(
-      yup.object().shape({
-        name: yup.string().required('Product name is required')
-      })
-    )
-    .min(1, 'Invoice must have at least 1 items')
-});
+// const validationSchema = yup.object({
+//   customerInfo: yup
+//     .object({
+//       name: yup.string().required('Bill receiver information is required')
+//     })
+//     .required('Bill receiver information is required'),
+//   status: yup.string().required('Status selection is required'),
+//   invoice_detail: yup
+//     .array()
+//     .required('Bill details is required')
+//     .of(
+//       yup.object().shape({
+//         name: yup.string().required('Product name is required')
+//       })
+//     )
+//     .min(1, 'Bill must have at least 1 items')
+// });
 
-// ==============================|| INVOICE - CREATE ||============================== //
+// ==============================|| BILL - CREATE ||============================== //
 
-const CreateBills = () => {
+const CreateBill = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { open, isCustomerOpen, countries, country, lists, isOpen } = useSelector((state) => state.invoice);
-  const navigation = useNavigate();
+  const { open, isCustomerOpen, country, countries, isOpen } = useSelector((state) => state.invoice);
   const notesLimit: number = 500;
+  const navigation = useNavigate();
 
   const handlerCreate = (values: any) => {
-    const NewList: BillingList = {
-      id: Number(incrementer(lists.length)),
-      invoiceNumber: Number(values.invoice_id),
+    const bill: BillHeader_main = {
+      id: Math.floor(Math.random() * 90000) + 10000,
+      billNumber: String(values.invoiceNumber),
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      date: format(values.date, 'MM/dd/yyyy'),
-      dueDate: format(values.dueDate, 'MM/dd/yyyy'),
+      billDate: format(values.billDate, 'yyyy-MM-dd'),
+      dueDate: format(values.due_date, 'yyyy-MM-dd'),
+
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
         }, 0)
       ),
-      status: '',
+      status: values.status,
+      totalAmount: 1000,
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
-      billDetails: values.invoice_detail,
       note: values.note,
-      clientId: '',
-      amount: null,
-      currency: '',
-      paymentTerm: 0,
-      billStatusId: 0,
-      vendorId: 0,
-      coaId: 0,
-      billPaymentId: null,
-      invoiceDate: values.invoiceDate,
-      customerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      currency: 'INR',
+      paymentTerm: 10,
+      billStatusId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      vendorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      coaId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      billPaymentId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      billDetails: undefined,
+      billVoucher: 'YP001'
     };
 
-    createInvoiceRequest(NewList).then(() => {
+    bill.lines = values.invoice_detail.map((billItem: any) => {
+      let billLine = {} as BillLine;
+      billLine.amount = parseInt(billItem.price) * billItem.qty;
+      billLine.name = billItem.name;
+      billLine.description = billItem.description;
+      billLine.quantity = billItem.qty;
+      billLine.price = billItem.price;
+      return billLine;
+    });
+
+    createBillRequest(bill).then(() => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Invoice Added successfully',
+          message: 'Bill Added successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -127,7 +126,7 @@ const CreateBills = () => {
           close: false
         })
       );
-      navigation('/apps/invoice/list');
+      navigation('/master/billslist');
     });
   };
 
@@ -144,10 +143,10 @@ const CreateBills = () => {
       <Formik
         initialValues={{
           id: 120,
-          invoice_id: Date.now(),
-          // status: '',
-          date: new Date(),
-          due_date: null,
+          billNumber: '',
+          status: '',
+          billDate: new Date(),
+          due_date: '',
           cashierInfo: {
             name: 'Belle J. Richter',
             address: '1300 Cooks Mine, NM 87829',
@@ -155,25 +154,24 @@ const CreateBills = () => {
             email: 'belljrc23@gmail.com'
           },
           customerInfo: {
-            address: '',
+            phoneNumber: '',
             email: '',
             firstName: '',
             lastName: ''
           },
           invoice_detail: [
             {
-              id: UIDV4(),
               name: '',
               description: '',
-              qty: 1,
-              price: '1.00'
+              qty: 0,
+              price: 0,
+              amount: 0
             }
           ],
           discount: 0,
           tax: 0,
           note: ''
         }}
-        validationSchema={validationSchema}
         onSubmit={(values) => {
           handlerCreate(values);
         }}
@@ -185,7 +183,7 @@ const CreateBills = () => {
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
           const discountRate = (values.discount * subtotal) / 100;
-          const total = subtotal - discountRate + taxRate;
+          const totalAmount = subtotal - discountRate + taxRate;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -195,11 +193,10 @@ const CreateBills = () => {
                     <FormControl sx={{ width: '100%' }}>
                       <TextField
                         required
-                        disabled
                         type="number"
-                        name="invoice_id"
-                        id="invoice_id"
-                        value={values.invoice_id}
+                        name="billNumber"
+                        id="billNumber"
+                        value={values.billNumber}
                         onChange={handleChange}
                       />
                     </FormControl>
@@ -207,14 +204,47 @@ const CreateBills = () => {
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
+                    <InputLabel>Status</InputLabel>
+                    <FormControl sx={{ width: '100%' }}>
+                      <Select
+                        value={values.status}
+                        displayEmpty
+                        name="status"
+                        renderValue={(selected) => {
+                          if (selected.length === 0) {
+                            return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
+                          }
+                          return selected;
+                          // return selected.join(', ');
+                        }}
+                        onChange={handleChange}
+                        error={Boolean(errors.status && touched.status)}
+                      >
+                        <MenuItem disabled value="">
+                          Select status
+                        </MenuItem>
+                        <MenuItem value="Paid">Paid</MenuItem>
+                        <MenuItem value="Unpaid">Unpaid</MenuItem>
+                        <MenuItem value="Cancelled">Cancelled</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Stack>
+                  {touched.status && errors.status && <FormHelperText error={true}>{errors.status}</FormHelperText>}
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Stack spacing={1}>
                     <InputLabel>Date</InputLabel>
-                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.date && errors.date)}>
+                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.billDate && errors.billDate)}>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker format="dd/MM/yyyy" value={values.date} onChange={(newValue) => setFieldValue('date', newValue)} />
+                        <DatePicker
+                          format="MM/dd/yyyy"
+                          value={values.billDate}
+                          onChange={(newValue) => setFieldValue('billDate', newValue)}
+                        />
                       </LocalizationProvider>
                     </FormControl>
                   </Stack>
-                  {touched.date && errors.date && <FormHelperText error={true}>{errors.date as string}</FormHelperText>}
+                  {touched.billDate && errors.billDate && <FormHelperText error={true}>{errors.billDate as string}</FormHelperText>}
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
@@ -222,7 +252,7 @@ const CreateBills = () => {
                     <FormControl sx={{ width: '100%' }} error={Boolean(touched.due_date && errors.due_date)}>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                          format="dd/MM/yyyy"
+                          format="MM/dd/yyyy"
                           value={values.due_date}
                           onChange={(newValue) => setFieldValue('due_date', newValue)}
                         />
@@ -239,9 +269,10 @@ const CreateBills = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.customerInfo?.firstName}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.lastName}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.email}</Typography>
+                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
+                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
+                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
+                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
                           </Stack>
                         </Stack>
                       </Grid>
@@ -262,7 +293,7 @@ const CreateBills = () => {
                           >
                             Change
                           </Button>
-                          <AddressModal
+                          <BillAddressModal
                             open={open}
                             setOpen={(value) =>
                               dispatch(
@@ -271,13 +302,14 @@ const CreateBills = () => {
                                 })
                               )
                             }
-                            handlerAddress={(address) => setFieldValue('cashierInfo', address)}
+                            handlerAddress={(billAddressList) => setFieldValue('cashierInfo', billAddressList)}
                           />
                         </Box>
                       </Grid>
                     </Grid>
                   </MainCard>
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
                     <Grid container spacing={2}>
@@ -285,8 +317,8 @@ const CreateBills = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.customerInfo?.firstName}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.lastName}</Typography>
+                            <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
                         </Stack>
@@ -308,7 +340,7 @@ const CreateBills = () => {
                           >
                             Add
                           </Button>
-                          <AddressModal
+                          <AddressBillModal
                             open={isCustomerOpen}
                             setOpen={(value) =>
                               dispatch(
@@ -331,6 +363,7 @@ const CreateBills = () => {
                 <Grid item xs={12}>
                   <Typography variant="h5">Detail</Typography>
                 </Grid>
+
                 <Grid item xs={12}>
                   <FieldArray
                     name="invoice_detail"
@@ -457,7 +490,9 @@ const CreateBills = () => {
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography variant="subtitle1">Grand Total:</Typography>
                                     <Typography variant="subtitle1">
-                                      {total % 1 === 0 ? country?.prefix + '' + total : country?.prefix + '' + total.toFixed(2)}
+                                      {totalAmount % 1 === 0
+                                        ? country?.prefix + '' + totalAmount
+                                        : country?.prefix + '' + totalAmount.toFixed(2)}
                                     </Typography>
                                   </Stack>
                                 </Stack>
@@ -546,7 +581,7 @@ const CreateBills = () => {
                               }}
                               inputProps={{
                                 ...params.inputProps,
-                                autoComplete: 'new-password' // disable autocomplete and autofill
+                                autoComplete: 'new-password'
                               }}
                             />
                           );
@@ -555,6 +590,7 @@ const CreateBills = () => {
                     </FormControl>
                   </Stack>
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
                     <Button
@@ -578,8 +614,8 @@ const CreateBills = () => {
                     <Button color="primary" variant="contained" type="submit">
                       Create & Send
                     </Button>
-                    <InvoiceModal
-                      isOpen={isOpen}
+                    <BillModal
+                      Open={isOpen}
                       setIsOpen={(value: any) =>
                         dispatch(
                           reviewInvoicePopup({
@@ -587,13 +623,13 @@ const CreateBills = () => {
                           })
                         )
                       }
-                      key={values.invoice_id}
+                      key={values.billNumber}
                       invoiceInfo={{
                         ...values,
                         subtotal,
                         taxRate,
                         discountRate,
-                        total
+                        totalAmount
                       }}
                       items={values?.invoice_detail}
                       onAddNextInvoice={addNextInvoiceHandler}
@@ -609,4 +645,4 @@ const CreateBills = () => {
   );
 };
 
-export default CreateBills;
+export default CreateBill;
