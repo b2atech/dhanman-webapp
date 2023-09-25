@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 // material-ui
-import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Typography } from '@mui/material';
+import { Stack, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress, Typography, Button } from '@mui/material';
 
 // third-party
 import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
@@ -14,6 +14,8 @@ import { CSVExport } from 'components/third-party/ReactTable';
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
 import { IVendor } from 'types/bill';
 import { getAllVendors } from 'api/services/BillService';
+import { PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -35,12 +37,21 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
   );
 
   const sortingRow = rows.slice(0, 10);
+  const navigation = useNavigate();
+  let navigateToAddVendor = () => {
+    navigation('/master/AddVendor');
+  };
 
   return (
     <>
       <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
         <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
-        <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
+        <Stack direction="row" spacing={2}>
+          <Button variant="contained" startIcon={<PlusOutlined />} onClick={navigateToAddVendor}>
+            Add Vendor
+          </Button>
+          <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
+        </Stack>
       </Stack>
 
       <Table {...getTableProps()}>
@@ -89,23 +100,23 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 }
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 const Vendors = () => {
-  const [vendor, setCustomers] = useState([] as IVendor[]);
+  const [vendor, setVendors] = useState([] as IVendor[]);
 
   useEffect(() => {
     getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((customerList) => {
-        if (Array.isArray(customerList)) {
-          const customersWithSequentialId = customerList.map((customer, index) => ({
-            ...customer,
+      .then((vendorList) => {
+        if (Array.isArray(vendorList)) {
+          const vendorsWithSequentialId = vendorList.map((vendor, index) => ({
+            ...vendor,
             sequentialId: index + 1
           }));
-          setCustomers(customersWithSequentialId);
+          setVendors(vendorsWithSequentialId);
         } else {
-          console.error('API response is not an array:', customerList);
+          console.error('API response is not an array:', vendorList);
         }
       })
       .catch((error) => {
-        console.error('Error fetching customer data:', error);
+        console.error('Error fetching vendor data:', error);
       });
   }, []);
 
