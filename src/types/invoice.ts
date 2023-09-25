@@ -59,3 +59,18 @@ export interface InvoiceDetail {
   description: string;
   price: number;
 }
+
+export interface ICustomer {
+  clientId: string;
+  vendorId: number;
+  name: string;
+  contactPerson: string;
+  email: string;
+  address: string;
+}
+
+export interface IGetCustomerResponse {
+  data: {
+    vendrors: ICustomer[];
+  };
+}

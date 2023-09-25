@@ -1,3 +1,4 @@
+import { CustomerInfo } from 'types/customerinfo';
 import { apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { InvoiceHeader } from 'types/invoiceDetails';
@@ -35,6 +36,14 @@ export const InvoiceAPI = {
       url: `v1/invoice`,
       method: 'POST',
       data: invoicedata
+    });
+    return response.data;
+  },
+  createCustomerRequest = async function (customerdata: CustomerInfo) {
+    const response = await apiSales.request({
+      url: `v1/customers`,
+      method: 'POST',
+      data: customerdata
     });
     return response.data;
   };
