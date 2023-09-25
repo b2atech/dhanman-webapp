@@ -14,13 +14,13 @@ import { CSVExport } from 'components/third-party/ReactTable';
 import { useNavigate } from 'react-router';
 
 import { GlobalFilter, DefaultColumnFilter, renderFilterTypes } from 'utils/react-table';
-import { IVendor } from 'types/bill';
 import { getAllCustomers } from 'api/services/SalesService';
 import { PlusOutlined } from '@ant-design/icons';
+import { ICustomer } from 'types/invoice';
 
 // ==============================|| REACT TABLE ||============================== //
 
-function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
+function ReactTable({ columns, data }: { columns: Column[]; data: ICustomer[] }) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const defaultColumn = useMemo(() => ({ Filter: DefaultColumnFilter }), []);
   const initialState = useMemo(() => ({ filters: [{ id: 'status', value: '' }] }), []);
@@ -100,7 +100,7 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IVendor[] }) {
 }
 // ==============================|| REACT TABLE - FILTERING ||============================== //
 const Customers = () => {
-  const [customer, setCustomers] = useState([] as IVendor[]); // Initialize as an empty array with the correct type
+  const [customer, setCustomers] = useState([] as ICustomer[]); // Initialize as an empty array with the correct type
 
   useEffect(() => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')

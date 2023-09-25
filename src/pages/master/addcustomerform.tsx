@@ -23,8 +23,6 @@ const validationSchema = yup.object({
 // ==============================|| ADD CUSTOMER FORMS VALIDATION - ADDRESS ||============================== //
 
 function AddCustomerForm() {
-  // const theme = useTheme();
-
   const customer = useFormik({
     initialValues: {
       firstName: '',
