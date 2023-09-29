@@ -1,148 +1,144 @@
-// material-ui
-import { Button, Divider, Grid, InputLabel, Stack, TextField } from '@mui/material';
-
-// third-party
-import { useFormik } from 'formik';
+import { Button, Divider, Grid, InputLabel, Stack, TextField, FormControl } from '@mui/material';
+import { Form, Formik } from 'formik';
 import * as yup from 'yup';
-import { useNavigate } from 'react-router';
-
-// project imports
-
-// assets
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
 import MainCard from 'components/MainCard';
+import { createVendorRequest } from 'api/services/BillService';
 
-// validation schema
+// Define validation schema using Yup
 const validationSchema = yup.object({
   firstName: yup.string().required('First Name is required'),
-  lastName: yup.string().required('Last Name is required'),
-  phoneNumber: yup.string().required('Phone Number is required'),
-  emailAddress: yup.string().required('E-Mail is required'),
-  city: yup.string().required('City Name is required')
+  lastName: yup.string().required('Last Name is required')
 });
 
-// ==============================|| ADD VENDOR FORMS VALIDATION - ADDRESS ||============================== //
-
 function AddVendor() {
-  const vendor = useFormik({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      emailAddress: '',
-      city: ''
-    },
-    validationSchema,
-    onSubmit: async (values, { setErrors, setStatus, setSubmitting }) => {}
-  });
-  const navigation = useNavigate();
-  let navigateToBack = () => {
-    navigation('/master/vendors');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const navigateToVendor = useNavigate();
+
+  // Handler function to create a vendor
+  const vendorHandlerCreate = async (values: { firstName: any; lastName: any; emailAddress: any }) => {
+    try {
+      const vendor = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.emailAddress
+      };
+
+      // Call the API to create a vendor
+      const response = await createVendorRequest(vendor);
+
+      if (response.status === 'success') {
+      } else {
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'Vendor Added successfully',
+            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+            variant: 'alert',
+            alert: {
+              color: 'success'
+            },
+            close: false
+          })
+        );
+        navigateToVendor('/master/vendors');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
   };
 
   return (
     <MainCard>
-      <form onSubmit={vendor.handleSubmit}>
-        <Grid container spacing={3.5}>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>First Name</InputLabel>
-              <TextField
-                id="firstName"
-                name="firstName"
-                placeholder="Enter First Name"
-                value={vendor.values.firstName}
-                onChange={vendor.handleChange}
-                onBlur={vendor.handleBlur}
-                error={vendor.touched.firstName && Boolean(vendor.errors.firstName)}
-                helperText={vendor.touched.firstName && vendor.errors.firstName}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Last Name</InputLabel>
-              <TextField
-                id="lastName"
-                name="lastName"
-                placeholder="Enter Last Name"
-                value={vendor.values.lastName}
-                onChange={vendor.handleChange}
-                onBlur={vendor.handleBlur}
-                error={vendor.touched.lastName && Boolean(vendor.errors.lastName)}
-                helperText={vendor.touched.lastName && vendor.errors.lastName}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Phone Number</InputLabel>
-              <TextField
-                id="phoneNumber"
-                name="phoneNumber"
-                placeholder="Enter Phone Number"
-                value={vendor.values.phoneNumber}
-                onChange={vendor.handleChange}
-                onBlur={vendor.handleBlur}
-                error={vendor.touched.phoneNumber && Boolean(vendor.errors.phoneNumber)}
-                helperText={vendor.touched.phoneNumber && vendor.errors.phoneNumber}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>E-Mail</InputLabel>
-              <TextField
-                id="emailAddress"
-                name="emailAddress"
-                placeholder="Enter E-Mail"
-                value={vendor.values.emailAddress}
-                onChange={vendor.handleChange}
-                onBlur={vendor.handleBlur}
-                error={vendor.touched.emailAddress && Boolean(vendor.errors.emailAddress)}
-                helperText={vendor.touched.emailAddress && vendor.errors.emailAddress}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Enter City</InputLabel>
-              <TextField
-                id="city"
-                name="city"
-                placeholder="Enter City Name"
-                value={vendor.values.city}
-                onChange={vendor.handleChange}
-                onBlur={vendor.handleBlur}
-                error={vendor.touched.city && Boolean(vendor.errors.city)}
-                helperText={vendor.touched.city && vendor.errors.city}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12}>
-            <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={navigateToBack}>
-                Cancel
-              </Button>
-              <Button variant="contained" type="reset" color="secondary" onClick={() => vendor.resetForm()}>
-                Reset Form
-              </Button>
-              <Button variant="contained" type="submit" color="success" disabled={vendor.isSubmitting}>
-                Save
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </form>
+      <Formik
+        initialValues={{
+          firstName: '',
+          lastName: '',
+          emailAddress: ''
+        }}
+        validationSchema={validationSchema}
+        onSubmit={(values, { resetForm }) => {
+          vendorHandlerCreate(values);
+          resetForm(); // Reset the form after successful submission
+        }}
+      >
+        {({ handleChange, handleSubmit, values, errors, touched, resetForm }) => (
+          <Form onSubmit={handleSubmit}>
+            <Grid container spacing={3.5}>
+              {/* Form fields */}
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>First Name</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="firstName"
+                      type="text"
+                      name="firstName"
+                      placeholder="Enter First Name"
+                      value={values.firstName}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.firstName && errors.firstName && <div className="error">{errors.firstName}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>Last Name</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Enter Last Name"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.lastName && errors.lastName && <div className="error">{errors.lastName}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>E-Mail</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="emailAddress"
+                      name="emailAddress"
+                      placeholder="Enter E-Mail"
+                      value={values.emailAddress}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.emailAddress && errors.emailAddress && <div className="error">{errors.emailAddress}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12}>
+                <Divider />
+              </Grid>
+              <Grid item xs={12}>
+                <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={2}>
+                  <Button variant="contained" color="error" onClick={() => navigate('/master/vendors')}>
+                    Cancel
+                  </Button>
+                  <Button variant="contained" type="reset" color="secondary" onClick={() => resetForm()}>
+                    Reset Form
+                  </Button>
+                  <Button variant="contained" color="success" type="submit">
+                    Save
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Form>
+        )}
+      </Formik>
     </MainCard>
   );
 }
-
 export default AddVendor;
