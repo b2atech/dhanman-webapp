@@ -1,17 +1,13 @@
-// material-ui
-import { Button, Divider, Grid, InputLabel, Stack, TextField } from '@mui/material';
-
-// third-party
-import { useFormik } from 'formik';
+import { Button, Divider, Grid, InputLabel, Stack, TextField, FormControl } from '@mui/material';
+import { Form, Formik } from 'formik';
 import * as yup from 'yup';
-import { useNavigate } from 'react-router';
-
-// project imports
-
-// assets
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
 import MainCard from 'components/MainCard';
+import { createCustomerRequest } from 'api/services/SalesService';
 
-// validation schema
+// Define validation schema using Yup
 const validationSchema = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
@@ -20,127 +16,162 @@ const validationSchema = yup.object({
   city: yup.string().required('City Name is required')
 });
 
-// ==============================|| ADD CUSTOMER FORMS VALIDATION - ADDRESS ||============================== //
-
 function AddCustomerForm() {
-  const customer = useFormik({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      emailAddress: '',
-      city: ''
-    },
-    validationSchema,
-    onSubmit: async (values, { setErrors, setStatus, setSubmitting }) => {}
-  });
-  const navigation = useNavigate();
-  let navigateToBack = () => {
-    navigation('/master/customers');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const navigateToCustomer = useNavigate();
+
+  // Handler function to create a customer
+  const customerHandlerCreate = async (values: { firstName: any; lastName: any; phoneNumber: any; emailAddress: any; city: any }) => {
+    try {
+      const customer = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phoneNumber: values.phoneNumber,
+        city: values.city,
+        email: values.emailAddress,
+        postCode: '',
+        address: ''
+      };
+
+      // Call the API to create a customer
+      const response = await createCustomerRequest(customer);
+
+      if (response.status === 'success') {
+      } else {
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'Customer Added successfully',
+            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+            variant: 'alert',
+            alert: {
+              color: 'success'
+            },
+            close: false
+          })
+        );
+        navigateToCustomer('/master/customers');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
   };
 
   return (
     <MainCard>
-      <form onSubmit={customer.handleSubmit}>
-        <Grid container spacing={3.5}>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>First Name</InputLabel>
-              <TextField
-                id="firstName"
-                name="firstName"
-                placeholder="Enter First Name"
-                value={customer.values.firstName}
-                onChange={customer.handleChange}
-                onBlur={customer.handleBlur}
-                error={customer.touched.firstName && Boolean(customer.errors.firstName)}
-                helperText={customer.touched.firstName && customer.errors.firstName}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Last Name</InputLabel>
-              <TextField
-                id="lastName"
-                name="lastName"
-                placeholder="Enter Last Name"
-                value={customer.values.lastName}
-                onChange={customer.handleChange}
-                onBlur={customer.handleBlur}
-                error={customer.touched.lastName && Boolean(customer.errors.lastName)}
-                helperText={customer.touched.lastName && customer.errors.lastName}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Phone Number</InputLabel>
-              <TextField
-                id="phoneNumber"
-                name="phoneNumber"
-                placeholder="Enter Phone Number"
-                value={customer.values.phoneNumber}
-                onChange={customer.handleChange}
-                onBlur={customer.handleBlur}
-                error={customer.touched.phoneNumber && Boolean(customer.errors.phoneNumber)}
-                helperText={customer.touched.phoneNumber && customer.errors.phoneNumber}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>E-Mail</InputLabel>
-              <TextField
-                id="emailAddress"
-                name="emailAddress"
-                placeholder="Enter E-Mail"
-                value={customer.values.emailAddress}
-                onChange={customer.handleChange}
-                onBlur={customer.handleBlur}
-                error={customer.touched.emailAddress && Boolean(customer.errors.emailAddress)}
-                helperText={customer.touched.emailAddress && customer.errors.emailAddress}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Enter City</InputLabel>
-              <TextField
-                id="city"
-                name="city"
-                placeholder="Enter City Name"
-                value={customer.values.city}
-                onChange={customer.handleChange}
-                onBlur={customer.handleBlur}
-                error={customer.touched.city && Boolean(customer.errors.city)}
-                helperText={customer.touched.city && customer.errors.city}
-                fullWidth
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12}>
-            <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={2}>
-              <Button variant="contained" color="error" onClick={navigateToBack}>
-                Cancel
-              </Button>
-              <Button variant="contained" type="reset" color="secondary" onClick={() => customer.resetForm()}>
-                Reset Form
-              </Button>
-              <Button variant="contained" type="submit" color="success" disabled={customer.isSubmitting}>
-                Save
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </form>
+      <Formik
+        initialValues={{
+          firstName: '',
+          lastName: '',
+          phoneNumber: '',
+          emailAddress: '',
+          city: ''
+        }}
+        validationSchema={validationSchema}
+        onSubmit={(values, { resetForm }) => {
+          customerHandlerCreate(values);
+          resetForm(); // Reset the form after successful submission
+        }}
+      >
+        {({ handleChange, handleSubmit, values, errors, touched, resetForm }) => (
+          <Form onSubmit={handleSubmit}>
+            <Grid container spacing={3.5}>
+              {/* Form fields */}
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>First Name</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="firstName"
+                      type="text"
+                      name="firstName"
+                      placeholder="Enter First Name"
+                      value={values.firstName}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.firstName && errors.firstName && <div className="error">{errors.firstName}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>Last Name</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Enter Last Name"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.lastName && errors.lastName && <div className="error">{errors.lastName}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>Phone Number</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="Enter Phone Number"
+                      value={values.phoneNumber}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.phoneNumber && errors.phoneNumber && <div className="error">{errors.phoneNumber}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>E-Mail</InputLabel>
+                  <FormControl>
+                    <TextField
+                      id="emailAddress"
+                      name="emailAddress"
+                      placeholder="Enter E-Mail"
+                      value={values.emailAddress}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                    {touched.emailAddress && errors.emailAddress && <div className="error">{errors.emailAddress}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Stack spacing={1}>
+                  <InputLabel>Enter City</InputLabel>
+                  <FormControl>
+                    <TextField id="city" name="city" placeholder="Enter City Name" value={values.city} onChange={handleChange} fullWidth />
+                    {touched.city && errors.city && <div className="error">{errors.city}</div>}
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={12}>
+                <Divider />
+              </Grid>
+              <Grid item xs={12}>
+                <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={2}>
+                  <Button variant="contained" color="error" onClick={() => navigate('/master/customers')}>
+                    Cancel
+                  </Button>
+                  <Button variant="contained" type="reset" color="secondary" onClick={() => resetForm()}>
+                    Reset Form
+                  </Button>
+                  <Button variant="contained" color="success" type="submit">
+                    Save
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Form>
+        )}
+      </Formik>
     </MainCard>
   );
 }
