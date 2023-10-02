@@ -6,24 +6,24 @@ import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import StatusPage from 'pages/master/status';
-import Vendors from 'pages/master/vendors';
-import Createinvoice from 'pages/master/createinvoice/createinvoice';
-import Invoicedetails from 'pages/master/createinvoice/invoicedetails';
-import Invoicelist from 'pages/master/createinvoice/invoicelist';
-import Invoiceedit from 'pages/master/createinvoice/invoiceedit';
-import CreateBills from 'pages/master/createbills/createbills';
-import BillsDetails from 'pages/master/createbills/billsdetails';
-import BillsList from 'pages/master/createbills/billslist';
-import EditBill from 'pages/master/createbills/editbill';
-import AddCustomerForm from 'pages/master/addcustomerform';
-import AddVendor from 'pages/master/addVendor';
+import Vendors from 'pages/purchase/createbills/vendors';
+import Createinvoice from 'pages/sales/createinvoice/createinvoice';
+import Invoicedetails from 'pages/sales/createinvoice/invoicedetails';
+import Invoicelist from 'pages/sales/createinvoice/invoicelist';
+import Invoiceedit from 'pages/sales/createinvoice/invoiceedit';
+import CreateBills from 'pages/purchase/createbills/createbills';
+import BillsDetails from 'pages/purchase/createbills/billsdetails';
+import BillsList from 'pages/purchase/createbills/billslist';
+import EditBill from 'pages/purchase/createbills/editbill';
+import AddCustomerForm from 'pages/sales/createinvoice/Customer/addcustomerform';
+import AddVendor from 'pages/purchase/createbills/Vendor/addVendor';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/500')));
 const MaintenanceUnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
 const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/coming-soon')));
-const Customers = Loadable(lazy(() => import('pages/master/customers')));
+const Customers = Loadable(lazy(() => import('pages/sales/createinvoice/Customer/customers')));
 
 // render - sample page
 // const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
