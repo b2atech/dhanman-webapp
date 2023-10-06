@@ -144,5 +144,7 @@
   "utils": "Utils",
   "widgets": "Widgets",
   "invoice": "Invoice",
-  "addcustomerform" : "Add Customer Form"
+  "AddCustomer" : "Add Customer",
+  "CustomerView" : "Customer View",
+  "AlertCustomerDelete" : "Alert Customer Delete"
 }

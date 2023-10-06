@@ -15,8 +15,8 @@ import CreateBills from 'pages/purchase/createbills/createbills';
 import BillsDetails from 'pages/purchase/createbills/billsdetails';
 import BillsList from 'pages/purchase/createbills/billslist';
 import EditBill from 'pages/purchase/createbills/editbill';
-import AddCustomerForm from 'pages/sales/createinvoice/Customer/addcustomerform';
 import AddVendor from 'pages/purchase/createbills/Vendor/addVendor';
+import CustomerListPage from 'pages/sales/createinvoice/Customer/customers';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -164,12 +164,12 @@ const MainRoutes = {
           element: <EditBill />
         },
         {
-          path: 'addcustomerform',
-          element: <AddCustomerForm />
-        },
-        {
           path: 'addVendor',
           element: <AddVendor />
+        },
+        {
+          path: 'newlist',
+          element: <CustomerListPage />
         },
         {
           path: 'status',
