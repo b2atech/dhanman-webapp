@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -9,67 +9,42 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   Grid,
-  FormHelperText,
   InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  SelectChangeEvent,
   Stack,
-  Switch,
   TextField,
-  Tooltip,
-  Typography
+  Autocomplete
 } from '@mui/material';
+import { UserAddOutlined, CloseOutlined } from '@ant-design/icons';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import IconButton from 'components/@extended/IconButton';
 
 // third-party
-import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 
 // project imports
-import Avatar from 'components/@extended/Avatar';
-import IconButton from 'components/@extended/IconButton';
+import AlertCustomerDelete from './AlertCustomerDelete';
 
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
-// assets
-import { CameraOutlined, DeleteFilled } from '@ant-design/icons';
-
 // types
 import { ThemeMode } from 'types/config';
-import AlertCustomerDelete from './AlertCustomerDelete';
-
-const avatarImage = require.context('assets/images/users', true);
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
-    name: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
     email: '',
-    location: '',
-    orderStatus: ''
+    cityName: ''
   };
-
-  if (customer) {
-    newCustomer.name = customer.fatherName;
-    newCustomer.location = customer.address;
-    return _.merge({}, newCustomer, customer);
-  }
 
   return newCustomer;
 };
-
-const allStatus = ['Complicated', 'Single', 'Relationship'];
 
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
 
@@ -82,22 +57,17 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   const theme = useTheme();
   const isCreating = !customer;
 
-  const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
-  const [avatar, setAvatar] = useState<string | undefined>(
-    avatarImage(`./avatar-${isCreating && !customer?.avatar ? 1 : customer.avatar}.png`)
-  );
-
-  useEffect(() => {
-    if (selectedImage) {
-      setAvatar(URL.createObjectURL(selectedImage));
-    }
-  }, [selectedImage]);
-
   const CustomerSchema = Yup.object().shape({
-    name: Yup.string().max(255).required('Name is required'),
-    orderStatus: Yup.string().required('Status is required'),
-    email: Yup.string().max(255).required('Email is required').email('Must be a valid email'),
-    location: Yup.string().max(500)
+    firstName: Yup.string().max(255).required('Please Enter First Name'),
+    lastName: Yup.string().max(255).required('Pease Enter Last Name'),
+    phoneNumber: Yup.string()
+      .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .required('Please Enter Phone Number'),
+    email: Yup.string()
+      .max(255)
+      .required('Please Enter E-mail Address')
+      .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, 'E-Mail Address Is Not Valid'),
+    cityName: Yup.string().max(255).required('Pease Enter City Name')
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -112,19 +82,11 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
-        // const newCustomer = {
-        //   name: values.name,
-        //   email: values.email,
-        //   location: values.location,
-        //   orderStatus: values.orderStatus
-        // };
-
         if (customer) {
-          // dispatch(updateCustomer(customer.id, newCustomer)); - update
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer update successfully.',
+              message: 'Customer added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -133,7 +95,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
           );
         } else {
-          // dispatch(createCustomer(newCustomer)); - add
           dispatch(
             openSnackbar({
               open: true,
@@ -155,30 +116,26 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     }
   });
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+  const { errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
+  const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Philadelphia'];
 
   return (
     <>
       <FormikProvider value={formik}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
-            <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <DialogTitle>{customer ? 'Add Customer' : 'New Customer'}</DialogTitle>
+              <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
+                <CloseOutlined />
+              </IconButton>
+            </Stack>
             <Divider />
             <DialogContent sx={{ p: 2.5 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={3}>
                   <Stack direction="row" justifyContent="center" sx={{ mt: 3 }}>
-                    <FormLabel
-                      htmlFor="change-avtar"
-                      sx={{
-                        position: 'relative',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        '&:hover .MuiBox-root': { opacity: 1 },
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <Avatar alt="Avatar 1" src={avatar} sx={{ width: 72, height: 72, border: '1px dashed' }} />
+                    <UserAddOutlined style={{ fontSize: '80px' }}>
                       <Box
                         sx={{
                           position: 'absolute',
@@ -192,46 +149,74 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}
-                      >
-                        <Stack spacing={0.5} alignItems="center">
-                          <CameraOutlined style={{ color: theme.palette.secondary.lighter, fontSize: '2rem' }} />
-                          <Typography sx={{ color: 'secondary.lighter' }}>Upload</Typography>
-                        </Stack>
-                      </Box>
-                    </FormLabel>
-                    <TextField
-                      type="file"
-                      id="change-avtar"
-                      placeholder="Outlined"
-                      variant="outlined"
-                      sx={{ display: 'none' }}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setSelectedImage(e.target.files?.[0])}
-                    />
+                      ></Box>
+                    </UserAddOutlined>
+                    <TextField type="file" id="change-avtar" placeholder="Outlined" variant="outlined" sx={{ display: 'none' }} />
                   </Stack>
                 </Grid>
                 <Grid item xs={12} md={8}>
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">Name</InputLabel>
+                        <InputLabel htmlFor="customer-name">First Name</InputLabel>
                         <TextField
                           autoFocus
                           fullWidth
-                          id="customer-name"
-                          placeholder="Enter Customer Name"
-                          {...getFieldProps('name')}
-                          error={Boolean(touched.name && errors.name)}
-                          helperText={touched.name && errors.name}
+                          id="firstName"
+                          type="text"
+                          placeholder="Enter First Name"
+                          {...getFieldProps('firstName')}
+                          error={Boolean(touched.firstName && errors.firstName)}
+                          helperText={touched.firstName && errors.firstName}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">Email</InputLabel>
+                        <InputLabel htmlFor="customer-lastName">Last Name</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-lastName"
+                          type="text"
+                          placeholder="Enter Last Name"
+                          {...getFieldProps('lastName')}
+                          error={Boolean(touched.lastName && errors.lastName)}
+                          helperText={touched.lastName && errors.lastName}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-phoneNumber"
+                          placeholder="Enter Phone Number"
+                          {...getFieldProps('phoneNumber')}
+                          error={Boolean(touched.phoneNumber && errors.phoneNumber)}
+                          helperText={touched.phoneNumber && errors.phoneNumber}
+                          inputProps={{
+                            inputMode: 'numeric',
+                            pattern: '[0-9]*',
+                            maxLength: 10,
+                            onInput: (e) => {
+                              e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                              if (e.currentTarget.value.length > 10) {
+                                e.currentTarget.value = e.currentTarget.value.slice(0, 10);
+                              }
+                            }
+                          }}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-email">E-mail</InputLabel>
                         <TextField
                           fullWidth
                           id="customer-email"
-                          placeholder="Enter Customer Email"
+                          type="email"
+                          placeholder="Enter Email"
                           {...getFieldProps('email')}
                           error={Boolean(touched.email && errors.email)}
                           helperText={touched.email && errors.email}
@@ -240,70 +225,21 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">Status</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="column-hiding"
-                            displayEmpty
-                            {...getFieldProps('orderStatus')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('orderStatus', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
-                                return <Typography variant="subtitle1">Select Status</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected}</Typography>;
-                            }}
-                          >
-                            {allStatus.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.orderStatus && errors.orderStatus && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.orderStatus}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-location">Location</InputLabel>
-                        <TextField
+                        <InputLabel htmlFor="customer-city">City</InputLabel>
+                        <Autocomplete
                           fullWidth
-                          id="customer-location"
-                          multiline
-                          rows={2}
-                          placeholder="Enter Location"
-                          {...getFieldProps('location')}
-                          error={Boolean(touched.location && errors.location)}
-                          helperText={touched.location && errors.location}
+                          autoHighlight
+                          id="customer-city"
+                          options={cities} // Provide your list of city names here
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Enter City Name"
+                              error={Boolean(touched.cityName && errors.cityName)}
+                              helperText={touched.cityName && errors.cityName}
+                            />
+                          )}
                         />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                        <Stack spacing={0.5}>
-                          <Typography variant="subtitle1">Make Contact Info Public</Typography>
-                          <Typography variant="caption" color="textSecondary">
-                            Means that anyone viewing your profile will be able to see your contacts details
-                          </Typography>
-                        </Stack>
-                        <FormControlLabel control={<Switch defaultChecked sx={{ mt: 0 }} />} label="" labelPlacement="start" />
-                      </Stack>
-                      <Divider sx={{ my: 2 }} />
-                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                        <Stack spacing={0.5}>
-                          <Typography variant="subtitle1">Available to hire</Typography>
-                          <Typography variant="caption" color="textSecondary">
-                            Toggling this will let your teammates know that you are available for acquiring new projects
-                          </Typography>
-                        </Stack>
-                        <FormControlLabel control={<Switch sx={{ mt: 0 }} />} label="" labelPlacement="start" />
                       </Stack>
                     </Grid>
                   </Grid>
@@ -312,23 +248,14 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             </DialogContent>
             <Divider />
             <DialogActions sx={{ p: 2.5 }}>
-              <Grid container justifyContent="space-between" alignItems="center">
+              <Grid container justifyContent="flex-end" alignItems={'end'}>
                 <Grid item>
-                  {!isCreating && (
-                    <Tooltip title="Delete Customer" placement="top">
-                      <IconButton onClick={() => setOpenAlert(true)} size="large" color="error">
-                        <DeleteFilled />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Grid>
-                <Grid item>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Button color="error" onClick={onCancel}>
-                      Cancel
+                  <Stack direction="row" spacing={2} justifyContent="flex-end">
+                    <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
+                      Add
                     </Button>
-                    <Button type="submit" variant="contained" disabled={isSubmitting}>
-                      {customer ? 'Edit' : 'Add'}
+                    <Button variant="contained" color="error" onClick={onCancel}>
+                      Cancel
                     </Button>
                   </Stack>
                 </Grid>
