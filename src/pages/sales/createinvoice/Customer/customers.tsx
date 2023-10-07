@@ -97,10 +97,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 
   useEffect(() => {
-    //Shreyas-06/10/2023-Original if else statement removed which is responsible for responsive design
     setHiddenColumns(['firstName']);
-    // eslint-disable-next-line
-  }, []);
+  });
 
   return (
     <>
@@ -334,7 +332,6 @@ const CustomerListPage = () => {
         TransitionComponent={PopupTransition}
         keepMounted
         fullWidth
-        onClose={handleAdd}
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
