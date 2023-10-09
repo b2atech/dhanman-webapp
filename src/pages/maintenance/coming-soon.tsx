@@ -9,7 +9,7 @@ import { useTimer } from 'react-timer-hook';
 import MainCard from 'components/MainCard';
 
 // assets
-import coming from 'assets/images/maintenance/coming-soon.png';
+//import coming from 'assets/images/maintenance/coming-soon.png';
 
 // ==============================|| COMING SOON - MAIN ||============================== //
 
@@ -42,11 +42,6 @@ function ComingSoon() {
   return (
     <>
       <Grid container spacing={4} direction="column" alignItems="center" justifyContent="center" sx={{ minHeight: '100vh', py: 2 }}>
-        <Grid item xs={12}>
-          <Box sx={{ height: { xs: 310, sm: 420 }, width: { xs: 360, sm: 'auto' } }}>
-            <img src={coming} alt="mantis" style={{ height: '100%', width: '100%' }} />
-          </Box>
-        </Grid>
         <Grid item xs={12}>
           <Stack spacing={1} justifyContent="center" alignItems="center" sx={{ mt: -2 }}>
             <Typography align="center" variant="h1">

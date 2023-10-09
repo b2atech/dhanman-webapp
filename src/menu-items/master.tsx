@@ -39,13 +39,13 @@ const icons = {
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
 
 const master: NavItemType = {
-  id: 'master',
-  title: <FormattedMessage id="master" />,
+  id: 'company',
+  title: <FormattedMessage id="company" />,
   type: 'group',
   children: [
     {
       id: 'forms-layout',
-      title: <FormattedMessage id="master" />,
+      title: <FormattedMessage id="company" />,
       type: 'collapse',
       icon: icons.GroupOutlined,
       children: [
@@ -53,14 +53,14 @@ const master: NavItemType = {
           id: 'customers',
           title: <FormattedMessage id="customers" />,
           type: 'item',
-          url: '/master/customers',
+          url: '/sales/customers/list',
           icon: icons.CustomerServiceOutlined
         },
         {
           id: 'vendors',
           title: <FormattedMessage id="Vendors" />,
           type: 'item',
-          url: '/master/vendors',
+          url: '/purchase/vendors/list',
           icon: icons.ShoppingCartOutlined
         }
       ]
@@ -72,18 +72,32 @@ const master: NavItemType = {
       icon: icons.ProfileOutlined,
       children: [
         {
-          id: 'createinvoice',
-          title: <FormattedMessage id="createinvoice" />,
+          id: 'customers',
+          title: <FormattedMessage id="customers" />,
           type: 'item',
-          url: '/master/createinvoice',
-          icon: icons.AuditOutlined
+          url: '/sales/customers/list',
+          icon: icons.CustomerServiceOutlined
         },
         {
           id: 'invoicelist',
           title: <FormattedMessage id="invoices" />,
           type: 'item',
-          url: '/invoice/list',
+          url: '/sales/invoices/list',
           icon: icons.UnorderedListOutlined
+        },
+        {
+          id: 'createinvoice',
+          title: <FormattedMessage id="createinvoice" />,
+          type: 'item',
+          url: '/sales/invoices/create',
+          icon: icons.AuditOutlined
+        },
+        {
+          id: 'paymentreceived',
+          title: <FormattedMessage id="paymentreceived" />,
+          type: 'item',
+          url: '/sales/payments',
+          icon: icons.AuditOutlined
         }
       ]
     },
@@ -94,18 +108,32 @@ const master: NavItemType = {
       icon: icons.ShoppingCartOutlined,
       children: [
         {
-          id: 'createbills',
-          title: <FormattedMessage id="createbills" />,
+          id: 'vendors',
+          title: <FormattedMessage id="Vendors" />,
           type: 'item',
-          url: '/master/createbills',
-          icon: icons.AuditOutlined
+          url: '/purchase/vendors/list',
+          icon: icons.ShoppingCartOutlined
         },
         {
           id: 'billslist',
           title: <FormattedMessage id="bills" />,
           type: 'item',
-          url: '/master/billslist',
+          url: '/purchase/bills/list',
           icon: icons.UnorderedListOutlined
+        },
+        {
+          id: 'createbills',
+          title: <FormattedMessage id="createbills" />,
+          type: 'item',
+          url: '/purchase/bills/create',
+          icon: icons.AuditOutlined
+        },
+        {
+          id: 'paymentmade',
+          title: <FormattedMessage id="paymentmade" />,
+          type: 'item',
+          url: '/purchase/payments',
+          icon: icons.AuditOutlined
         }
       ]
     }

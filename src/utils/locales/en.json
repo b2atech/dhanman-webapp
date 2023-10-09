@@ -146,5 +146,8 @@
   "invoice": "Invoice",
   "AddCustomer" : "Add Customer",
   "CustomerView" : "Customer View",
-  "AlertCustomerDelete" : "Alert Customer Delete"
+  "AlertCustomerDelete" : "Alert Customer Delete",
+  "paymentreceived" : "Payment Received",
+  "company": "Company",
+  "paymentmade" : "Payment Made"
 }

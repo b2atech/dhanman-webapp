@@ -5,26 +5,21 @@ import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
-import StatusPage from 'pages/master/status';
-import Vendors from 'pages/purchase/createbills/vendors';
-import Createinvoice from 'pages/sales/createinvoice/createinvoice';
-import Invoicedetails from 'pages/sales/createinvoice/invoicedetails';
-import Invoicelist from 'pages/sales/createinvoice/invoicelist';
-import Invoiceedit from 'pages/sales/createinvoice/invoiceedit';
-import CreateBills from 'pages/purchase/createbills/createbills';
-import BillsDetails from 'pages/purchase/createbills/billsdetails';
-import BillsList from 'pages/purchase/createbills/billslist';
-import EditBill from 'pages/purchase/createbills/editbill';
-import AddVendor from 'pages/purchase/createbills/Vendor/addVendor';
-import CustomerListPage from 'pages/sales/createinvoice/Customer/customers';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
 const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/500')));
 const MaintenanceUnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
 const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/coming-soon')));
-const Customers = Loadable(lazy(() => import('pages/sales/createinvoice/Customer/customers')));
 
+//Render Applications
+const AppInvoices = Loadable(lazy(() => import('pages/sales/invoice/list')));
+const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create')));
+const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
+
+const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
+const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
+const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 // render - sample page
 // const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 
@@ -43,7 +38,7 @@ const MainRoutes = {
       children: [
         {
           path: 'customers',
-          element: <Customers />
+          element: <AppCustomers />
         }
       ]
     },
@@ -70,57 +65,7 @@ const MainRoutes = {
       ]
     },
     {
-      path: '/invoice',
-      element: (
-        <AuthGuard>
-          <MainLayout />
-        </AuthGuard>
-      ),
-      children: [
-        {
-          path: 'list',
-          element: <Invoicelist />
-        },
-        {
-          path: 'vendors',
-          element: <Vendors />
-        },
-        {
-          path: 'createinvoice',
-          element: <Createinvoice />
-        },
-        {
-          path: 'invoicedetails',
-          element: <Invoicedetails />
-        },
-        {
-          path: 'invoiceedit',
-          element: <Invoiceedit />
-        },
-        {
-          path: 'createbills',
-          element: <CreateBills />
-        },
-        {
-          path: 'billsdetails',
-          element: <BillsDetails />
-        },
-        {
-          path: 'billslist',
-          element: <BillsList />
-        },
-        {
-          path: 'editbill',
-          element: <EditBill />
-        },
-        {
-          path: 'status',
-          element: <StatusPage />
-        }
-      ]
-    },
-    {
-      path: '/master',
+      path: '/sales',
       element: (
         <AuthGuard>
           <MainLayout />
@@ -129,51 +74,87 @@ const MainRoutes = {
       children: [
         {
           path: 'customers',
-          element: <Customers />
+          element: <AppCustomers />,
+          children: [
+            {
+              path: 'list',
+              element: <AppCustomers />
+            }
+          ]
         },
+        {
+          path: 'invoices',
+          children: [
+            {
+              path: 'list',
+              element: <AppInvoices />
+            },
+            {
+              path: 'create',
+              element: <AppCreateInvoice />
+            }
+          ]
+        },
+        {
+          path: 'payments',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'receive',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        }
+      ]
+    },
+    {
+      path: '/purchase',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
         {
           path: 'vendors',
-          element: <Vendors />
+          element: <AppVendors />,
+          children: [
+            {
+              path: 'list',
+              element: <AppVendors />
+            }
+          ]
         },
         {
-          path: 'createinvoice',
-          element: <Createinvoice />
+          path: 'bills',
+          children: [
+            {
+              path: 'list',
+              element: <AppBills />
+            },
+            {
+              path: 'create',
+              element: <AppCreateBill />
+            }
+          ]
         },
         {
-          path: 'invoicedetails',
-          element: <Invoicedetails />
-        },
-        {
-          path: 'invoiceedit',
-          element: <Invoiceedit />
-        },
-        {
-          path: 'createbills',
-          element: <CreateBills />
-        },
-        {
-          path: 'billsdetails',
-          element: <BillsDetails />
-        },
-        {
-          path: 'billslist',
-          element: <BillsList />
-        },
-        {
-          path: 'editbill',
-          element: <EditBill />
-        },
-        {
-          path: 'addVendor',
-          element: <AddVendor />
-        },
-        {
-          path: 'newlist',
-          element: <CustomerListPage />
-        },
-        {
-          path: 'status',
-          element: <StatusPage />
+          path: 'payments',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'make',
+              element: <MaintenanceComingSoon />
+            }
+          ]
         }
       ]
     }
