@@ -21,17 +21,15 @@ import { PatternFormat } from 'react-number-format';
 
 // project import
 import MainCard from 'components/MainCard';
-//import Avatar from 'components/@extended/Avatar';
 import Transitions from 'components/@extended/Transitions';
 
 // assets
 import { EnvironmentOutlined, LinkOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 
-//const avatarImage = require.context('assets/images/users', true);
 
-// ==============================|| VENDOR - VIEW ||============================== //
+// ==============================|| VENDOR - DETAILS ||============================== //
 
-const VendorVew = ({ data }: any) => {
+const VendorDetails = ({ data }: any) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -192,4 +190,4 @@ const VendorVew = ({ data }: any) => {
   );
 };
 
-export default VendorVew;
+export default VendorDetails;

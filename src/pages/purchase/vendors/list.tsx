@@ -23,7 +23,6 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-// import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import {
@@ -41,11 +40,9 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
 // import AddVendor from '../createbills/Vendor/AddVendor';
-import VendorVew from '../createbills/Vendor/vendorView';
+import VendorDetails from '../createbills/Vendor/VendorDetails';
 import { getAllVendors } from 'api/services/BillService';
 import { IVendor } from 'types/bill';
-
-//const avatarImage = require.context('assets/images/users', true);
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -222,10 +219,6 @@ const Vendors = () => {
         Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
         disableSortBy: true
       },
-      // {
-      //   Header: 'Sr.No',
-      //   accessor: 'sequentialId'
-      // },
       {
         Header: 'Vendor Name',
         accessor: 'lastName',
@@ -233,13 +226,11 @@ const Vendors = () => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              {/* <Avatar alt="Avatar 1" size="sm" src={avatarImage(`./avatar-${!values.avatar ? 1 : values.avatar}.png`)} /> */}
               <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
             </Stack>
           );
         }
       },
-      //Karan-07/10/2023-concatination logic implitation need to improve cusrrent logic is based on hiding the Email column
       {
         Header: '',
         accessor: 'firstName'
@@ -300,13 +291,11 @@ const Vendors = () => {
         }
       }
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
 
-  // eslint-disable-next-line react/jsx-no-undef
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorVew data={memoizedCustomers[Number(row.id)]} />,
+    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedCustomers[Number(row.id)]} />,
     [memoizedCustomers]
   );
 

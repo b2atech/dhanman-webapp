@@ -2,11 +2,7 @@
 import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material';
 
 // project import
-//import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
-
-// assets
-// import { DeleteFilled } from '@ant-design/icons';
 
 // types
 interface Props {
@@ -30,9 +26,6 @@ export default function AlertVendorDelete({ title, open, handleClose }: Props) {
     >
       <DialogContent sx={{ mt: 2, my: 1 }}>
         <Stack alignItems="center" spacing={3.5}>
-          {/* <Avatar color="error" sx={{ width: 72, height: 72, fontSize: '1.75rem' }}>
-            <DeleteFilled />
-          </Avatar> */}
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
               Are you sure you want to delete?
