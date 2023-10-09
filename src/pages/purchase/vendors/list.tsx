@@ -197,7 +197,7 @@ const Vendors = () => {
       });
   }, []);
 
-  const memoizedCustomers = useMemo(() => vendors, [vendors]);
+  const memoizedVendors = useMemo(() => vendors, [vendors]);
 
   const handleAdd = () => {
     setAdd(!add);
@@ -295,8 +295,8 @@ const Vendors = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedCustomers[Number(row.id)]} />,
-    [memoizedCustomers]
+    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
+    [memoizedVendors]
   );
 
   return (
@@ -304,7 +304,7 @@ const Vendors = () => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={memoizedCustomers}
+          data={memoizedVendors}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
