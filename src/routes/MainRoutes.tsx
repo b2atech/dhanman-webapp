@@ -126,6 +126,14 @@ const MainRoutes = {
             {
               path: 'list',
               element: <AppVendors />
+            },
+            {
+              path: 'addVendor',
+              element: <AppVendors />
+            },
+            {
+              path: 'alertVendorDelete',
+              element: <AppVendors />
             }
           ]
         },
