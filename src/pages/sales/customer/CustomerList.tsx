@@ -59,7 +59,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'firstName', desc: false };
 
   const {
     getTableProps,
@@ -231,6 +231,7 @@ const CustomerListPage = () => {
           );
         }
       },
+      //Shreyas-06/10/2023-concatination logic implitation need to improve cusrrent logic is based on hiding the Email column
       {
         Header: '',
         accessor: 'firstName'
