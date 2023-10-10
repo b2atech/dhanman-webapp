@@ -38,17 +38,17 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
-// import AddVendor from '../createbills/Vendor/AddVendor';
-import VendorDetails from '../createbills/Vendor/VendorDetails';
-import { getAllVendors } from 'api/services/BillService';
-import { IVendor } from 'types/bill';
+import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
+import AddCustomer from '../createinvoice/Customer/AddCustomer';
+import CustomerView from '../createinvoice/Customer/CustomerView';
+import { getAllCustomers } from 'api/services/SalesService';
+import { ICustomer } from 'types/invoice';
 
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: IVendor[];
+  data: ICustomer[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
@@ -95,7 +95,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     setHiddenColumns(['firstName']);
-  });
+  }, [setHiddenColumns]);
 
   return (
     <>
@@ -117,11 +117,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Vendor
+              Add Customer
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={'vendor-list.csv'}
+              filename={'customer-list.csv'}
             />
           </Stack>
         </Stack>
@@ -171,25 +171,25 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-// ==============================|| VENDOR - LIST ||============================== //
+// ==============================|| CUSTOMER - LIST ||============================== //
 
-const Vendors = () => {
+const CustomerListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [vendor, setVendor] = useState<any>(null);
-  const [vendorDeleteId, setVendorDeleteId] = useState<any>('');
+  const [customer, setCustomer] = useState<any>(null);
+  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
-  const [vendors, setVendors] = useState<IVendor[]>([]);
+  const [customers, setCustomers] = useState<ICustomer[]>([]);
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          const vendorsWithSequentialId = vendorList.map((vendor, index) => ({
-            ...vendor,
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((customerList) => {
+        if (Array.isArray(customerList)) {
+          const customersWithSequentialId = customerList.map((customer, index) => ({
+            ...customer,
             sequentialId: index + 1
           }));
-          setVendors(vendorsWithSequentialId);
+          setCustomers(customersWithSequentialId);
         }
       })
       .catch((error) => {
@@ -197,11 +197,11 @@ const Vendors = () => {
       });
   }, []);
 
-  const memoizedVendors = useMemo(() => vendors, [vendors]);
+  const memoizedCustomers = useMemo(() => customers, [customers]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (vendor && !add) setVendor(null);
+    if (customer && !add) setCustomer(null);
   };
 
   const handleClose = () => {
@@ -220,7 +220,7 @@ const Vendors = () => {
         disableSortBy: true
       },
       {
-        Header: 'Vendor Name',
+        Header: 'Customer Name',
         accessor: 'lastName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
@@ -236,8 +236,12 @@ const Vendors = () => {
         accessor: 'firstName'
       },
       {
-        Header: 'Email',
-        accessor: 'email'
+        Header: 'Contact',
+        accessor: 'phoneNumber'
+      },
+      {
+        Header: 'City',
+        accessor: 'city'
       },
       {
         Header: 'Actions',
@@ -267,7 +271,7 @@ const Vendors = () => {
                   color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setVendor(row.values);
+                    setCustomer(row.values);
                     handleAdd();
                   }}
                 >
@@ -280,7 +284,7 @@ const Vendors = () => {
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     handleClose();
-                    setVendorDeleteId(row.values.id);
+                    setCustomerDeleteId(row.values.id);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -291,12 +295,13 @@ const Vendors = () => {
         }
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
-    [memoizedVendors]
+    ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
+    [memoizedCustomers]
   );
 
   return (
@@ -304,14 +309,14 @@ const Vendors = () => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={memoizedVendors}
+          data={memoizedCustomers}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
-      {/* add vendor dialog */}
+      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+      {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -321,10 +326,10 @@ const Vendors = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {/* <AddVendor vendor={vendor} onCancel={handleAdd} /> */}
+        <AddCustomer customer={customer} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default Vendors;
+export default CustomerListPage;
