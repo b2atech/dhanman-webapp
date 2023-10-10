@@ -43,6 +43,7 @@ import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
 import VendorDetails from '../createbills/Vendor/VendorDetails';
 import { getAllVendors } from 'api/services/BillService';
 import { IVendor } from 'types/bill';
+import moment from 'moment';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -97,6 +98,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     setHiddenColumns(['firstName']);
   }, [setHiddenColumns]);
 
+  const now = new Date();
+  const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -121,7 +125,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={'vendor-list.csv'}
+              filename={formatedFilename}
             />
           </Stack>
         </Stack>
