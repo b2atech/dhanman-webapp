@@ -102,7 +102,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   });
 
   const now = new Date();
-  const formatedFilename = 'customersList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename = 'CustomersList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
 
   return (
     <>
