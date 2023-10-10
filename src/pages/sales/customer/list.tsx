@@ -44,6 +44,7 @@ import AddCustomer from '../createinvoice/Customer/AddCustomer';
 import CustomerView from '../createinvoice/Customer/CustomerView';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
+import moment from 'moment';
 
 const avatarImage = require.context('assets/images/users', true);
 
@@ -100,6 +101,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     setHiddenColumns(['firstName']);
   });
 
+  const now = new Date();
+  const formatedFilename = 'customersList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -124,7 +128,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={'customer-list.csv'}
+              filename={formatedFilename}
             />
           </Stack>
         </Stack>
