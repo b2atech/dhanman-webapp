@@ -180,9 +180,10 @@ const CustomerListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+  // const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -207,8 +208,13 @@ const CustomerListPage = () => {
     if (customer && !add) setCustomer(null);
   };
 
-  const handleClose = () => {
-    setOpen(!open);
+  const handleClose = (confirmed: boolean) => {
+    if (confirmed) {
+      if (customerDeleteId) {
+        setCustomerDeleteId(null);
+      }
+    }
+    setOpen(false);
   };
 
   const columns = useMemo(
@@ -292,8 +298,8 @@ const CustomerListPage = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleClose();
                     setCustomerDeleteId(row.values.id);
+                    setOpen(true);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -325,7 +331,8 @@ const CustomerListPage = () => {
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+      <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
+
       {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
