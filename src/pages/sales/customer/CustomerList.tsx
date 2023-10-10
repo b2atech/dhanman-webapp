@@ -23,7 +23,6 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import {
@@ -45,8 +44,6 @@ import CustomerView from '../createinvoice/Customer/CustomerView';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 
-const avatarImage = require.context('assets/images/users', true);
-
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
@@ -62,7 +59,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'sequentialId', desc: false };
+  const sortBy = { id: 'firstName', desc: false };
 
   const {
     getTableProps,
@@ -98,7 +95,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     setHiddenColumns(['firstName']);
-  });
+  }, [setHiddenColumns]);
 
   return (
     <>
@@ -229,17 +226,12 @@ const CustomerListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'Sr.No',
-        accessor: 'sequentialId'
-      },
-      {
         Header: 'Customer Name',
         accessor: 'lastName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Avatar alt="Avatar 1" size="sm" src={avatarImage(`./avatar-${!values.avatar ? 1 : values.avatar}.png`)} />
               <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
             </Stack>
           );
@@ -314,7 +306,6 @@ const CustomerListPage = () => {
     [theme]
   );
 
-  // eslint-disable-next-line react/jsx-no-undef
   const renderRowSubComponent = useCallback(
     ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
     [memoizedCustomers]

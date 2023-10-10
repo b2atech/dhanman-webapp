@@ -26,7 +26,6 @@ import Transitions from 'components/@extended/Transitions';
 // assets
 import { EnvironmentOutlined, LinkOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 
-
 // ==============================|| VENDOR - DETAILS ||============================== //
 
 const VendorDetails = ({ data }: any) => {

@@ -95,7 +95,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     setHiddenColumns(['firstName']);
-  });
+  }, [setHiddenColumns]);
 
   return (
     <>
@@ -291,6 +291,7 @@ const Vendors = () => {
         }
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
 
