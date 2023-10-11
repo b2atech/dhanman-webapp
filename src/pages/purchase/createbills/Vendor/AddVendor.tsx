@@ -31,7 +31,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 
 // types
 import { ThemeMode } from 'types/config';
-import AlertVendorDelete from './alertVendorDelete';
+import AlertVendorDelete from './AlertVendorDelete';
 
 // constant
 const getInitialValues = (vendor: FormikValues | null) => {
