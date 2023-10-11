@@ -43,7 +43,6 @@ import AddCustomer from '../createinvoice/Customer/AddCustomer';
 import CustomerView from '../createinvoice/Customer/CustomerView';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
-import moment from 'moment';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -60,14 +59,13 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'firstName', desc: false };
+  const sortBy = { id: 'customerName', desc: false };
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -94,12 +92,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect
   );
 
-  useEffect(() => {
-    setHiddenColumns(['firstName']);
-  }, [setHiddenColumns]);
+  const moment = require('moment');
 
   const now = new Date();
-  const formatedFilename = 'CustomersList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formattedFilename = `CustomersList ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
 
   return (
     <>
@@ -125,7 +121,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formatedFilename}
+              filename={formattedFilename}
             />
           </Stack>
         </Stack>
@@ -225,28 +221,31 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Customer Name',
-        accessor: 'lastName',
+        accessor: 'customerName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
+              <Typography variant="subtitle1">{values.customerName}</Typography>
             </Stack>
           );
         }
       },
-      //Shreyas-06/10/2023-concatination logic implitation need to improve cusrrent logic is based on hiding the Email column
-      {
-        Header: '',
-        accessor: 'firstName'
-      },
       {
         Header: 'Contact',
-        accessor: 'phoneNumber'
+        accessor: 'phoneNumber',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return <Typography variant="subtitle1">{values.phoneNumber}</Typography>;
+        }
       },
       {
         Header: 'City',
-        accessor: 'city'
+        accessor: 'city',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return <Typography variant="subtitle1">{values.city}</Typography>;
+        }
       },
       {
         Header: 'Actions',
