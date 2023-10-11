@@ -38,13 +38,12 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
-// import AddVendor from '../createbills/Vendor/AddVendor';
 import VendorDetails from '../createbills/Vendor/VendorDetails';
 import { getAllVendors } from 'api/services/BillService';
 import { IVendor } from 'types/bill';
 import moment from 'moment';
-
+import AddVendor from '../createbills/Vendor/AddVendor';
+import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
@@ -326,7 +325,7 @@ const Vendors = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {/* <AddVendor vendor={vendor} onCancel={handleAdd} /> */}
+        <AddVendor vendor={vendor} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
