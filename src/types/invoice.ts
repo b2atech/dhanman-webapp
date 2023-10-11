@@ -67,6 +67,7 @@ export interface ICustomer {
   contactPerson: string;
   email: string;
   address: string;
+  customerName: string;
 }
 
 export interface IGetCustomerResponse {
