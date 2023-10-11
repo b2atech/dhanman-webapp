@@ -23,7 +23,6 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import {
@@ -45,8 +44,6 @@ import CustomerView from '../createinvoice/Customer/CustomerView';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 
-const avatarImage = require.context('assets/images/users', true);
-
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
@@ -62,14 +59,13 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'sequentialId', desc: false };
+  const sortBy = { id: 'customerName', desc: false };
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -96,9 +92,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect
   );
 
-  useEffect(() => {
-    setHiddenColumns(['firstName']);
-  });
+  const moment = require('moment');
+
+  const now = new Date();
+  const formattedFilename = `CustomersList ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
 
   return (
     <>
@@ -124,7 +121,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={'customer-list.csv'}
+              filename={formattedFilename}
             />
           </Stack>
         </Stack>
@@ -223,34 +220,32 @@ const CustomerListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'Sr.No',
-        accessor: 'sequentialId'
-      },
-      {
         Header: 'Customer Name',
-        accessor: 'lastName',
+        accessor: 'customerName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Avatar alt="Avatar 1" size="sm" src={avatarImage(`./avatar-${!values.avatar ? 1 : values.avatar}.png`)} />
-              <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
+              <Typography variant="subtitle1">{values.customerName}</Typography>
             </Stack>
           );
         }
       },
-      //Shreyas-06/10/2023-concatination logic implitation need to improve cusrrent logic is based on hiding the Email column
-      {
-        Header: '',
-        accessor: 'firstName'
-      },
       {
         Header: 'Contact',
-        accessor: 'phoneNumber'
+        accessor: 'phoneNumber',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return <Typography variant="subtitle1">{values.phoneNumber}</Typography>;
+        }
       },
       {
         Header: 'City',
-        accessor: 'city'
+        accessor: 'city',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return <Typography variant="subtitle1">{values.city}</Typography>;
+        }
       },
       {
         Header: 'Actions',
@@ -308,7 +303,6 @@ const CustomerListPage = () => {
     [theme]
   );
 
-  // eslint-disable-next-line react/jsx-no-undef
   const renderRowSubComponent = useCallback(
     ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
     [memoizedCustomers]
