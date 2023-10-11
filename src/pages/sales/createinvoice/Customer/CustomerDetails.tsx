@@ -21,13 +21,10 @@ import { PatternFormat } from 'react-number-format';
 
 // project import
 import MainCard from 'components/MainCard';
-import Avatar from 'components/@extended/Avatar';
 import Transitions from 'components/@extended/Transitions';
 
 // assets
 import { EnvironmentOutlined, LinkOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-
-const avatarImage = require.context('assets/images/users', true);
 
 // ==============================|| CUSTOMER - VIEW ||============================== //
 
@@ -56,7 +53,6 @@ const CustomerView = ({ data }: any) => {
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <Stack spacing={2.5} alignItems="center">
-                      <Avatar alt="Avatar 1" size="xl" src={avatarImage(`./avatar-${data.avatar}.png`)} />
                       <Stack spacing={0.5} alignItems="center">
                         <Typography variant="h5">{data.fatherName}</Typography>
                         <Typography color="secondary">{data.role}</Typography>
@@ -139,12 +135,6 @@ const CustomerView = ({ data }: any) => {
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">Full Name</Typography>
-                            <Typography>{data.fatherName}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">Father Name</Typography>
                             <Typography>
                               Mr. {data.firstName} {data.lastName}
                             </Typography>
@@ -177,11 +167,6 @@ const CustomerView = ({ data }: any) => {
                       </Stack>
                     </ListItem>
                   </List>
-                </MainCard>
-                <MainCard title="About me">
-                  <Typography color="secondary">
-                    Hello, I’m {data.fatherName} {data.role} based in international company, {data.about}
-                  </Typography>
                 </MainCard>
               </Stack>
             </Grid>

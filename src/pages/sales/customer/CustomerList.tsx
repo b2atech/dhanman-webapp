@@ -40,7 +40,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
 import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerView from '../createinvoice/Customer/CustomerView';
+import CustomerView from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 import moment from 'moment';

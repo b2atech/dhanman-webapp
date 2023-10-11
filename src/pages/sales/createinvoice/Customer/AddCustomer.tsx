@@ -82,11 +82,17 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
+        // const newCustomer = {
+        //   name: values.firstName,
+        //   email: values.email,
+        //   location: values.cityName,
+        // };
         if (customer) {
+          //dispatch(updateCustomer(customer.id, newCustomer)); //update
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Customer update successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -95,6 +101,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
           );
         } else {
+          //dispatch(createCustomer(newCustomer));
           dispatch(
             openSnackbar({
               open: true,
@@ -125,7 +132,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Add Customer' : 'New Customer'}</DialogTitle>
+              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -251,8 +258,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               <Grid container justifyContent="flex-end" alignItems={'end'}>
                 <Grid item>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
-                    <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
-                      Add
+                  <Button type="submit" variant="contained" disabled={isSubmitting}>
+                      {customer ? 'Edit' : 'Add'}
                     </Button>
                     <Button variant="contained" color="error" onClick={onCancel}>
                       Cancel
