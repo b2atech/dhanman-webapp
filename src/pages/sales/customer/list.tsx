@@ -230,10 +230,6 @@ const CustomerListPage = () => {
         }
       },
       {
-        Header: 'Contact',
-        accessor: 'phoneNumber'
-      },
-      {
         Header: 'City',
         accessor: 'city'
       },
