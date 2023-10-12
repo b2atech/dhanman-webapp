@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, FC, Fragment } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery } from '@mui/material';
 
 // third-party
 import {
@@ -23,7 +23,6 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import {
   CSVExport,
@@ -37,12 +36,12 @@ import {
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
-import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerView from '../createinvoice/Customer/CustomerView';
-import { getAllCustomers } from 'api/services/SalesService';
+import { PlusOutlined } from '@ant-design/icons';
+
+import CustomerView from '../../sales/createinvoice/Customer/CustomerView';
 import { ICustomer } from 'types/invoice';
+import { getAllChartOfAccount } from 'api/services/CommonService';
+import AddNewAccount from './addAccount';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -59,12 +58,14 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'customerName', desc: false };
+  const sortBy = { id: 'name', desc: false };
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -81,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'firstName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', ''], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -91,10 +92,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect
   );
 
-  const moment = require('moment');
+  useEffect(() => {
+    setHiddenColumns(['']);
+  }, [setHiddenColumns]);
 
-  const now = new Date();
-  const formattedFilename = `CustomersList ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -115,11 +116,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Customer
+              New Account
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formattedFilename}
+              filename={'customer-list.csv'}
             />
           </Stack>
         </Stack>
@@ -171,24 +172,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
 // ==============================|| CUSTOMER - LIST ||============================== //
 
-const CustomerListPage = () => {
+const ChartOfAccounts = () => {
   const theme = useTheme();
-  const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
 
   useEffect(() => {
-    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllChartOfAccount('0332a2a1-8d09-464c-8903-ab24950f54d4')
       .then((customerList) => {
-        if (Array.isArray(customerList)) {
-          const customersWithSequentialId = customerList.map((customer, index) => ({
-            ...customer,
-            sequentialId: index + 1
-          }));
-          setCustomers(customersWithSequentialId);
-        }
+        setCustomers(customerList);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -200,10 +193,6 @@ const CustomerListPage = () => {
   const handleAdd = () => {
     setAdd(!add);
     if (customer && !add) setCustomer(null);
-  };
-
-  const handleClose = () => {
-    setOpen(!open);
   };
 
   const columns = useMemo(
@@ -218,87 +207,16 @@ const CustomerListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'Customer Name',
-        accessor: 'customerName',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return (
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.customerName}</Typography>
-            </Stack>
-          );
-        }
+        Header: 'Account Name',
+        accessor: 'name'
       },
       {
-        Header: 'City',
-        accessor: 'city'
+        Header: 'Account Code',
+        accessor: 'accountCode'
       },
       {
-        Header: 'Contact',
-        accessor: 'phoneNumber',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return <Typography variant="subtitle1">{values.phoneNumber}</Typography>;
-        }
-      },
-      {
-        Header: 'City',
-        accessor: 'city',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return <Typography variant="subtitle1">{values.city}</Typography>;
-        }
-      },
-      {
-        Header: 'Actions',
-        className: 'cell-left',
-        disableSortBy: true,
-        Cell: ({ row }: { row: Row<{}> }) => {
-          const collapseIcon = row.isExpanded ? (
-            <CloseOutlined style={{ color: theme.palette.error.main }} />
-          ) : (
-            <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-          );
-          return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    row.toggleRowExpanded();
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setCustomer(row.values);
-                    handleAdd();
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    handleClose();
-                    setCustomerDeleteId(row.values.id);
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          );
-        }
+        Header: 'Type',
+        accessor: 'type'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -321,7 +239,6 @@ const CustomerListPage = () => {
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
       {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
@@ -332,10 +249,10 @@ const CustomerListPage = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} />
+        <AddNewAccount customer={customer} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default CustomerListPage;
+export default ChartOfAccounts;

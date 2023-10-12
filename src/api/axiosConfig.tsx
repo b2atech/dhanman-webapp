@@ -13,6 +13,10 @@ export const apiSales = axios.create({
   baseURL: 'https://api-dhanman-sales-nonprod.azurewebsites.net/api/'
 });
 
+export const apiCommon = axios.create({
+  baseURL: 'https://api-dhanman-common-nonprod.azurewebsites.net/api/'
+});
+
 const errorHandler = (error: any) => {
   const statusCode = error.response?.status;
 
@@ -40,5 +44,9 @@ apiPurchase.interceptors.response.use(undefined, (error) => {
 });
 
 apiSales.interceptors.response.use(undefined, (error) => {
+  return errorHandler(error);
+});
+
+apiCommon.interceptors.response.use(undefined, (error) => {
   return errorHandler(error);
 });

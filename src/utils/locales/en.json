@@ -149,5 +149,6 @@
   "AlertCustomerDelete" : "Alert Customer Delete",
   "paymentreceived" : "Payment Received",
   "company": "Company",
-  "paymentmade" : "Payment Made"
+  "paymentmade" : "Payment Made",
+  "chartofaccounts": "Chart of Accounts"
 }

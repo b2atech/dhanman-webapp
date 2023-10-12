@@ -9,6 +9,7 @@ import {
   EditFilled,
   UnorderedListOutlined,
   CustomerServiceOutlined,
+  TableOutlined,
   ProfileOutlined,
   UserOutlined,
   ShoppingCartOutlined,
@@ -28,6 +29,7 @@ const icons = {
   EditFilled,
   UnorderedListOutlined,
   CustomerServiceOutlined,
+  TableOutlined,
   ProfileOutlined,
   UserOutlined,
   ShoppingCartOutlined,
@@ -49,6 +51,13 @@ const master: NavItemType = {
       type: 'collapse',
       icon: icons.GroupOutlined,
       children: [
+        {
+          id: 'chartofaccounts',
+          title: <FormattedMessage id="chartofaccounts" />,
+          type: 'item',
+          url: '/sales/chartOfAccounts/list',
+          icon: icons.TableOutlined
+        },
         {
           id: 'customers',
           title: <FormattedMessage id="customers" />,
