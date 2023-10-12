@@ -231,19 +231,11 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Contact',
-        accessor: 'phoneNumber',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return <Typography variant="subtitle1">{values.phoneNumber}</Typography>;
-        }
+        accessor: 'phoneNumber'
       },
       {
         Header: 'City',
-        accessor: 'city',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return <Typography variant="subtitle1">{values.city}</Typography>;
-        }
+        accessor: 'city'
       },
       {
         Header: 'Actions',
