@@ -60,7 +60,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'customerName', desc: false };
-    
   const {
     getTableProps,
     getTableBodyProps,
@@ -96,7 +95,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   const now = new Date();
   const formattedFilename = `CustomersList ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
-        
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -238,6 +236,7 @@ const CustomerListPage = () => {
       {
         Header: 'City',
         accessor: 'city'
+      },
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
