@@ -109,7 +109,7 @@ const VendorDetails = ({ data }: any) => {
                           <EnvironmentOutlined />
                         </ListItemIcon>
                         <ListItemSecondaryAction>
-                          <Typography align="right">{data.country}</Typography>
+                          <Typography align="right">{data.City}</Typography>
                         </ListItemSecondaryAction>
                       </ListItem>
                       <ListItem>
@@ -136,25 +136,27 @@ const VendorDetails = ({ data }: any) => {
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">Full Name</Typography>
-                            <Typography>{data.fatherName}</Typography>
+                            <Typography>
+                              Mr. {data.firstName} {data.lastName}
+                            </Typography>
                           </Stack>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        {/* <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">Father Name</Typography>
                             <Typography>
                               Mr. {data.firstName} {data.lastName}
                             </Typography>
                           </Stack>
-                        </Grid>
+                        </Grid> */}
                       </Grid>
                     </ListItem>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
-                            <Typography color="secondary">Country</Typography>
-                            <Typography>{data.country}</Typography>
+                            <Typography color="secondary">City</Typography>
+                            <Typography>{data.City}</Typography>
                           </Stack>
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -175,11 +177,11 @@ const VendorDetails = ({ data }: any) => {
                     </ListItem>
                   </List>
                 </MainCard>
-                <MainCard title="About me">
+                {/* <MainCard title="About me">
                   <Typography color="secondary">
                     Hello, I’m {data.fatherName} {data.role} based in international company, {data.about}
                   </Typography>
-                </MainCard>
+                </MainCard> */}
               </Stack>
             </Grid>
           </Grid>
