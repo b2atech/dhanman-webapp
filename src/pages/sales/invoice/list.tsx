@@ -40,12 +40,14 @@ function ReactTable({ columns, data }: { columns: Column[]; data: IInvoice[] }) 
   );
 
   const sortingRow = rows.slice(0, 10);
+  const now = new Date();
+  const formatedFilename = 'InvoicesList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
 
   return (
     <>
       <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
         <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
-        <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
+        <CSVExport data={rows.map((d: Row) => d.original)} filename={formatedFilename} />
       </Stack>
 
       <Table {...getTableProps()}>
