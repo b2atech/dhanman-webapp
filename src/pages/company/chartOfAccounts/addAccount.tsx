@@ -1,5 +1,3 @@
-//import { useState } from 'react';
-
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Grid, InputLabel, Stack, TextField } from '@mui/material';
@@ -13,7 +11,6 @@ import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 
 // project imports
-//import AlertCustomerDelete from './AlertCustomerDelete';
 
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
@@ -43,7 +40,6 @@ export interface Props {
 
 const AddNewAccount = ({ customer, onCancel }: Props) => {
   const theme = useTheme();
-  //const isCreating = !customer;
 
   const CustomerSchema = Yup.object().shape({
     firstName: Yup.string().max(255).required('Please Enter First Name'),
@@ -57,13 +53,6 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
       .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, 'E-Mail Address Is Not Valid'),
     cityName: Yup.string().max(255).required('Pease Enter City Name')
   });
-
-  //   const [openAlert, setOpenAlert] = useState(false);
-
-  //   const handleAlertClose = () => {
-  //     setOpenAlert(!openAlert);
-  //     onCancel();
-  //   };
 
   const formik = useFormik({
     initialValues: getInitialValues(customer!),
@@ -222,7 +211,6 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {/* {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />} */}
     </>
   );
 };
