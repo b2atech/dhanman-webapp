@@ -18,12 +18,7 @@ const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create'
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
-const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
-const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
-const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
 const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/VendorList')));
-// const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
-
 
 // ==============================|| MAIN ROUTING ||============================== //
 
