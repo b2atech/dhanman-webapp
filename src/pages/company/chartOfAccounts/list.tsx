@@ -38,10 +38,10 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
 import { PlusOutlined } from '@ant-design/icons';
 
-import CustomerView from '../sales/createinvoice/Customer/CustomerView';
+import CustomerView from '../../sales/createinvoice/Customer/CustomerView';
 import { ICustomer } from 'types/invoice';
 import { getAllChartOfAccount } from 'api/services/CommonService';
-import AddNewAccount from './addNewAccount';
+import AddNewAccount from './addAccount';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -82,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 100, hiddenColumns: ['avatar', ''], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', ''], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -116,7 +116,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              New Accoun
+              New Account
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}

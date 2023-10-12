@@ -74,7 +74,7 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Account added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -86,7 +86,7 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Account added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -112,7 +112,7 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Add Customer' : 'Create Account'}</DialogTitle>
+              <DialogTitle>{customer ? 'Add Account' : 'Create Account'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -145,14 +145,14 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">Account Type</InputLabel>
+                        <InputLabel htmlFor="Type">Account Type</InputLabel>
                         <TextField
                           autoFocus
                           fullWidth
-                          id="firstName"
+                          id="Type"
                           type="text"
                           placeholder="Enter Account Type"
-                          {...getFieldProps('firstName')}
+                          {...getFieldProps('Type')}
                           error={Boolean(touched.firstName && errors.firstName)}
                           helperText={touched.firstName && errors.firstName}
                         />
@@ -160,13 +160,13 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-lastName">Account Name</InputLabel>
+                        <InputLabel htmlFor="accountName">Account Name</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-lastName"
+                          id="accountName"
                           type="text"
-                          placeholder="Enter Last Name"
-                          {...getFieldProps('lastName')}
+                          placeholder="Enter Account Name"
+                          {...getFieldProps('accountName')}
                           error={Boolean(touched.lastName && errors.lastName)}
                           helperText={touched.lastName && errors.lastName}
                         />
@@ -174,13 +174,13 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-lastName">Account Code</InputLabel>
+                        <InputLabel htmlFor="accountCode">Account Code</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-lastNamfe"
+                          id="accountCode"
                           type="text"
                           placeholder="Enter Account Code"
-                          {...getFieldProps('lastName')}
+                          {...getFieldProps('accountCode')}
                           error={Boolean(touched.lastName && errors.lastName)}
                           helperText={touched.lastName && errors.lastName}
                         />
@@ -188,13 +188,13 @@ const AddNewAccount = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">Description</InputLabel>
+                        <InputLabel htmlFor="description">Description</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-email"
+                          id="description"
                           type="email"
                           placeholder="Enter Account Description"
-                          {...getFieldProps('email')}
+                          {...getFieldProps('description')}
                           error={Boolean(touched.email && errors.email)}
                           helperText={touched.email && errors.email}
                         />
