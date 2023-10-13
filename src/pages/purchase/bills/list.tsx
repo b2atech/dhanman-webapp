@@ -248,11 +248,7 @@ const Bills = () => {
     getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((billList) => {
         if (Array.isArray(billList)) {
-          const billsWithSequentialId = billList.map((bill, index) => ({
-            ...bill,
-            billsequentialId: index + 1
-          }));
-          setBills(billsWithSequentialId);
+          setBills(billList);
         } else {
           console.error('API response is not an array:', billList);
         }
@@ -299,7 +295,15 @@ const Bills = () => {
         {
           Header: 'Vendor Name',
           accessor: 'vendorName',
-          disableFilters: true
+          disableFilters: true,
+          Cell: ({ row }: { row: Row }) => {
+            const { values } = row;
+            return (
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Typography variant="subtitle1">{values.vendorName}</Typography>
+              </Stack>
+            );
+          }
         },
         {
           Header: 'Create Date',
@@ -342,36 +346,19 @@ const Bills = () => {
                   <IconButton
                     color="secondary"
                     onClick={() => {
-                      navigation('/purchase/bills/list');
+                      navigation('./create');
                     }}
                   >
                     <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Edit">
-                  <IconButton
-                    color="primary"
-                    // onClick={(e: any) => {
-                    //   e.stopPropagation();
-                    //   navigation(`/apps/bill/edit/${row.values.id}`);
-                    // }}
-                  >
+                  <IconButton color="primary">
                     <EditTwoTone twoToneColor={theme.palette.primary.main} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete">
-                  <IconButton
-                    color="error"
-                    // onClick={(e: any) => {
-                    //   e.stopPropagation();
-                    //   setGetInvoiceId(row.values.bill_id); // row.original
-                    //   dispatch(
-                    //     alertPopupToggle({
-                    //       alertToggle: true
-                    //     })
-                    //   );
-                    // }}
-                  >
+                  <IconButton color="error">
                     <DeleteTwoTone twoToneColor={theme.palette.error.main} />
                   </IconButton>
                 </Tooltip>
