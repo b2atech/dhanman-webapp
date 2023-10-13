@@ -66,7 +66,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -92,10 +91,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     usePagination,
     useRowSelect
   );
-
-  useEffect(() => {
-    setHiddenColumns(['firstName']);
-  }, [setHiddenColumns]);
 
   const now = new Date();
   const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
@@ -224,19 +219,15 @@ const Vendors = () => {
       },
       {
         Header: 'Vendor Name',
-        accessor: 'lastName',
+        accessor: 'vendorName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
+              <Typography variant="subtitle1">{values.vendorName}</Typography>
             </Stack>
           );
         }
-      },
-      {
-        Header: '',
-        accessor: 'firstName'
       },
       {
         Header: 'Email',
