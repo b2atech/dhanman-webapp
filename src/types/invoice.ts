@@ -61,8 +61,8 @@ export interface InvoiceDetail {
 }
 
 export interface ICustomer {
+  id : string
   clientId: string;
-  vendorId: number;
   name: string;
   contactPerson: string;
   email: string;

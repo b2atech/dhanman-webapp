@@ -3,7 +3,6 @@ import { useTheme } from '@mui/material/styles';
 import {
   useMediaQuery,
   Grid,
-  Chip,
   Divider,
   Link,
   List,
@@ -39,23 +38,13 @@ const CustomerView = ({ data }: any) => {
           <Grid container spacing={2.5} sx={{ pl: { xs: 0, sm: 5, md: 6, lg: 10, xl: 12 } }}>
             <Grid item xs={12} sm={5} md={4} lg={4} xl={3}>
               <MainCard>
-                <Chip
-                  label={data.status}
-                  size="small"
-                  color="primary"
-                  sx={{
-                    position: 'absolute',
-                    right: 10,
-                    top: 10,
-                    fontSize: '0.675rem'
-                  }}
-                />
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <Stack spacing={2.5} alignItems="center">
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.fatherName}</Typography>
-                        <Typography color="secondary">{data.role}</Typography>
+                      <Stack spacing={0.3} alignItems="center">
+                        <Typography fontWeight={{fontWeight:'bold'}} >
+                             Mr. {data.firstName} {data.lastName}
+                        </Typography>
                       </Stack>
                     </Stack>
                   </Grid>
@@ -64,19 +53,9 @@ const CustomerView = ({ data }: any) => {
                   </Grid>
                   <Grid item xs={12}>
                     <Stack direction="row" justifyContent="space-around" alignItems="center">
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.age}</Typography>
-                        <Typography color="secondary">Age</Typography>
-                      </Stack>
-                      <Divider orientation="vertical" flexItem />
-                      <Stack spacing={0.5} alignItems="center">
+                      <Stack spacing={0.3} alignItems="center">
                         <Typography variant="h5">{data.progress}%</Typography>
                         <Typography color="secondary">Progress</Typography>
-                      </Stack>
-                      <Divider orientation="vertical" flexItem />
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.visits}</Typography>
-                        <Typography color="secondary">Visits</Typography>
                       </Stack>
                     </Stack>
                   </Grid>
@@ -99,7 +78,7 @@ const CustomerView = ({ data }: any) => {
                         </ListItemIcon>
                         <ListItemSecondaryAction>
                           <Typography align="right">
-                            <PatternFormat displayType="text" format="+1 (###) ###-####" mask="_" defaultValue={data.contact} />
+                            <PatternFormat displayType="text" format="+1 (###) ###-####" mask="_" defaultValue={data.phoneNumber} />
                           </Typography>
                         </ListItemSecondaryAction>
                       </ListItem>
@@ -108,7 +87,7 @@ const CustomerView = ({ data }: any) => {
                           <EnvironmentOutlined />
                         </ListItemIcon>
                         <ListItemSecondaryAction>
-                          <Typography align="right">{data.country}</Typography>
+                          <Typography align="right">{data.city}</Typography>
                         </ListItemSecondaryAction>
                       </ListItem>
                       <ListItem>
@@ -146,8 +125,8 @@ const CustomerView = ({ data }: any) => {
                       <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
-                            <Typography color="secondary">Country</Typography>
-                            <Typography>{data.country}</Typography>
+                            <Typography color="secondary">City</Typography>
+                            <Typography>{data.city}</Typography>
                           </Stack>
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -163,7 +142,7 @@ const CustomerView = ({ data }: any) => {
                     <ListItem>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">Address</Typography>
-                        <Typography>{data.address}</Typography>
+                        <Typography>{data.Address}</Typography>
                       </Stack>
                     </ListItem>
                   </List>
