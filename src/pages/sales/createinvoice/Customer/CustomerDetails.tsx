@@ -52,17 +52,6 @@ const CustomerView = ({ data }: any) => {
                     <Divider />
                   </Grid>
                   <Grid item xs={12}>
-                    <Stack direction="row" justifyContent="space-around" alignItems="center">
-                      <Stack spacing={0.3} alignItems="center">
-                        <Typography variant="h5">{data.progress}%</Typography>
-                        <Typography color="secondary">Progress</Typography>
-                      </Stack>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Divider />
-                  </Grid>
-                  <Grid item xs={12}>
                     <List component="nav" aria-label="main mailbox folders" sx={{ py: 0 }}>
                       <ListItem>
                         <ListItemIcon>
