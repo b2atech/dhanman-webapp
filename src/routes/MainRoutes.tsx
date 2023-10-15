@@ -165,6 +165,86 @@ const MainRoutes = {
           ]
         }
       ]
+    },
+    {
+      path: '/timesheet',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'projects',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'tasks',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'logtime',
+          element: <MaintenanceComingSoon />
+        }
+      ]
+    },
+    {
+      path: '/inventory',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'products',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'orders',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        }
+      ]
     }
   ]
 };

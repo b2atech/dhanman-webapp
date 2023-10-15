@@ -15,7 +15,15 @@ import {
   ShoppingCartOutlined,
   WalletOutlined,
   AuditOutlined,
-  GroupOutlined
+  GroupOutlined,
+  FieldTimeOutlined,
+  TagOutlined,
+  PlusSquareOutlined,
+  HourglassOutlined,
+  BookOutlined,
+  OrderedListOutlined,
+  AppstoreAddOutlined,
+  BankOutlined
 } from '@ant-design/icons';
 
 // type
@@ -35,7 +43,15 @@ const icons = {
   ShoppingCartOutlined,
   WalletOutlined,
   AuditOutlined,
-  GroupOutlined
+  GroupOutlined,
+  FieldTimeOutlined,
+  TagOutlined,
+  PlusSquareOutlined,
+  HourglassOutlined,
+  BookOutlined,
+  OrderedListOutlined,
+  AppstoreAddOutlined,
+  BankOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
@@ -49,7 +65,7 @@ const master: NavItemType = {
       id: 'company-forms-layout',
       title: <FormattedMessage id="company" />,
       type: 'collapse',
-      icon: icons.GroupOutlined,
+      icon: icons.BankOutlined,
       children: [
         {
           id: 'chartofaccounts',
@@ -63,14 +79,14 @@ const master: NavItemType = {
           title: <FormattedMessage id="customers" />,
           type: 'item',
           url: '/sales/customers/list',
-          icon: icons.CustomerServiceOutlined
+          icon: icons.UserOutlined
         },
         {
           id: 'vendors',
           title: <FormattedMessage id="vendors" />,
           type: 'item',
           url: '/purchase/vendors/list',
-          icon: icons.ShoppingCartOutlined
+          icon: icons.UserOutlined
         }
       ]
     },
@@ -85,7 +101,7 @@ const master: NavItemType = {
           title: <FormattedMessage id="customers" />,
           type: 'item',
           url: '/sales/customers/list',
-          icon: icons.CustomerServiceOutlined
+          icon: icons.UserOutlined
         },
         {
           id: 'invoicelist',
@@ -99,14 +115,14 @@ const master: NavItemType = {
           title: <FormattedMessage id="createinvoice" />,
           type: 'item',
           url: '/sales/invoices/create',
-          icon: icons.AuditOutlined
+          icon: icons.PlusSquareOutlined
         },
         {
           id: 'paymentreceived',
           title: <FormattedMessage id="paymentreceived" />,
           type: 'item',
           url: '/sales/payments',
-          icon: icons.AuditOutlined
+          icon: icons.PlusSquareOutlined
         }
       ]
     },
@@ -121,7 +137,7 @@ const master: NavItemType = {
           title: <FormattedMessage id="Vendors" />,
           type: 'item',
           url: '/purchase/vendors/list',
-          icon: icons.ShoppingCartOutlined
+          icon: icons.UserOutlined
         },
         {
           id: 'billslist',
@@ -135,14 +151,79 @@ const master: NavItemType = {
           title: <FormattedMessage id="createbills" />,
           type: 'item',
           url: '/purchase/bills/create',
-          icon: icons.AuditOutlined
+          icon: icons.PlusSquareOutlined
         },
         {
           id: 'paymentmade',
           title: <FormattedMessage id="paymentmade" />,
           type: 'item',
           url: '/purchase/payments',
-          icon: icons.AuditOutlined
+          icon: icons.PlusSquareOutlined
+        }
+      ]
+    },
+    {
+      id: 'inventory-forms-layout',
+      title: <FormattedMessage id="inventory" />,
+      type: 'collapse',
+      icon: icons.AppstoreAddOutlined,
+      children: [
+        {
+          id: 'products',
+          title: <FormattedMessage id="products" />,
+          type: 'item',
+          url: '/inventory/products/list',
+          icon: icons.TagOutlined
+        },
+        {
+          id: 'createproduct',
+          title: <FormattedMessage id="createProduct" />,
+          type: 'item',
+          url: '/inventory/products/create',
+          icon: icons.PlusSquareOutlined
+        }
+      ]
+    },
+    {
+      id: 'timesheet-forms-layout',
+      title: <FormattedMessage id="timesheet" />,
+      type: 'collapse',
+      icon: icons.FieldTimeOutlined,
+      children: [
+        {
+          id: 'projects',
+          title: <FormattedMessage id="projects" />,
+          type: 'item',
+          url: '/timesheet/projects/list',
+          icon: icons.BookOutlined
+        },
+        {
+          id: 'createproduct',
+          title: <FormattedMessage id="createProject" />,
+          type: 'item',
+          url: '/timesheet/projects/create',
+          icon: icons.PlusSquareOutlined
+        },
+        {
+          id: 'task',
+          title: <FormattedMessage id="tasks" />,
+          type: 'item',
+          url: '/timesheet/tasks/list',
+          icon: icons.OrderedListOutlined
+        },
+        {
+          id: 'createtask',
+          title: <FormattedMessage id="createTask" />,
+          type: 'item',
+          url: '/timesheet/tasks/create',
+          icon: icons.PlusSquareOutlined
+        },
+        {
+          id: 'logTime',
+          title: <FormattedMessage id="logTime" />,
+          type: 'item',
+          url: '/timesheet/logtime',
+          icon: icons.HourglassOutlined
         }
       ]
     }
