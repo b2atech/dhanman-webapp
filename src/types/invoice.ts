@@ -14,6 +14,24 @@ export interface CountryType {
   prefix: string;
 }
 
+export interface IInvoiceList {
+  id: number;
+  invoice_id: number;
+  customer_name: string;
+  email: string;
+  avatar: number;
+  date: Date | string | number;
+  due_date: Date | string | number;
+  quantity: number;
+  invoiceStatus: string;
+  invoice_detail: Items[];
+  cashierInfo: InfoType;
+  discount: number | null;
+  tax: number | null;
+  customerInfo: InfoType;
+  notes: string;
+}
+
 export interface Items {
   id: string | number;
   name: string;
@@ -61,12 +79,13 @@ export interface InvoiceDetail {
 }
 
 export interface ICustomer {
+  id: string;
   clientId: string;
-  vendorId: number;
-  name: string;
-  contactPerson: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  address: string;
+  phoneNumber: string;
+  city: string;
 }
 
 export interface IGetCustomerResponse {

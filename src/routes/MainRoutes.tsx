@@ -15,13 +15,11 @@ const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/comi
 //Render Applications
 const AppInvoices = Loadable(lazy(() => import('pages/sales/invoice/list')));
 const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create')));
-const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/CustomerList')));
-
+const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
+const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/list')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
-const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/VendorList')));
-// render - sample page
-// const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
+const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -79,6 +77,16 @@ const MainRoutes = {
             {
               path: 'list',
               element: <AppCustomers />
+            }
+          ]
+        },
+        {
+          path: 'chartOfAccounts',
+          element: <AppChartOfAccounts />,
+          children: [
+            {
+              path: 'list',
+              element: <AppChartOfAccounts />
             }
           ]
         },
@@ -152,6 +160,86 @@ const MainRoutes = {
             },
             {
               path: 'make',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        }
+      ]
+    },
+    {
+      path: '/timesheet',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'projects',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'tasks',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'logtime',
+          element: <MaintenanceComingSoon />
+        }
+      ]
+    },
+    {
+      path: '/inventory',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'products',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'orders',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
               element: <MaintenanceComingSoon />
             }
           ]

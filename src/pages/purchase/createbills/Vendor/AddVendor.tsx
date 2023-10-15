@@ -25,55 +25,39 @@ import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 
 // project imports
-import AlertCustomerDelete from './AlertCustomerDelete';
 
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
 // types
 import { ThemeMode } from 'types/config';
+import AlertVendorDelete from './AlertVendorDelete';
 
 // constant
-const getInitialValues = (customer: FormikValues | null) => {
-  if (customer) {
-    const newCustomer = {
-      id: customer.id,
-      clientId: '',
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      phoneNumber: customer.phoneNumber,
-      city: customer.city
-    };
+const getInitialValues = (vendor: FormikValues | null) => {
+  const newVendor = {
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    email: '',
+    cityName: ''
+  };
 
-    return newCustomer;
-  } else {
-    const newCustomer = {
-      id: '',
-      clientId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      city: ''
-    };
-
-    return newCustomer;
-  }
+  return newVendor;
 };
 
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
 
 export interface Props {
-  customer?: any;
+  vendor?: any;
   onCancel: () => void;
 }
 
-const AddCustomer = ({ customer, onCancel }: Props) => {
+const AddVendor = ({ vendor, onCancel }: Props) => {
   const theme = useTheme();
-  const isCreating = !customer;
+  const isCreating = !vendor;
 
-  const CustomerSchema = Yup.object().shape({
+  const VendorSchema = Yup.object().shape({
     firstName: Yup.string().max(255).required('Please Enter First Name'),
     lastName: Yup.string().max(255).required('Pease Enter Last Name'),
     phoneNumber: Yup.string()
@@ -94,16 +78,15 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   };
 
   const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: getInitialValues(customer!),
-    validationSchema: CustomerSchema,
+    initialValues: getInitialValues(vendor!),
+    validationSchema: VendorSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
-        if (customer) {
+        if (vendor) {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Vendor added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -115,7 +98,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Vendor added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -142,8 +125,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
-              <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
+              <DialogTitle>{vendor ? 'Add Vendor' : 'New Vendor'}</DialogTitle>
+              <IconButton shape="rounded" type="reset" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
             </Stack>
@@ -175,7 +158,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">First Name</InputLabel>
+                        <InputLabel htmlFor="vendor-name">First Name</InputLabel>
                         <TextField
                           autoFocus
                           fullWidth
@@ -184,34 +167,34 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter First Name"
                           {...getFieldProps('firstName')}
                           error={Boolean(touched.firstName && errors.firstName)}
-                          // helperText={touched.firstName && errors.firstName}
+                          helperText={touched.firstName && errors.firstName}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-lastName">Last Name</InputLabel>
+                        <InputLabel htmlFor="vendor-lastName">Last Name</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-lastName"
+                          id="vendor-lastName"
                           type="text"
                           placeholder="Enter Last Name"
                           {...getFieldProps('lastName')}
                           error={Boolean(touched.lastName && errors.lastName)}
-                          // helperText={touched.lastName && errors.lastName}
+                          helperText={touched.lastName && errors.lastName}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
+                        <InputLabel htmlFor="vendor-phoneNumber">Phone Number</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-phoneNumber"
+                          id="vendor-phoneNumber"
                           placeholder="Enter Phone Number"
                           {...getFieldProps('phoneNumber')}
                           error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                          // helperText={touched.phoneNumber && errors.phoneNumber}
+                          helperText={touched.phoneNumber && errors.phoneNumber}
                           inputProps={{
                             inputMode: 'numeric',
                             pattern: '[0-9]*',
@@ -228,32 +211,32 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">E-mail</InputLabel>
+                        <InputLabel htmlFor="vendor-email">E-mail</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-email"
+                          id="vendor-email"
                           type="email"
                           placeholder="Enter Email"
                           {...getFieldProps('email')}
                           error={Boolean(touched.email && errors.email)}
-                          // helperText={touched.email && errors.email}
+                          helperText={touched.email && errors.email}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-city">City</InputLabel>
+                        <InputLabel htmlFor="vendor-city">City</InputLabel>
                         <Autocomplete
                           fullWidth
                           autoHighlight
-                          id="customer-city"
+                          id="vendor-city"
                           options={cities} // Provide your list of city names here
                           renderInput={(params) => (
                             <TextField
                               {...params}
                               placeholder="Enter City Name"
-                              error={Boolean(touched.city && errors.city)}
-                              // helperText={touched.city && errors.city}
+                              error={Boolean(touched.cityName && errors.cityName)}
+                              helperText={touched.cityName && errors.cityName}
                             />
                           )}
                         />
@@ -271,7 +254,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
                       Add
                     </Button>
-                    <Button variant="contained" color="error" onClick={onCancel}>
+                    <Button variant="contained" type="reset" color="error" onClick={onCancel}>
                       Cancel
                     </Button>
                   </Stack>
@@ -281,9 +264,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />}
+      {!isCreating && <AlertVendorDelete title={vendor.fatherName} open={openAlert} handleClose={handleAlertClose} />}
     </>
   );
 };
 
-export default AddCustomer;
+export default AddVendor;

@@ -1,20 +1,6 @@
-import { useState } from 'react';
-
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import {
-  Box,
-  Button,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Grid,
-  InputLabel,
-  Stack,
-  TextField,
-  Autocomplete
-} from '@mui/material';
+import { Box, Button, DialogActions, DialogContent, DialogTitle, Divider, Grid, InputLabel, Stack, TextField } from '@mui/material';
 import { UserAddOutlined, CloseOutlined } from '@ant-design/icons';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -25,7 +11,6 @@ import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 
 // project imports
-import AlertCustomerDelete from './AlertCustomerDelete';
 
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
@@ -35,31 +20,15 @@ import { ThemeMode } from 'types/config';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  if (customer) {
-    const newCustomer = {
-      id: customer.id,
-      clientId: '',
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      phoneNumber: customer.phoneNumber,
-      city: customer.city
-    };
+  const newCustomer = {
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    email: '',
+    cityName: ''
+  };
 
-    return newCustomer;
-  } else {
-    const newCustomer = {
-      id: '',
-      clientId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      city: ''
-    };
-
-    return newCustomer;
-  }
+  return newCustomer;
 };
 
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
@@ -69,9 +38,8 @@ export interface Props {
   onCancel: () => void;
 }
 
-const AddCustomer = ({ customer, onCancel }: Props) => {
+const AddNewAccount = ({ customer, onCancel }: Props) => {
   const theme = useTheme();
-  const isCreating = !customer;
 
   const CustomerSchema = Yup.object().shape({
     firstName: Yup.string().max(255).required('Please Enter First Name'),
@@ -86,15 +54,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     cityName: Yup.string().max(255).required('Pease Enter City Name')
   });
 
-  const [openAlert, setOpenAlert] = useState(false);
-
-  const handleAlertClose = () => {
-    setOpenAlert(!openAlert);
-    onCancel();
-  };
-
   const formik = useFormik({
-    enableReinitialize: true,
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
@@ -103,7 +63,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Account added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -115,7 +75,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Account added successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -134,7 +94,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   });
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
-  const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Philadelphia'];
 
   return (
     <>
@@ -142,7 +101,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
+              <DialogTitle>{customer ? 'Add Account' : 'Create Account'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -175,87 +134,58 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">First Name</InputLabel>
+                        <InputLabel htmlFor="Type">Account Type</InputLabel>
                         <TextField
                           autoFocus
                           fullWidth
-                          id="firstName"
+                          id="Type"
                           type="text"
-                          placeholder="Enter First Name"
-                          {...getFieldProps('firstName')}
+                          placeholder="Enter Account Type"
+                          {...getFieldProps('Type')}
                           error={Boolean(touched.firstName && errors.firstName)}
-                          // helperText={touched.firstName && errors.firstName}
+                          helperText={touched.firstName && errors.firstName}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-lastName">Last Name</InputLabel>
+                        <InputLabel htmlFor="accountName">Account Name</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-lastName"
+                          id="accountName"
                           type="text"
-                          placeholder="Enter Last Name"
-                          {...getFieldProps('lastName')}
+                          placeholder="Enter Account Name"
+                          {...getFieldProps('accountName')}
                           error={Boolean(touched.lastName && errors.lastName)}
-                          // helperText={touched.lastName && errors.lastName}
+                          helperText={touched.lastName && errors.lastName}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
+                        <InputLabel htmlFor="accountCode">Account Code</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-phoneNumber"
-                          placeholder="Enter Phone Number"
-                          {...getFieldProps('phoneNumber')}
-                          error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                          // helperText={touched.phoneNumber && errors.phoneNumber}
-                          inputProps={{
-                            inputMode: 'numeric',
-                            pattern: '[0-9]*',
-                            maxLength: 10,
-                            onInput: (e) => {
-                              e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
-                              if (e.currentTarget.value.length > 10) {
-                                e.currentTarget.value = e.currentTarget.value.slice(0, 10);
-                              }
-                            }
-                          }}
+                          id="accountCode"
+                          type="text"
+                          placeholder="Enter Account Code"
+                          {...getFieldProps('accountCode')}
+                          error={Boolean(touched.lastName && errors.lastName)}
+                          helperText={touched.lastName && errors.lastName}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">E-mail</InputLabel>
+                        <InputLabel htmlFor="description">Description</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-email"
+                          id="description"
                           type="email"
-                          placeholder="Enter Email"
-                          {...getFieldProps('email')}
+                          placeholder="Enter Account Description"
+                          {...getFieldProps('description')}
                           error={Boolean(touched.email && errors.email)}
-                          // helperText={touched.email && errors.email}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-city">City</InputLabel>
-                        <Autocomplete
-                          fullWidth
-                          autoHighlight
-                          id="customer-city"
-                          options={cities} // Provide your list of city names here
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Enter City Name"
-                              error={Boolean(touched.city && errors.city)}
-                              // helperText={touched.city && errors.city}
-                            />
-                          )}
+                          helperText={touched.email && errors.email}
                         />
                       </Stack>
                     </Grid>
@@ -281,9 +211,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />}
     </>
   );
 };
 
-export default AddCustomer;
+export default AddNewAccount;

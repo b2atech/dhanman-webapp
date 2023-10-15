@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, FC, Fragment } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery } from '@mui/material';
 
 // third-party
 import {
@@ -23,7 +23,6 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import {
   CSVExport,
@@ -37,19 +36,18 @@ import {
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
-// import AddVendor from '../createbills/Vendor/AddVendor';
-import VendorDetails from '../createbills/Vendor/VendorDetails';
-import { getAllVendors } from 'api/services/BillService';
-import { IVendor } from 'types/bill';
-import moment from 'moment';
+import { PlusOutlined } from '@ant-design/icons';
+
+import CustomerView from '../../sales/createinvoice/Customer/CustomerView';
+import { ICustomer } from 'types/invoice';
+import { getAllChartOfAccount } from 'api/services/CommonService';
+import AddNewAccount from './addAccount';
 
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: IVendor[];
+  data: ICustomer[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
@@ -60,7 +58,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'name', desc: false };
 
   const {
     getTableProps,
@@ -84,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'firstName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', ''], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -95,11 +93,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 
   useEffect(() => {
-    setHiddenColumns(['firstName']);
+    setHiddenColumns(['']);
   }, [setHiddenColumns]);
-
-  const now = new Date();
-  const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
 
   return (
     <>
@@ -121,11 +116,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Vendor
+              New Account
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formatedFilename}
+              filename={'customer-list.csv'}
             />
           </Stack>
         </Stack>
@@ -175,41 +170,29 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-// ==============================|| VENDOR - LIST ||============================== //
+// ==============================|| CUSTOMER - LIST ||============================== //
 
-const Vendors = () => {
+const ChartOfAccounts = () => {
   const theme = useTheme();
-  const [open, setOpen] = useState<boolean>(false);
-  const [vendor, setVendor] = useState<any>(null);
-  const [vendorDeleteId, setVendorDeleteId] = useState<any>('');
+  const [customer, setCustomer] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
-  const [vendors, setVendors] = useState<IVendor[]>([]);
+  const [customers, setCustomers] = useState<ICustomer[]>([]);
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          const vendorsWithSequentialId = vendorList.map((vendor, index) => ({
-            ...vendor,
-            sequentialId: index + 1
-          }));
-          setVendors(vendorsWithSequentialId);
-        }
+    getAllChartOfAccount('0332a2a1-8d09-464c-8903-ab24950f54d4')
+      .then((customerList) => {
+        setCustomers(customerList);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
   }, []);
 
-  const memoizedVendors = useMemo(() => vendors, [vendors]);
+  const memoizedCustomers = useMemo(() => customers, [customers]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (vendor && !add) setVendor(null);
-  };
-
-  const handleClose = () => {
-    setOpen(!open);
+    if (customer && !add) setCustomer(null);
   };
 
   const columns = useMemo(
@@ -224,75 +207,16 @@ const Vendors = () => {
         disableSortBy: true
       },
       {
-        Header: 'Vendor Name',
-        accessor: 'lastName',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return (
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
-            </Stack>
-          );
-        }
+        Header: 'Account Name',
+        accessor: 'name'
       },
       {
-        Header: '',
-        accessor: 'firstName'
+        Header: 'Account Code',
+        accessor: 'accountCode'
       },
       {
-        Header: 'Email',
-        accessor: 'email'
-      },
-      {
-        Header: 'Actions',
-        className: 'cell-left',
-        disableSortBy: true,
-        Cell: ({ row }: { row: Row<{}> }) => {
-          const collapseIcon = row.isExpanded ? (
-            <CloseOutlined style={{ color: theme.palette.error.main }} />
-          ) : (
-            <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-          );
-          return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    row.toggleRowExpanded();
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setVendor(row.values);
-                    handleAdd();
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    handleClose();
-                    setVendorDeleteId(row.values.id);
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          );
-        }
+        Header: 'Type',
+        accessor: 'type'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -300,8 +224,8 @@ const Vendors = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
-    [memoizedVendors]
+    ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
+    [memoizedCustomers]
   );
 
   return (
@@ -309,14 +233,13 @@ const Vendors = () => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={memoizedVendors}
+          data={memoizedCustomers}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
-      {/* add vendor dialog */}
+      {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -326,10 +249,10 @@ const Vendors = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {/* <AddVendor vendor={vendor} onCancel={handleAdd} /> */}
+        <AddNewAccount customer={customer} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default Vendors;
+export default ChartOfAccounts;
