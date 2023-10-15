@@ -46,7 +46,7 @@ const master: NavItemType = {
   type: 'group',
   children: [
     {
-      id: 'forms-layout',
+      id: 'company-forms-layout',
       title: <FormattedMessage id="company" />,
       type: 'collapse',
       icon: icons.GroupOutlined,
@@ -67,7 +67,7 @@ const master: NavItemType = {
         },
         {
           id: 'vendors',
-          title: <FormattedMessage id="Vendors" />,
+          title: <FormattedMessage id="vendors" />,
           type: 'item',
           url: '/purchase/vendors/list',
           icon: icons.ShoppingCartOutlined
@@ -75,7 +75,7 @@ const master: NavItemType = {
       ]
     },
     {
-      id: 'forms-layout',
+      id: 'sales-forms-layout',
       title: <FormattedMessage id="sales" />,
       type: 'collapse',
       icon: icons.ProfileOutlined,
@@ -111,7 +111,7 @@ const master: NavItemType = {
       ]
     },
     {
-      id: 'forms-layout',
+      id: 'purchase-forms-layout',
       title: <FormattedMessage id="purchase" />,
       type: 'collapse',
       icon: icons.ShoppingCartOutlined,

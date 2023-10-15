@@ -81,7 +81,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'firstName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -208,6 +208,18 @@ const CustomerListPage = () => {
 
   const columns = useMemo(
     () => [
+      {
+        show: false,
+        accessor: 'id'
+      },
+      {
+        show: false,
+        accessor: 'firstName'
+      },
+      {
+        show: false,
+        accessor: 'lastName'
+      },
       {
         title: 'Row Selection',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (

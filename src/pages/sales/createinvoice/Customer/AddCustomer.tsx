@@ -35,15 +35,31 @@ import { ThemeMode } from 'types/config';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  const newCustomer = {
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-    cityName: ''
-  };
+  if (customer) {
+    const newCustomer = {
+      id: customer.id,
+      clientId: '',
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phoneNumber: customer.phoneNumber,
+      city: customer.city
+    };
 
-  return newCustomer;
+    return newCustomer;
+  } else {
+    const newCustomer = {
+      id: '',
+      clientId: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      city: ''
+    };
+
+    return newCustomer;
+  }
 };
 
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
@@ -78,6 +94,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
@@ -125,7 +142,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Add Customer' : 'New Customer'}</DialogTitle>
+              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -167,7 +184,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter First Name"
                           {...getFieldProps('firstName')}
                           error={Boolean(touched.firstName && errors.firstName)}
-                          helperText={touched.firstName && errors.firstName}
+                          // helperText={touched.firstName && errors.firstName}
                         />
                       </Stack>
                     </Grid>
@@ -181,7 +198,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Last Name"
                           {...getFieldProps('lastName')}
                           error={Boolean(touched.lastName && errors.lastName)}
-                          helperText={touched.lastName && errors.lastName}
+                          // helperText={touched.lastName && errors.lastName}
                         />
                       </Stack>
                     </Grid>
@@ -194,7 +211,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Phone Number"
                           {...getFieldProps('phoneNumber')}
                           error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                          helperText={touched.phoneNumber && errors.phoneNumber}
+                          // helperText={touched.phoneNumber && errors.phoneNumber}
                           inputProps={{
                             inputMode: 'numeric',
                             pattern: '[0-9]*',
@@ -219,7 +236,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Email"
                           {...getFieldProps('email')}
                           error={Boolean(touched.email && errors.email)}
-                          helperText={touched.email && errors.email}
+                          // helperText={touched.email && errors.email}
                         />
                       </Stack>
                     </Grid>
@@ -235,8 +252,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                             <TextField
                               {...params}
                               placeholder="Enter City Name"
-                              error={Boolean(touched.cityName && errors.cityName)}
-                              helperText={touched.cityName && errors.cityName}
+                              error={Boolean(touched.city && errors.city)}
+                              // helperText={touched.city && errors.city}
                             />
                           )}
                         />
