@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 
 // third-party
+
 import {
   useExpanded,
   useFilters,
@@ -59,6 +60,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 import { alertPopupToggle } from 'store/reducers/invoice';
 import { NumericFormat } from 'react-number-format';
 
+const moment = require('moment');
 interface BillWidgets {
   title: string;
   count: string;
@@ -294,6 +296,10 @@ const Bills = () => {
           disableFilters: true
         },
         {
+          Header: 'Bill No',
+          accessor: 'billNumber'
+        },
+        {
           Header: 'Vendor Name',
           accessor: 'vendorName',
           disableFilters: true,
@@ -307,12 +313,14 @@ const Bills = () => {
           }
         },
         {
-          Header: 'Create Date',
-          accessor: 'billDate'
+          Header: 'Bill Date',
+          accessor: 'billDate',
+          Cell: (props) => moment(props.value).format('DD MMM YYYY')
         },
         {
           Header: 'Due Date',
-          accessor: 'dueDate'
+          accessor: 'dueDate',
+          Cell: (props) => moment(props.value).format('DD MMM YYYY')
         },
         {
           Header: 'Amount',
@@ -324,9 +332,19 @@ const Bills = () => {
           disableFilters: true
         },
         {
+          Header: 'Tax',
+          accessor: 'tax',
+          className: 'cell-right'
+        },
+        {
+          Header: 'Term',
+          accessor: 'paymentTerm',
+          className: 'cell-right'
+        },
+        {
           Header: 'Status',
           accessor: 'billStatus',
-          className: 'cell-center',
+          className: 'cell-left',
           disableFilters: true,
           filter: 'includes',
           Cell: ({ value }: { value: string }) => {
