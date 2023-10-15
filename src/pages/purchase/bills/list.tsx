@@ -57,6 +57,7 @@ import { IBill } from 'types/bill';
 import { alpha, useTheme } from '@mui/material/styles';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { alertPopupToggle } from 'store/reducers/invoice';
+import { NumericFormat } from 'react-number-format';
 
 interface BillWidgets {
   title: string;
@@ -316,11 +317,16 @@ const Bills = () => {
         {
           Header: 'Amount',
           accessor: 'amount',
+          className: 'cell-right',
+          Cell: ({ value }: { value: number }) => (
+            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          ),
           disableFilters: true
         },
         {
           Header: 'Status',
           accessor: 'billStatus',
+          className: 'cell-center',
           disableFilters: true,
           filter: 'includes',
           Cell: ({ value }: { value: string }) => {

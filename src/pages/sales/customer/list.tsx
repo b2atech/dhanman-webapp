@@ -5,6 +5,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
 
 // third-party
+import { PatternFormat } from 'react-number-format';
 import {
   useFilters,
   useExpanded,
@@ -243,7 +244,8 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Contact',
-        accessor: 'phoneNumber'
+        accessor: 'phoneNumber',
+        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
         Header: 'City',
@@ -251,7 +253,7 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Actions',
-        className: 'cell-left',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -260,7 +262,7 @@ const CustomerListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
