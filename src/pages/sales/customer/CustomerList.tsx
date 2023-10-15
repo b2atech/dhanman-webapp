@@ -40,7 +40,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
 import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerView from '../createinvoice/Customer/CustomerDetails';
+import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 import moment from 'moment';
@@ -181,7 +181,6 @@ const CustomerListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  // const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
   const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
@@ -241,7 +240,6 @@ const CustomerListPage = () => {
           );
         }
       },
-      //Shreyas-06/10/2023-concatination logic implitation need to improve cusrrent logic is based on hiding the Email column
       {
         Header: '',
         accessor: 'firstName'
@@ -311,7 +309,7 @@ const CustomerListPage = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
+    ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
     [memoizedCustomers]
   );
 
@@ -327,8 +325,6 @@ const CustomerListPage = () => {
         />
       </ScrollX>
       <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
-
-      {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}

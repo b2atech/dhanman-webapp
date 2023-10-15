@@ -82,17 +82,11 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
-        // const newCustomer = {
-        //   name: values.firstName,
-        //   email: values.email,
-        //   location: values.cityName,
-        // };
         if (customer) {
-          //dispatch(updateCustomer(customer.id, newCustomer)); //update
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer update successfully.',
+              message: 'Customer updated successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -101,7 +95,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
           );
         } else {
-          //dispatch(createCustomer(newCustomer));
           dispatch(
             openSnackbar({
               open: true,
