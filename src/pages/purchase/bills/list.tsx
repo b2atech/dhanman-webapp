@@ -296,50 +296,20 @@ const Bills = () => {
           disableFilters: true
         },
         {
+          Header: 'Bill Date',
+          accessor: 'billDate',
+          Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+          disableFilters: true
+        },
+        {
           Header: 'Bill No',
-          accessor: 'billNumber'
+          accessor: 'billNumber',
+          disableFilters: true
         },
         {
           Header: 'Vendor Name',
           accessor: 'vendorName',
-          disableFilters: true,
-          Cell: ({ row }: { row: Row }) => {
-            const { values } = row;
-            return (
-              <Stack direction="row" spacing={1.5} alignItems="center">
-                <Typography variant="subtitle1">{values.vendorName}</Typography>
-              </Stack>
-            );
-          }
-        },
-        {
-          Header: 'Bill Date',
-          accessor: 'billDate',
-          Cell: (props) => moment(props.value).format('DD MMM YYYY')
-        },
-        {
-          Header: 'Due Date',
-          accessor: 'dueDate',
-          Cell: (props) => moment(props.value).format('DD MMM YYYY')
-        },
-        {
-          Header: 'Amount',
-          accessor: 'amount',
-          className: 'cell-right',
-          Cell: ({ value }: { value: number }) => (
-            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-          ),
           disableFilters: true
-        },
-        {
-          Header: 'Tax',
-          accessor: 'tax',
-          className: 'cell-right'
-        },
-        {
-          Header: 'Term',
-          accessor: 'paymentTerm',
-          className: 'cell-right'
         },
         {
           Header: 'Status',
@@ -358,6 +328,33 @@ const Bills = () => {
                 return <Chip color="info" label="Unpaid" size="small" variant="light" />;
             }
           }
+        },
+        {
+          Header: 'Due Date',
+          accessor: 'dueDate',
+          Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+          disableFilters: true
+        },
+        {
+          Header: 'Amount',
+          accessor: 'amount',
+          className: 'cell-right',
+          Cell: ({ value }: { value: number }) => (
+            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          ),
+          disableFilters: true
+        },
+        {
+          Header: 'Tax',
+          accessor: 'tax',
+          className: 'cell-right',
+          disableFilters: true
+        },
+        {
+          Header: 'Term',
+          accessor: 'paymentTerm',
+          className: 'cell-right',
+          disableFilters: true
         },
         {
           Header: 'Actions',
