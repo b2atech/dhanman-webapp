@@ -75,7 +75,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
 
   const CustomerSchema = Yup.object().shape({
     firstName: Yup.string().max(255).required('Please Enter First Name'),
-    lastName: Yup.string().max(255).required('Pease Enter Last Name'),
+    lastName: Yup.string().max(255).required('Please Enter Last Name'),
     phoneNumber: Yup.string()
       .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
       .required('Please Enter Phone Number'),
@@ -83,7 +83,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       .max(255)
       .required('Please Enter E-mail Address')
       .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, 'E-Mail Address Is Not Valid'),
-    cityName: Yup.string().max(255).required('Pease Enter City Name')
+    city: Yup.string().max(255).required('Please Enter City Name')
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -133,7 +133,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     }
   });
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
+  const { values, setFieldValue, errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
   const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Philadelphia'];
 
   return (
@@ -184,7 +184,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter First Name"
                           {...getFieldProps('firstName')}
                           error={Boolean(touched.firstName && errors.firstName)}
-                          // helperText={touched.firstName && errors.firstName}
+                          helperText={touched.firstName && errors.firstName ? (errors.firstName as React.ReactNode) : ''}
                         />
                       </Stack>
                     </Grid>
@@ -198,7 +198,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Last Name"
                           {...getFieldProps('lastName')}
                           error={Boolean(touched.lastName && errors.lastName)}
-                          // helperText={touched.lastName && errors.lastName}
+                          helperText={touched.lastName && errors.lastName ? (errors.lastName as React.ReactNode) : ''}
                         />
                       </Stack>
                     </Grid>
@@ -211,7 +211,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Phone Number"
                           {...getFieldProps('phoneNumber')}
                           error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                          // helperText={touched.phoneNumber && errors.phoneNumber}
+                          helperText={touched.phoneNumber && errors.phoneNumber ? (errors.phoneNumber as React.ReactNode) : ''}
                           inputProps={{
                             inputMode: 'numeric',
                             pattern: '[0-9]*',
@@ -236,7 +236,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Email"
                           {...getFieldProps('email')}
                           error={Boolean(touched.email && errors.email)}
-                          // helperText={touched.email && errors.email}
+                          helperText={touched.email && errors.email ? (errors.email as React.ReactNode) : ''}
                         />
                       </Stack>
                     </Grid>
@@ -246,14 +246,16 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                         <Autocomplete
                           fullWidth
                           autoHighlight
-                          id="customer-city"
-                          options={cities} // Provide your list of city names here
+                          options={cities}
+                          value={values.city}
+                          onChange={(event, newValue) => setFieldValue('city', newValue)}
                           renderInput={(params) => (
                             <TextField
                               {...params}
+                              id="customer-city"
                               placeholder="Enter City Name"
                               error={Boolean(touched.city && errors.city)}
-                              // helperText={touched.city && errors.city}
+                              helperText={touched.city && errors.city ? (errors.city as React.ReactNode) : ''}
                             />
                           )}
                         />
