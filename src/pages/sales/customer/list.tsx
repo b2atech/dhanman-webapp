@@ -82,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'email', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -211,15 +211,18 @@ const CustomerListPage = () => {
     () => [
       {
         show: false,
-        accessor: 'id'
+        accessor: 'id',
+        disableSortBy: true
       },
       {
         show: false,
-        accessor: 'firstName'
+        accessor: 'firstName',
+        disableSortBy: true
       },
       {
         show: false,
-        accessor: 'lastName'
+        accessor: 'lastName',
+        disableSortBy: true
       },
       {
         title: 'Row Selection',
@@ -243,6 +246,11 @@ const CustomerListPage = () => {
         }
       },
       {
+        show: false,
+        accessor: 'email',
+        disableSortBy: true
+      },
+      {
         Header: 'Contact',
         accessor: 'phoneNumber',
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
@@ -262,7 +270,7 @@ const CustomerListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
