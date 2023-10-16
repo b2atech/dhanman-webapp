@@ -87,6 +87,15 @@ export interface ICustomer {
   address: string;
   customerName: string;
 }
+export interface ICoa {
+  clientId: string;
+  vendorId: number;
+  name: string;
+  contactPerson: string;
+  email: string;
+  address: string;
+  customerName: string;
+}
 
 export interface IGetCustomerResponse {
   data: {
