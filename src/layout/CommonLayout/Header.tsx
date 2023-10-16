@@ -113,9 +113,9 @@ const Header = ({ handleDrawerOpen, layout = 'landing', ...others }: Props) => {
               >
                 Components
               </Link>
-              <Link className="header-link" color="white" href="https://codedthemes.gitbook.io/mantis/" target="_blank" underline="none">
+              {/* <Link className="header-link" color="white" href="https://codedthemes.gitbook.io/mantis/" target="_blank" underline="none">
                 Documentation
-              </Link>
+              </Link> */}
               <Box sx={{ display: 'inline-block' }}>
                 <AnimateButton>
                   <Button

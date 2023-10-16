@@ -38,18 +38,17 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
-import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
-import { getAllCustomers } from 'api/services/SalesService';
-import { ICustomer } from 'types/invoice';
+import VendorDetails from '../createbills/Vendor/VendorDetails';
+import { getAllVendors } from 'api/services/BillService';
+import { IVendor } from 'types/bill';
 import moment from 'moment';
-
+import AddVendor from '../createbills/Vendor/AddVendor';
+import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: ICustomer[];
+  data: IVendor[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
@@ -60,14 +59,13 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'firstName', desc: false };
+  const sortBy = { id: '', desc: false };
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -94,12 +92,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect
   );
 
-  useEffect(() => {
-    setHiddenColumns(['firstName']);
-  }, [setHiddenColumns]);
-
   const now = new Date();
-  const formatedFilename = 'CustomersList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
 
   return (
     <>
@@ -121,7 +115,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Customer
+              Add Vendor
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -175,25 +169,25 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-// ==============================|| CUSTOMER - LIST ||============================== //
+// ==============================|| VENDOR - LIST ||============================== //
 
-const CustomerListPage = () => {
+const Vendors = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [customer, setCustomer] = useState<any>(null);
+  const [vendor, setVendor] = useState<any>(null);
+  const [vendorDeleteId, setVendorDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
+  const [vendors, setVendors] = useState<IVendor[]>([]);
 
   useEffect(() => {
-    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((customerList) => {
-        if (Array.isArray(customerList)) {
-          const customersWithSequentialId = customerList.map((customer, index) => ({
-            ...customer,
+    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
+      .then((vendorList) => {
+        if (Array.isArray(vendorList)) {
+          const vendorsWithSequentialId = vendorList.map((vendor, index) => ({
+            ...vendor,
             sequentialId: index + 1
           }));
-          setCustomers(customersWithSequentialId);
+          setVendors(vendorsWithSequentialId);
         }
       })
       .catch((error) => {
@@ -201,20 +195,15 @@ const CustomerListPage = () => {
       });
   }, []);
 
-  const memoizedCustomers = useMemo(() => customers, [customers]);
+  const memoizedVendors = useMemo(() => vendors, [vendors]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (customer && !add) setCustomer(null);
+    if (vendor && !add) setVendor(null);
   };
 
-  const handleClose = (confirmed: boolean) => {
-    if (confirmed) {
-      if (customerDeleteId) {
-        setCustomerDeleteId(null);
-      }
-    }
-    setOpen(false);
+  const handleClose = () => {
+    setOpen(!open);
   };
 
   const columns = useMemo(
@@ -229,28 +218,20 @@ const CustomerListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'Customer Name',
-        accessor: 'lastName',
+        Header: 'Vendor Name',
+        accessor: 'vendorName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
+              <Typography variant="subtitle1">{values.vendorName}</Typography>
             </Stack>
           );
         }
       },
       {
-        Header: '',
-        accessor: 'firstName'
-      },
-      {
-        Header: 'Contact',
-        accessor: 'phoneNumber'
-      },
-      {
-        Header: 'City',
-        accessor: 'city'
+        Header: 'Email',
+        accessor: 'email'
       },
       {
         Header: 'Actions',
@@ -280,7 +261,7 @@ const CustomerListPage = () => {
                   color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setCustomer(row.values);
+                    setVendor(row.values);
                     handleAdd();
                   }}
                 >
@@ -292,8 +273,8 @@ const CustomerListPage = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setCustomerDeleteId(row.values.id);
-                    setOpen(true);
+                    handleClose();
+                    setVendorDeleteId(row.values.id);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -309,8 +290,8 @@ const CustomerListPage = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
-    [memoizedCustomers]
+    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
+    [memoizedVendors]
   );
 
   return (
@@ -318,13 +299,14 @@ const CustomerListPage = () => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={memoizedCustomers}
+          data={memoizedVendors}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
+      <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
+      {/* add vendor dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -334,10 +316,10 @@ const CustomerListPage = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} />
+        <AddVendor vendor={vendor} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default CustomerListPage;
+export default Vendors;

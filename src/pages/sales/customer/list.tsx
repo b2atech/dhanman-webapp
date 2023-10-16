@@ -5,6 +5,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
 
 // third-party
+import { PatternFormat } from 'react-number-format';
 import {
   useFilters,
   useExpanded,
@@ -38,18 +39,17 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
-// import AddVendor from '../createbills/Vendor/AddVendor';
-import VendorDetails from '../createbills/Vendor/VendorDetails';
-import { getAllVendors } from 'api/services/BillService';
-import { IVendor } from 'types/bill';
-import moment from 'moment';
+import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
+import AddCustomer from '../createinvoice/Customer/AddCustomer';
+import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
+import { getAllCustomers } from 'api/services/SalesService';
+import { ICustomer } from 'types/invoice';
 
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: IVendor[];
+  data: ICustomer[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
@@ -60,14 +60,12 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
-
+  const sortBy = { id: 'customerName', desc: false };
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -84,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'firstName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -94,13 +92,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect
   );
 
-  useEffect(() => {
-    setHiddenColumns(['firstName']);
-  }, [setHiddenColumns]);
+  const moment = require('moment');
 
   const now = new Date();
-  const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
-
+  const formattedFilename = `CustomersList ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -121,11 +116,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Vendor
+              Add Customer
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formatedFilename}
+              filename={formattedFilename}
             />
           </Stack>
         </Stack>
@@ -175,25 +170,25 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-// ==============================|| VENDOR - LIST ||============================== //
+// ==============================|| CUSTOMER - LIST ||============================== //
 
-const Vendors = () => {
+const CustomerListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [vendor, setVendor] = useState<any>(null);
-  const [vendorDeleteId, setVendorDeleteId] = useState<any>('');
+  const [customer, setCustomer] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
-  const [vendors, setVendors] = useState<IVendor[]>([]);
+  const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          const vendorsWithSequentialId = vendorList.map((vendor, index) => ({
-            ...vendor,
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((customerList) => {
+        if (Array.isArray(customerList)) {
+          const customersWithSequentialId = customerList.map((customer, index) => ({
+            ...customer,
             sequentialId: index + 1
           }));
-          setVendors(vendorsWithSequentialId);
+          setCustomers(customersWithSequentialId);
         }
       })
       .catch((error) => {
@@ -201,19 +196,36 @@ const Vendors = () => {
       });
   }, []);
 
-  const memoizedVendors = useMemo(() => vendors, [vendors]);
+  const memoizedCustomers = useMemo(() => customers, [customers]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (vendor && !add) setVendor(null);
+    if (customer && !add) setCustomer(null);
   };
 
-  const handleClose = () => {
-    setOpen(!open);
+  const handleClose = (confirmed: boolean) => {
+    if (confirmed) {
+      if (customerDeleteId) {
+        setCustomerDeleteId(null);
+      }
+    }
+    setOpen(false);
   };
 
   const columns = useMemo(
     () => [
+      {
+        show: false,
+        accessor: 'id'
+      },
+      {
+        show: false,
+        accessor: 'firstName'
+      },
+      {
+        show: false,
+        accessor: 'lastName'
+      },
       {
         title: 'Row Selection',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
@@ -224,28 +236,29 @@ const Vendors = () => {
         disableSortBy: true
       },
       {
-        Header: 'Vendor Name',
-        accessor: 'lastName',
+        Header: 'Customer Name',
+        accessor: 'customerName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{`${values.firstName} ${values.lastName}`}</Typography>
+              <Typography variant="subtitle1">{values.customerName}</Typography>
             </Stack>
           );
         }
       },
       {
-        Header: '',
-        accessor: 'firstName'
+        Header: 'Contact',
+        accessor: 'phoneNumber',
+        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
-        Header: 'Email',
-        accessor: 'email'
+        Header: 'City',
+        accessor: 'city'
       },
       {
         Header: 'Actions',
-        className: 'cell-left',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -254,7 +267,7 @@ const Vendors = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
@@ -271,7 +284,7 @@ const Vendors = () => {
                   color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setVendor(row.values);
+                    setCustomer(row.values);
                     handleAdd();
                   }}
                 >
@@ -283,8 +296,8 @@ const Vendors = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleClose();
-                    setVendorDeleteId(row.values.id);
+                    setCustomerDeleteId(row.values.id);
+                    setOpen(true);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -300,8 +313,8 @@ const Vendors = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
-    [memoizedVendors]
+    ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
+    [memoizedCustomers]
   );
 
   return (
@@ -309,14 +322,13 @@ const Vendors = () => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={memoizedVendors}
+          data={memoizedCustomers}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
-      {/* add vendor dialog */}
+      <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -326,10 +338,10 @@ const Vendors = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {/* <AddVendor vendor={vendor} onCancel={handleAdd} /> */}
+        <AddCustomer customer={customer} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default Vendors;
+export default CustomerListPage;
