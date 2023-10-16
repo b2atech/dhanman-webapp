@@ -210,6 +210,7 @@ const CustomerListPage = () => {
       }
     }
     setOpen(false);
+
   };
 
   const columns = useMemo(
@@ -298,6 +299,7 @@ const CustomerListPage = () => {
                     e.stopPropagation();
                     setCustomerDeleteId(row.values.id);
                     setOpen(true);
+
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -314,6 +316,7 @@ const CustomerListPage = () => {
 
   const renderRowSubComponent = useCallback(
     ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
+
     [memoizedCustomers]
   );
 
@@ -329,6 +332,7 @@ const CustomerListPage = () => {
         />
       </ScrollX>
       <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
+
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
