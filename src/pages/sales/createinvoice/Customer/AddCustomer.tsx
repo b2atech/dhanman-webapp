@@ -103,7 +103,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Customer added successfully.',
+              message: 'Customer updated successfully.',
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -270,8 +270,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               <Grid container justifyContent="flex-end" alignItems={'end'}>
                 <Grid item>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
-                    <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
-                      Add
+                  <Button type="submit" variant="contained" disabled={isSubmitting}>
+                      {customer ? 'Edit' : 'Add'}
                     </Button>
                     <Button variant="contained" color="error" onClick={onCancel}>
                       Cancel

@@ -41,7 +41,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
 import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerView from '../createinvoice/Customer/CustomerView';
+import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 
@@ -176,9 +176,9 @@ const CustomerListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -203,8 +203,14 @@ const CustomerListPage = () => {
     if (customer && !add) setCustomer(null);
   };
 
-  const handleClose = () => {
-    setOpen(!open);
+  const handleClose = (confirmed: boolean) => {
+    if (confirmed) {
+      if (customerDeleteId) {
+        setCustomerDeleteId(null);
+      }
+    }
+    setOpen(false);
+
   };
 
   const columns = useMemo(
@@ -299,8 +305,9 @@ const CustomerListPage = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleClose();
                     setCustomerDeleteId(row.values.id);
+                    setOpen(true);
+
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -316,7 +323,8 @@ const CustomerListPage = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
+    ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
+
     [memoizedCustomers]
   );
 
@@ -331,8 +339,8 @@ const CustomerListPage = () => {
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
-      {/* add customer dialog */}
+      <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
+
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}

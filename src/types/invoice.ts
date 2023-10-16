@@ -89,7 +89,6 @@ export interface ICustomer {
 }
 export interface ICoa {
   clientId: string;
-  vendorId: number;
   name: string;
   contactPerson: string;
   email: string;
