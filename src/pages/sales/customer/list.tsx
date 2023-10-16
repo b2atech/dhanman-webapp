@@ -41,7 +41,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
 import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerView from '../createinvoice/Customer/CustomerView';
+import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 
@@ -82,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'email', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -176,7 +176,6 @@ const CustomerListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  // const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
   const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
@@ -211,21 +210,25 @@ const CustomerListPage = () => {
       }
     }
     setOpen(false);
+
   };
 
   const columns = useMemo(
     () => [
       {
         show: false,
-        accessor: 'id'
+        accessor: 'id',
+        disableSortBy: true
       },
       {
         show: false,
-        accessor: 'firstName'
+        accessor: 'firstName',
+        disableSortBy: true
       },
       {
         show: false,
-        accessor: 'lastName'
+        accessor: 'lastName',
+        disableSortBy: true
       },
       {
         title: 'Row Selection',
@@ -249,6 +252,11 @@ const CustomerListPage = () => {
         }
       },
       {
+        show: false,
+        accessor: 'email',
+        disableSortBy: true
+      },
+      {
         Header: 'Contact',
         accessor: 'phoneNumber',
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
@@ -268,7 +276,7 @@ const CustomerListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
@@ -299,6 +307,7 @@ const CustomerListPage = () => {
                     e.stopPropagation();
                     setCustomerDeleteId(row.values.id);
                     setOpen(true);
+
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -314,7 +323,8 @@ const CustomerListPage = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <CustomerView data={memoizedCustomers[Number(row.id)]} />,
+    ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
+
     [memoizedCustomers]
   );
 
@@ -331,7 +341,6 @@ const CustomerListPage = () => {
       </ScrollX>
       <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
 
-      {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
