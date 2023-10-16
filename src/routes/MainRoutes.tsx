@@ -19,7 +19,7 @@ const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/list')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
-const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/VendorList')));
+const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -160,6 +160,86 @@ const MainRoutes = {
             },
             {
               path: 'make',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        }
+      ]
+    },
+    {
+      path: '/timesheet',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'projects',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'tasks',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'logtime',
+          element: <MaintenanceComingSoon />
+        }
+      ]
+    },
+    {
+      path: '/inventory',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'products',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        },
+        {
+          path: 'orders',
+          element: <MaintenanceComingSoon />,
+          children: [
+            {
+              path: 'list',
+              element: <MaintenanceComingSoon />
+            },
+            {
+              path: 'create',
               element: <MaintenanceComingSoon />
             }
           ]

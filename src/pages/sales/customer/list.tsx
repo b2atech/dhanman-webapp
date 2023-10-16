@@ -5,6 +5,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
 
 // third-party
+import { PatternFormat } from 'react-number-format';
 import {
   useFilters,
   useExpanded,
@@ -81,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'firstName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -209,6 +210,18 @@ const CustomerListPage = () => {
   const columns = useMemo(
     () => [
       {
+        show: false,
+        accessor: 'id'
+      },
+      {
+        show: false,
+        accessor: 'firstName'
+      },
+      {
+        show: false,
+        accessor: 'lastName'
+      },
+      {
         title: 'Row Selection',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
@@ -232,22 +245,15 @@ const CustomerListPage = () => {
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return <Typography variant="subtitle1">{values.phoneNumber}</Typography>;
-        }
+        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
         Header: 'City',
-        accessor: 'city',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return <Typography variant="subtitle1">{values.city}</Typography>;
-        }
+        accessor: 'city'
       },
       {
         Header: 'Actions',
-        className: 'cell-left',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -256,7 +262,7 @@ const CustomerListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"

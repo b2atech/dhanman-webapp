@@ -28,20 +28,20 @@ const other: NavItemType = {
     //   url: '/customers',
     //   icon: icons.ChromeOutlined
     // },
-    {
-      id: 'documentation',
-      title: <FormattedMessage id="documentation" />,
-      type: 'item',
-      url: 'https://codedthemes.gitbook.io/mantis/',
-      icon: icons.QuestionOutlined,
-      external: true,
-      target: true,
-      chip: {
-        label: 'gitbook',
-        color: 'secondary',
-        size: 'small'
-      }
-    },
+    // {
+    //   id: 'documentation',
+    //   title: <FormattedMessage id="documentation" />,
+    //   type: 'item',
+    //   url: 'https://codedthemes.gitbook.io/mantis/',
+    //   icon: icons.QuestionOutlined,
+    //   external: true,
+    //   target: true,
+    //   chip: {
+    //     label: 'gitbook',
+    //     color: 'secondary',
+    //     size: 'small'
+    //   }
+    // },
     {
       id: 'roadmap',
       title: <FormattedMessage id="roadmap" />,

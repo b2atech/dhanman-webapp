@@ -79,13 +79,13 @@ export interface InvoiceDetail {
 }
 
 export interface ICustomer {
+  id: string;
   clientId: string;
-  vendorId: number;
-  name: string;
-  contactPerson: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  address: string;
-  customerName: string;
+  phoneNumber: string;
+  city: string;
 }
 export interface ICoa {
   clientId: string;

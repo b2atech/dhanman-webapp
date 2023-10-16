@@ -98,7 +98,6 @@
   "pagination": "Pagination",
   "plugins": "Plugins",
   "pricing": "Pricing",
-  "products": "Products",
   "product-details": "Product Details",
   "product-list": "Product List",
   "profile": "Profile",
@@ -150,5 +149,14 @@
   "paymentreceived" : "Payment Received",
   "company": "Company",
   "paymentmade" : "Payment Made",
-  "chartofaccounts": "Chart of Accounts"
+  "chartofaccounts": "Chart of Accounts",
+  "inventory": "Inventory",
+  "products": "Products",
+  "createProduct": "Create Product",
+  "timesheet": "Timesheet",
+  "projects": "Projects",
+  "createProject": "Create Project",
+  "logTime": "Log Time",
+  "tasks": "Tasks",
+  "createTask": "Create Task"
 }
