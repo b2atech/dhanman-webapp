@@ -134,7 +134,7 @@ const master: NavItemType = {
       children: [
         {
           id: 'vendors',
-          title: <FormattedMessage id="Vendors" />,
+          title: <FormattedMessage id="vendors" />,
           type: 'item',
           url: '/purchase/vendors/list',
           icon: icons.UserOutlined

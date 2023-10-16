@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 
 // third-party
+
 import {
   useExpanded,
   useFilters,
@@ -59,6 +60,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 import { alertPopupToggle } from 'store/reducers/invoice';
 import { NumericFormat } from 'react-number-format';
 
+const moment = require('moment');
 interface BillWidgets {
   title: string;
   count: string;
@@ -225,7 +227,7 @@ function ReactTable({ columns, data }: Props) {
               );
             })}
             <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
                 <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
               </TableCell>
             </TableRow>
@@ -294,39 +296,25 @@ const Bills = () => {
           disableFilters: true
         },
         {
+          Header: 'Bill Date',
+          accessor: 'billDate',
+          Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+          disableFilters: true
+        },
+        {
+          Header: 'Bill No',
+          accessor: 'billNumber',
+          disableFilters: true
+        },
+        {
           Header: 'Vendor Name',
           accessor: 'vendorName',
-          disableFilters: true,
-          Cell: ({ row }: { row: Row }) => {
-            const { values } = row;
-            return (
-              <Stack direction="row" spacing={1.5} alignItems="center">
-                <Typography variant="subtitle1">{values.vendorName}</Typography>
-              </Stack>
-            );
-          }
-        },
-        {
-          Header: 'Create Date',
-          accessor: 'billDate'
-        },
-        {
-          Header: 'Due Date',
-          accessor: 'dueDate'
-        },
-        {
-          Header: 'Amount',
-          accessor: 'amount',
-          className: 'cell-right',
-          Cell: ({ value }: { value: number }) => (
-            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-          ),
           disableFilters: true
         },
         {
           Header: 'Status',
           accessor: 'billStatus',
-          className: 'cell-center',
+          className: 'cell-left',
           disableFilters: true,
           filter: 'includes',
           Cell: ({ value }: { value: string }) => {
@@ -340,6 +328,33 @@ const Bills = () => {
                 return <Chip color="info" label="Unpaid" size="small" variant="light" />;
             }
           }
+        },
+        {
+          Header: 'Due Date',
+          accessor: 'dueDate',
+          Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+          disableFilters: true
+        },
+        {
+          Header: 'Amount',
+          accessor: 'amount',
+          className: 'cell-right',
+          Cell: ({ value }: { value: number }) => (
+            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          ),
+          disableFilters: true
+        },
+        {
+          Header: 'Tax',
+          accessor: 'tax',
+          className: 'cell-right',
+          disableFilters: true
+        },
+        {
+          Header: 'Term',
+          accessor: 'paymentTerm',
+          className: 'cell-right',
+          disableFilters: true
         },
         {
           Header: 'Actions',
