@@ -226,6 +226,21 @@ const master: NavItemType = {
           icon: icons.HourglassOutlined
         }
       ]
+    },
+    {
+      id: 'dev-forms-layout',
+      title: <FormattedMessage id="dev" />,
+      type: 'collapse',
+      icon: icons.FieldTimeOutlined,
+      children: [
+        {
+          id: 'pr',
+          title: <FormattedMessage id="pullRequests" />,
+          type: 'item',
+          url: '/dev/pr',
+          icon: icons.BookOutlined
+        }
+      ]
     }
   ]
 };

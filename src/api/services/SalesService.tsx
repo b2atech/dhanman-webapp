@@ -46,6 +46,15 @@ export const InvoiceAPI = {
       data: customerdata
     });
     return response.data;
+  },
+  getAllPRs = async function (repo: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/GetAllPRs/${repo}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllPRs.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
   };
 
 const cancelApiObject = defineCancelApiObject(InvoiceAPI);

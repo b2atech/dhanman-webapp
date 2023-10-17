@@ -42,7 +42,7 @@ export default function AlertCustomerDelete({ title, open, handleClose }: AlertC
               Cancel
             </Button>
             <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
-             Delete
+              Delete
             </Button>
           </Stack>
         </Stack>
