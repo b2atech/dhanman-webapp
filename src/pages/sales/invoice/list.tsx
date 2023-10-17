@@ -352,11 +352,11 @@ const List = () => {
       },
       {
         Header: 'Actions',
-        className: 'cell-center',
+        className: 'cell-right',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"

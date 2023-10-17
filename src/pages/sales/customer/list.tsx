@@ -254,12 +254,16 @@ const CustomerListPage = () => {
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
+        Header: 'Email',
+        accessor: 'email'
+      },
+      {
         Header: 'City',
         accessor: 'city'
       },
       {
         Header: 'Actions',
-        className: 'cell-center',
+        className: 'cell-right',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -268,7 +272,7 @@ const CustomerListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
