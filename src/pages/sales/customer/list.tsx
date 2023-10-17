@@ -82,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'email', 'lastName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -249,11 +249,6 @@ const CustomerListPage = () => {
             </Stack>
           );
         }
-      },
-      {
-        show: false,
-        accessor: 'email',
-        disableSortBy: true
       },
       {
         Header: 'Contact',
