@@ -42,8 +42,8 @@ const CustomerView = ({ data }: any) => {
                   <Grid item xs={12}>
                     <Stack spacing={2.5} alignItems="center">
                       <Stack spacing={0.3} alignItems="center">
-                        <Typography fontWeight={{fontWeight:'bold'}} >
-                             Mr. {data.firstName} {data.lastName}
+                        <Typography fontWeight={{ fontWeight: 'bold' }}>
+                          Mr. {data.firstName} {data.lastName}
                         </Typography>
                       </Stack>
                     </Stack>

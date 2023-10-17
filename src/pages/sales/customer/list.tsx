@@ -210,7 +210,6 @@ const CustomerListPage = () => {
       }
     }
     setOpen(false);
-
   };
 
   const columns = useMemo(
@@ -307,7 +306,6 @@ const CustomerListPage = () => {
                     e.stopPropagation();
                     setCustomerDeleteId(row.values.id);
                     setOpen(true);
-
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />

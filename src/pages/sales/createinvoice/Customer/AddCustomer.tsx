@@ -270,7 +270,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               <Grid container justifyContent="flex-end" alignItems={'end'}>
                 <Grid item>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
-                  <Button type="submit" variant="contained" disabled={isSubmitting}>
+                    <Button type="submit" variant="contained" disabled={isSubmitting}>
                       {customer ? 'Edit' : 'Add'}
                     </Button>
                     <Button variant="contained" color="error" onClick={onCancel}>
