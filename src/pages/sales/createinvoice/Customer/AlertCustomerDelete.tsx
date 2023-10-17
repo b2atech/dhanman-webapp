@@ -35,14 +35,6 @@ export default function AlertCustomerDelete({ title, open, handleClose }: AlertC
             <Typography variant="h4" align="center">
               Are you sure you want to delete?
             </Typography>
-            {/* <Typography align="center">
-              By deleting
-              <Typography variant="subtitle1" component="span">
-                {' '}
-                "{title}"{' '}
-              </Typography>
-              user, all task assigned to that user will also be deleted.
-            </Typography> */}
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
@@ -50,7 +42,7 @@ export default function AlertCustomerDelete({ title, open, handleClose }: AlertC
               Cancel
             </Button>
             <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
-             Delete
+              Delete
             </Button>
           </Stack>
         </Stack>
