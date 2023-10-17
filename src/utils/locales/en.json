@@ -158,5 +158,7 @@
   "createProject": "Create Project",
   "logTime": "Log Time",
   "tasks": "Tasks",
-  "createTask": "Create Task"
+  "createTask": "Create Task",
+  "pullRequests": "Pull Requests",
+  "dev": "Dev"
 }
