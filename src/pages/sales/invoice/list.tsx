@@ -330,7 +330,7 @@ const List = () => {
       {
         Header: 'Due Date',
         accessor: 'dueDate',
-        Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+        Cell: ({ row }: any) => moment(row.values.dueDate).format('DD MMM YYYY'),
         disableFilters: true
       },
       {
