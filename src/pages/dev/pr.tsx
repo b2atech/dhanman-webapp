@@ -1,8 +1,7 @@
 import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent } from 'react';
-import { useNavigate } from 'react-router';
 
 // material-ui
-import { Box, Tabs, Tab, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery, Tooltip, Chip } from '@mui/material';
+import { Box, Tabs, Tab, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery, Chip } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
 // third-party
@@ -20,12 +19,10 @@ import {
   Cell,
   HeaderProps
 } from 'react-table';
-import { EditTwoTone, EyeTwoTone } from '@ant-design/icons';
 
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import IconButton from 'components/@extended/IconButton';
 import {
   CSVExport,
   HeaderSort,
@@ -42,6 +39,7 @@ import { IPullRequest } from 'types/git';
 import { getAllPRs } from 'api/services/SalesService';
 
 // ==============================|| REACT TABLE ||============================== //
+const moment = require('moment');
 
 interface Props {
   columns: Column[];
@@ -98,8 +96,8 @@ function ReactTable({ columns, data }: Props) {
 
   // ================ Tab ================
 
-  const groups = ['All', ...new Set(data.map((item: IPullRequest) => item.state))];
-  const countGroup = data.map((item: IPullRequest) => item.state);
+  const groups = ['All', ...new Set(data.map((item: IPullRequest) => item.repository))];
+  const countGroup = data.map((item: IPullRequest) => item.repository);
   const counts = countGroup.reduce(
     (acc: any, value: any) => ({
       ...acc,
@@ -111,7 +109,7 @@ function ReactTable({ columns, data }: Props) {
   const [activeTab, setActiveTab] = useState(groups[0]);
 
   useEffect(() => {
-    setFilter('title', activeTab === 'All' ? '' : activeTab);
+    setFilter('repository', activeTab === 'All' ? '' : activeTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -131,9 +129,27 @@ function ReactTable({ columns, data }: Props) {
               icon={
                 <Chip
                   label={
-                    state === 'All' ? data.length : state === 'Paid' ? counts.Paid : state === 'Unpaid' ? counts.Unpaid : counts.Closed
+                    state === 'All'
+                      ? data.length
+                      : state === 'sales'
+                      ? counts.sales
+                      : state === 'purchase'
+                      ? counts.purchase
+                      : state === 'webapp'
+                      ? counts.webapp
+                      : counts.common
                   }
-                  color={state === 'All' ? 'primary' : state === 'Paid' ? 'success' : state === 'Unpaid' ? 'warning' : 'error'}
+                  color={
+                    state === 'All'
+                      ? 'info'
+                      : state === 'sales'
+                      ? 'success'
+                      : state === 'purchase'
+                      ? 'secondary'
+                      : state === 'webapp'
+                      ? 'warning'
+                      : 'error'
+                  }
                   variant="light"
                   size="small"
                 />
@@ -231,8 +247,6 @@ const List = () => {
 
   const memoizedPullRequests = useMemo(() => list, [list]);
 
-  const navigation = useNavigate();
-
   const columns = useMemo(
     () => [
       {
@@ -247,7 +261,8 @@ const List = () => {
       },
       {
         Header: 'Repository',
-        accessor: 'repository'
+        accessor: 'repository',
+        disableFilters: true
       },
       {
         Header: 'Url',
@@ -269,51 +284,29 @@ const List = () => {
       },
       {
         Header: 'Create Date',
-        accessor: 'created_at'
+        accessor: 'created_at',
+        Cell: ({ row }: { row: Row<{}> }) => {
+          return moment(row.values.created_at).format('DD MMM YYYY HH:MM A');
+        },
+        disableFilters: true
+      },
+      {
+        Header: 'Days Old',
+        disableFilters: true,
+        Cell: ({ row }: { row: Row<{}> }) => {
+          return moment(new Date()).diff(moment(row.values.created_at), 'days');
+        }
       },
       {
         Header: 'Author',
-        accessor: 'user.login'
-      },
-      {
-        Header: 'Actions',
-        className: 'cell-center',
-        disableSortBy: true,
-        Cell: ({ row }: { row: Row<{}> }) => {
-          return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    navigation(`/apps/invoice/details/${row.values.id}`);
-                  }}
-                >
-                  <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    navigation(`/apps/invoice/edit/${row.values.id}`);
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          );
-        }
+        accessor: 'user.login',
+        disableFilters: true
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
-  const theme = useTheme();
   return (
     <>
       <MainCard content={false}>

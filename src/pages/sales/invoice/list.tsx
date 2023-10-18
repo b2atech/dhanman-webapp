@@ -56,6 +56,7 @@ import { dispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { alertPopupToggle, getInvoiceDelete } from 'store/reducers/invoice';
 import { renderFilterTypes, GlobalFilter, DateColumnFilter } from 'utils/react-table';
+import { NumericFormat } from 'react-number-format';
 
 // types
 import { IInvoiceList } from 'types/invoice';
@@ -335,6 +336,9 @@ const List = () => {
       {
         Header: 'Amount',
         accessor: 'totalAmount',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+        ),
         disableFilters: true
       },
       {
