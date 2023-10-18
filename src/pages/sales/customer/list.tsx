@@ -82,7 +82,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'email', 'lastName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -251,14 +251,13 @@ const CustomerListPage = () => {
         }
       },
       {
-        show: false,
-        accessor: 'email',
-        disableSortBy: true
-      },
-      {
         Header: 'Contact',
         accessor: 'phoneNumber',
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
+      },
+      {
+        Header: 'Email',
+        accessor: 'email'
       },
       {
         Header: 'City',
@@ -266,7 +265,7 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Actions',
-        className: 'cell-center',
+        className: 'cell-right',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (

@@ -296,7 +296,7 @@ const Bills = () => {
           disableFilters: true
         },
         {
-          Header: 'Bill Date',
+          Header: 'Create Date',
           accessor: 'billDate',
           Cell: (props) => moment(props.value).format('DD MMM YYYY'),
           disableFilters: true
@@ -354,22 +354,22 @@ const Bills = () => {
         {
           Header: 'Tax',
           accessor: 'tax',
-          className: 'cell-right',
+          className: 'cell-center',
           disableFilters: true
         },
         {
           Header: 'Term',
           accessor: 'paymentTerm',
-          className: 'cell-right',
+          className: 'cell-center',
           disableFilters: true
         },
         {
           Header: 'Actions',
-          className: 'cell-center',
+          className: 'cell-right',
           disableSortBy: true,
           Cell: ({ row }: { row: Row<{}> }) => {
             return (
-              <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+              <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
                 <Tooltip title="View">
                   <IconButton
                     color="secondary"
