@@ -359,7 +359,7 @@ const List = () => {
         }
       },
       {
-        Header: 'Tax',
+        Header: 'Tax1',
         accessor: 'tax',
         className: 'cell-center',
         disableFilters: true
