@@ -338,11 +338,18 @@ const Bills = () => {
         {
           Header: 'Amount',
           accessor: 'amount',
-          className: 'cell-right',
           Cell: ({ value }: { value: number }) => (
-            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+            <div style={{ textAlign: 'right' }}>
+              <NumericFormat
+                value={value}
+                displayType="text"
+                thousandSeparator={true}
+                prefix={'₹'}
+                decimalScale={2}
+              />
+            </div>
           ),
-          disableFilters: true
+          disableFilters: false // Enable filters
         },
         {
           Header: 'Tax',
