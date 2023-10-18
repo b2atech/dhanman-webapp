@@ -359,6 +359,18 @@ const List = () => {
         }
       },
       {
+        Header: 'Tax',
+        accessor: 'tax',
+        className: 'cell-center',
+        disableFilters: true
+      },
+      {
+        Header: 'Term',
+        accessor: 'paymentTerm',
+        className: 'cell-center',
+        disableFilters: true
+      },
+      {
         Header: 'Actions',
         className: 'cell-right',
         disableSortBy: true,
