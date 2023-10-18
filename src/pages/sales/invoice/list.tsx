@@ -84,7 +84,7 @@ interface Props {
   columns: Column[];
   data: IInvoiceList[];
 }
-
+const moment = require('moment');
 function ReactTable({ columns, data }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
@@ -323,11 +323,15 @@ const List = () => {
       },
       {
         Header: 'Create Date',
-        accessor: 'invoiceDate'
+        accessor: 'invoiceDate',
+        Cell: ({ row }: any) => moment(row.values.invoiceDate).format('DD MMM YYYY'),
+        disableFilters: true
       },
       {
         Header: 'Due Date',
-        accessor: 'dueDate'
+        accessor: 'dueDate',
+        Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+        disableFilters: true
       },
       {
         Header: 'Amount',
@@ -355,12 +359,24 @@ const List = () => {
         }
       },
       {
-        Header: 'Actions',
+        Header: 'Tax',
+        accessor: 'tax',
         className: 'cell-center',
+        disableFilters: true
+      },
+      {
+        Header: 'Term',
+        accessor: 'paymentTerm',
+        className: 'cell-center',
+        disableFilters: true
+      },
+      {
+        Header: 'Actions',
+        className: 'cell-right',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
