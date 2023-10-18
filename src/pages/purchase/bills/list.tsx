@@ -349,7 +349,7 @@ const Bills = () => {
               />
             </div>
           ),
-          disableFilters: false // Enable filters
+          disableFilters: true
         },
         {
           Header: 'Tax',

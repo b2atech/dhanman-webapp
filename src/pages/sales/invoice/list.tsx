@@ -347,7 +347,7 @@ const List = () => {
             />
           </div>
         ),
-        disableFilters: false // Enable filters
+        disableFilters: true
       },
       {
         Header: 'Status',
