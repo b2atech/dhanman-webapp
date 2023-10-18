@@ -330,14 +330,22 @@ const List = () => {
       {
         Header: 'Due Date',
         accessor: 'dueDate',
-        Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+        Cell: ({ row }: any) => moment(row.values.dueDate).format('DD MMM YYYY'),
         disableFilters: true
       },
       {
         Header: 'Amount',
         accessor: 'totalAmount',
         Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          <div style={{ textAlign: 'right' }}>
+            <NumericFormat
+              value={value}
+              displayType="text"
+              thousandSeparator={true}
+              prefix={'₹'}
+              decimalScale={2}
+            />
+          </div>
         ),
         disableFilters: true
       },
