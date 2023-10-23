@@ -91,8 +91,12 @@ export interface InvoiceWidgets {
 }
 
 // ==============================|| SUB TABLE ||============================== //
-
-function ReactSubTable({ columns, data, loading }: { columns: Column[]; data: []; loading: boolean }) {
+interface SubTableProps {
+  columns: Column[];
+  data: [];
+  loading: boolean;
+}
+function ReactSubTable({ columns, data, loading }: SubTableProps) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
     columns,
     data
@@ -161,10 +165,10 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
 
   useEffect(() => {
     getInvoiceDetailsByHeaderId(invoiceId)
-      .then((invoiceList) => {
-        if (Array.isArray(invoiceList)) {
+      .then((invoiceDetailList) => {
+        if (Array.isArray(invoiceDetailList)) {
         }
-        setData(invoiceList);
+        setData(invoiceDetailList);
         setLoading(false);
       })
       .catch((error) => {
