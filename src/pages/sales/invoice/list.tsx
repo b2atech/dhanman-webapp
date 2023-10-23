@@ -1,4 +1,4 @@
-import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent } from 'react';
+import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, useCallback, FC } from 'react';
 import { useNavigate } from 'react-router';
 
 // material-ui
@@ -18,8 +18,11 @@ import {
   TableRow,
   useMediaQuery,
   Tooltip,
-  Chip
+  Chip,
+  Skeleton,
+  CircularProgress
 } from '@mui/material';
+
 import { alpha, useTheme } from '@mui/material/styles';
 
 // third-party
@@ -35,9 +38,18 @@ import {
   HeaderGroup,
   Row,
   Cell,
-  HeaderProps
+  HeaderProps,
+  CellProps
 } from 'react-table';
-import { DeleteTwoTone, EditTwoTone, EyeTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  DeleteTwoTone,
+  DownOutlined,
+  EditTwoTone,
+  EyeTwoTone,
+  FileDoneOutlined,
+  InfoCircleOutlined,
+  RightOutlined
+} from '@ant-design/icons';
 
 // project import
 import MainCard from 'components/MainCard';
@@ -61,7 +73,7 @@ import { NumericFormat } from 'react-number-format';
 // types
 import { IInvoiceList } from 'types/invoice';
 import AlertColumnDelete from 'sections/apps/invoice/AlertColumnDelete';
-import { getAllInvoices } from 'api/services/SalesService';
+import { getAllInvoices, getInvoiceDetailsByHeaderId } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
@@ -78,14 +90,147 @@ export interface InvoiceWidgets {
   chartData: number[];
 }
 
+// ==============================|| SUB TABLE ||============================== //
+
+function ReactSubTable({ columns, data, loading }: { columns: Column[]; data: []; loading: boolean }) {
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+    columns,
+    data
+  });
+
+  if (loading) {
+    return (
+      <Table {...getTableProps()}>
+        <TableHead>
+          {headerGroups.map((headerGroup) => (
+            <TableRow {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <TableCell {...column.getHeaderProps()}>{column.render('Header')}</TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableHead>
+        <TableBody {...getTableBodyProps()}>
+          {[0, 1, 2].map((item: number) => (
+            <TableRow key={item}>
+              {[0, 1, 2, 3, 4, 5].map((col: number) => (
+                <TableCell key={col}>
+                  <Skeleton animation="wave" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+
+  return (
+    <Table {...getTableProps()}>
+      <TableHead>
+        {headerGroups.map((headerGroup) => (
+          <TableRow {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map((column: HeaderGroup) => (
+              <TableCell {...column.getHeaderProps([{ className: column.className }])}>{column.render('Header')}</TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableHead>
+      <TableBody {...getTableBodyProps()}>
+        {rows.map((row) => {
+          prepareRow(row);
+          return (
+            <TableRow {...row.getRowProps()}>
+              {row.cells.map((cell: Cell) => (
+                <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+              ))}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
+}
+
+// ==============================|| SUB ROW - ASYNC DATA ||============================== //
+
+function SubRowAsync({ invoiceId }: { invoiceId: string }) {
+  const theme = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<[]>([]);
+
+  useEffect(() => {
+    getInvoiceDetailsByHeaderId(invoiceId)
+      .then((invoiceList) => {
+        if (Array.isArray(invoiceList)) {
+        }
+        setData(invoiceList);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, [invoiceId]);
+
+  const columns = useMemo(
+    () => [
+      {
+        Header: 'Name',
+        accessor: 'name'
+      },
+      {
+        Header: 'Description',
+        accessor: 'description',
+        Cell: ({ value }: { value: string }) => (
+          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+        )
+      },
+      {
+        Header: 'Price',
+        accessor: 'price',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true} />
+        )
+      },
+      {
+        Header: 'Quantity',
+        accessor: 'quantity'
+      },
+      {
+        Header: 'Amount',
+        accessor: 'amount',
+        disableFilters: true,
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true} />
+        )
+      }
+    ],
+    []
+  );
+
+  const backColor = alpha(theme.palette.primary.lighter, 0.1);
+
+  return (
+    <TableRow sx={{ bgcolor: backColor, '&:hover': { bgcolor: `${backColor} !important` } }}>
+      <TableCell colSpan={8} sx={{ p: 2.5 }}>
+        <MainCard content={false} sx={{ ml: { xs: 2.5, sm: 5, md: 6, lg: 10, xl: 12 } }}>
+          <ReactSubTable columns={columns} data={data} loading={loading} />
+        </MainCard>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
   data: IInvoiceList[];
+  renderRowSubComponent: FC<any>;
 }
 const moment = require('moment');
-function ReactTable({ columns, data }: Props) {
+
+function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const defaultColumn = useMemo(() => ({ Filter: DateColumnFilter }), []);
@@ -107,6 +252,7 @@ function ReactTable({ columns, data }: Props) {
     prepareRow,
     rows,
     page,
+    visibleColumns,
     gotoPage,
     setPageSize,
     setSortBy,
@@ -117,7 +263,7 @@ function ReactTable({ columns, data }: Props) {
     setFilter
   } = useTable(
     {
-      columns,
+      columns: userColumns,
       data,
       filterTypes,
       defaultColumn,
@@ -232,6 +378,7 @@ function ReactTable({ columns, data }: Props) {
           <TableBody {...getTableBodyProps()}>
             {page.map((row: Row, i: number) => {
               prepareRow(row);
+              const rowProps = row.getRowProps();
               return (
                 <Fragment key={i}>
                   <TableRow
@@ -245,6 +392,7 @@ function ReactTable({ columns, data }: Props) {
                       <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                     ))}
                   </TableRow>
+                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
                 </Fragment>
               );
             })}
@@ -264,21 +412,23 @@ function ReactTable({ columns, data }: Props) {
 
 const List = () => {
   const { alertPopup } = useSelector((state) => state.invoice);
-  const [list, setList] = useState<IInvoiceList[]>([]);
+  const [invoice, setList] = useState<IInvoiceList[]>([]);
   const [invoiceId, setInvoiceId] = useState(0);
   const [getInvoiceId, setGetInvoiceId] = useState(0);
+  const [expandedRows, setExpandedRows] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((customerList) => {
-        setList(customerList);
+      .then((invoiceList) => {
+        setList(invoiceList);
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        setLoading(false);
       });
   }, []);
-
-  const memoizedInvoices = useMemo(() => list, [list]);
 
   const navigation = useNavigate();
   const handleClose = (invoiceStatus: boolean) => {
@@ -306,6 +456,30 @@ const List = () => {
 
   const columns = useMemo(
     () => [
+      {
+        Header: () => null,
+        id: 'expander',
+        className: 'cell-center',
+        Cell: ({ row }: CellProps<any>) => {
+          const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
+          return (
+            <Box sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+              <span
+                onClick={() => {
+                  setExpandedRows((prevState: { [key: string]: boolean }) => ({
+                    ...prevState,
+                    [row.id]: !prevState[row.id]
+                  }));
+                  row.toggleRowExpanded();
+                }}
+              >
+                {collapseIcon}
+              </span>
+            </Box>
+          );
+        },
+        SubCell: () => null
+      },
       {
         title: 'Row Selection',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
@@ -337,15 +511,7 @@ const List = () => {
         Header: 'Amount',
         accessor: 'totalAmount',
         Cell: ({ value }: { value: number }) => (
-          <div style={{ textAlign: 'right' }}>
-            <NumericFormat
-              value={value}
-              displayType="text"
-              thousandSeparator={true}
-              prefix={'₹'}
-              decimalScale={2}
-            />
-          </div>
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true} />
         ),
         disableFilters: true
       },
@@ -367,24 +533,12 @@ const List = () => {
         }
       },
       {
-        Header: 'Tax',
-        accessor: 'tax',
-        className: 'cell-center',
-        disableFilters: true
-      },
-      {
-        Header: 'Term',
-        accessor: 'paymentTerm',
-        className: 'cell-center',
-        disableFilters: true
-      },
-      {
         Header: 'Actions',
-        className: 'cell-right',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
+            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
@@ -431,6 +585,15 @@ const List = () => {
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+  );
+  const renderRowSubComponent = useCallback(
+    ({ row }: { row: any }) => {
+      if ((expandedRows as { [key: string]: boolean })[row.id]) {
+        return <SubRowAsync invoiceId={row.original.id} />;
+      }
+      return null;
+    },
+    [expandedRows]
   );
 
   const theme = useTheme();
@@ -540,13 +703,21 @@ const List = () => {
           </Box>
         </Grid>
       </Grid>
-
       <MainCard content={false}>
-        <ScrollX>
-          <ReactTable columns={columns} data={memoizedInvoices} />
-        </ScrollX>
+        {loading ? ( // Step 3: Conditionally render loading indicator or content
+          <TableCell colSpan={7} align="center">
+            <Stack spacing={2} justifyContent="center" alignItems="center">
+              <Typography variant="h5">Loading Please Wait !</Typography>
+              <CircularProgress color="success" />
+            </Stack>
+          </TableCell>
+        ) : (
+          <ScrollX>
+            <ReactTable columns={columns} data={invoice} renderRowSubComponent={renderRowSubComponent} />
+          </ScrollX>
+        )}
+        <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
       </MainCard>
-      <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
     </>
   );
 };

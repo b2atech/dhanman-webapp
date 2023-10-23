@@ -28,6 +28,14 @@ export const InvoiceAPI = {
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
     });
+    return response.data.items;
+  },
+  getInvoiceDetailsByHeaderId = async function (id: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceDetailByHeaderId/${id}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getInvoiceDetailsByHeaderId.name].handleRequestCancellation().signal : undefined
+    });
 
     return response.data.items;
   },
