@@ -40,15 +40,6 @@ export interface Items {
   price: string | number;
 }
 
-export interface IInvoiceDetails {
-  id: string | number;
-  name: string;
-  description: string;
-  quantity: number;
-  amount: number;
-  price: string | number;
-}
-
 export interface InvoiceProps {
   isOpen: boolean;
   isCustomerOpen: boolean;
