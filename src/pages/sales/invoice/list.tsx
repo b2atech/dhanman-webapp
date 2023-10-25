@@ -397,6 +397,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props
               <TableBody {...getTableBodyProps()}>
                 {page.map((row: Row, i: number) => {
                   prepareRow(row);
+                  const rowProps = row.getRowProps();
                   return (
                     <Fragment key={i}>
                       <TableRow
@@ -410,6 +411,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props
                           <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                         ))}
                       </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
                     </Fragment>
                   );
                 })}
@@ -541,7 +543,14 @@ const List = () => {
         sticky: 'left',
         Cell: ({ value }: { value: number }) => (
           <div style={{ textAlign: 'right' }}>
-            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true}/>
+            <NumericFormat
+              value={value}
+              displayType="text"
+              thousandSeparator={true}
+              prefix={'₹'}
+              decimalScale={2}
+              fixedDecimalScale={true}
+            />
           </div>
         ),
         disableFilters: true
