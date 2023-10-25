@@ -45,12 +45,12 @@ const AddressModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">Select Address</Typography>
           <Button startIcon={<PlusOutlined />} onClick={closeAddressModal} color="primary">
-            Add New
+          Coming Soon
           </Button>
         </Stack>
       </DialogTitle>
       <Divider />
-      <DialogContent sx={{ p: 2.5 }}>
+      <DialogContent sx={{ p: 2.5, height: '500px' }}>
         <FormControl sx={{ width: '100%', pb: 2 }}>
           <TextField
             autoFocus
