@@ -480,6 +480,8 @@ const List = () => {
       {
         Header: () => null,
         id: 'expander',
+        width: 10,
+        sticky: 'left',
         className: 'cell-center',
         Cell: ({ row }: CellProps<any>) => {
           const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
