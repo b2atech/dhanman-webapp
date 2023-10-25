@@ -19,6 +19,7 @@ import {
   useMediaQuery,
   Tooltip,
   Chip,
+  styled,
   Skeleton,
   CircularProgress
 } from '@mui/material';
@@ -41,6 +42,7 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
+import { useSticky } from 'react-table-sticky';
 import {
   DeleteTwoTone,
   DownOutlined,
@@ -226,7 +228,17 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
 }
 
 // ==============================|| REACT TABLE ||============================== //
-
+const TableWrapper = styled('div')(({ theme }) => ({
+  '.header': {
+    position: 'sticky',
+    zIndex: 1,
+    width: 'fit-content'
+  },
+  '& th[data-sticky-td]': {
+    position: 'sticky',
+    zIndex: '5 !important'
+  }
+}));
 interface Props {
   columns: Column[];
   data: IInvoiceList[];
@@ -278,7 +290,8 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect
+    useRowSelect,
+    useSticky
   );
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
@@ -367,46 +380,48 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props
         </Stack>
       </Stack>
       <Box ref={componentRef}>
-        <Table {...getTableProps()}>
-          <TableHead>
-            {headerGroups.map((headerGroup) => (
-              <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                {headerGroup.headers.map((column: HeaderGroup<{}>) => (
-                  <TableCell {...column.getHeaderProps([{ className: column.className }])}>
-                    <HeaderSort column={column} sort />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody {...getTableBodyProps()}>
-            {page.map((row: Row, i: number) => {
-              prepareRow(row);
-              const rowProps = row.getRowProps();
-              return (
-                <Fragment key={i}>
-                  <TableRow
-                    {...row.getRowProps()}
-                    onClick={() => {
-                      row.toggleRowSelected();
-                    }}
-                    sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                  >
-                    {row.cells.map((cell: Cell) => (
-                      <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+        <ScrollX sx={{ height: 500 }}>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup<{}>) => (
+                      <TableCell {...column.getHeaderProps([{ className: column.className }])}>
+                        <HeaderSort column={column} sort />
+                      </TableCell>
                     ))}
                   </TableRow>
-                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
-                </Fragment>
-              );
-            })}
-            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
-                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => (
+                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                        ))}
+                      </TableRow>
+                    </Fragment>
+                  );
+                })}
+                <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+                  <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+                    <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableWrapper>
+        </ScrollX>
       </Box>
     </>
   );
@@ -486,6 +501,8 @@ const List = () => {
       },
       {
         title: 'Row Selection',
+        width: 10,
+        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -497,31 +514,43 @@ const List = () => {
       {
         Header: 'Customer Name',
         accessor: 'customerName',
+        width: 100,
+        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Create Date',
         accessor: 'invoiceDate',
+        width: 100,
+        sticky: 'left',
         Cell: ({ row }: any) => moment(row.values.invoiceDate).format('DD MMM YYYY'),
         disableFilters: true
       },
       {
         Header: 'Due Date',
         accessor: 'dueDate',
+        width: 100,
+        sticky: 'left',
         Cell: ({ row }: any) => moment(row.values.dueDate).format('DD MMM YYYY'),
         disableFilters: true
       },
       {
         Header: 'Amount',
         accessor: 'totalAmount',
+        width: 100,
+        sticky: 'left',
         Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true} />
+          <div style={{ textAlign: 'right' }}>
+            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true}/>
+          </div>
         ),
         disableFilters: true
       },
       {
         Header: 'Status',
         accessor: 'invoiceStatus',
+        width: 100,
+        sticky: 'left',
         disableFilters: true,
         filter: 'includes',
         Cell: ({ value }: { value: string }) => {
@@ -537,8 +566,26 @@ const List = () => {
         }
       },
       {
-        Header: 'Actions',
+        Header: 'Tax',
+        accessor: 'tax',
+        width: 100,
+        sticky: 'left',
         className: 'cell-center',
+        disableFilters: true
+      },
+      {
+        Header: 'Term',
+        accessor: 'paymentTerm',
+        width: 100,
+        sticky: 'left',
+        className: 'cell-center',
+        disableFilters: true
+      },
+      {
+        Header: 'Actions',
+        className: 'cell-right',
+        width: 100,
+        sticky: 'left',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (

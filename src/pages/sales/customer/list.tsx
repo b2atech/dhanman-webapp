@@ -2,10 +2,24 @@ import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } f
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  styled,
+  useMediaQuery
+} from '@mui/material';
 
 // third-party
 import { PatternFormat } from 'react-number-format';
+import { useSticky } from 'react-table-sticky';
 import {
   useFilters,
   useExpanded,
@@ -46,6 +60,17 @@ import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 
 // ==============================|| REACT TABLE ||============================== //
+const TableWrapper = styled('div')(({ theme }) => ({
+  '.header': {
+    position: 'sticky',
+    zIndex: 1,
+    width: 'fit-content'
+  },
+  '& th[data-sticky-td]': {
+    position: 'sticky',
+    zIndex: '5 !important'
+  }
+}));
 
 interface Props {
   columns: Column[];
@@ -89,7 +114,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect
+    useRowSelect,
+    useSticky
   );
 
   const moment = require('moment');
@@ -124,47 +150,51 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             />
           </Stack>
         </Stack>
-        <Table {...getTableProps()}>
-          <TableHead>
-            {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-              <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                {headerGroup.headers.map((column: HeaderGroup) => (
-                  <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                    <HeaderSort column={column} />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody {...getTableBodyProps()}>
-            {page.map((row: Row, i: number) => {
-              prepareRow(row);
-              const rowProps = row.getRowProps();
-
-              return (
-                <Fragment key={i}>
-                  <TableRow
-                    {...row.getRowProps()}
-                    onClick={() => {
-                      row.toggleRowSelected();
-                    }}
-                    sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                  >
-                    {row.cells.map((cell: Cell) => (
-                      <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+        <ScrollX sx={{ height: 500 }}>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => (
+                      <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                        <HeaderSort column={column} />
+                      </TableCell>
                     ))}
                   </TableRow>
-                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
-                </Fragment>
-              );
-            })}
-            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
-                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  const rowProps = row.getRowProps();
+
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => (
+                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                        ))}
+                      </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
+                    </Fragment>
+                  );
+                })}
+                <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+                  <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+                    <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableWrapper>
+        </ScrollX>
       </Stack>
     </>
   );
@@ -184,11 +214,7 @@ const CustomerListPage = () => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((customerList) => {
         if (Array.isArray(customerList)) {
-          const customersWithSequentialId = customerList.map((customer, index) => ({
-            ...customer,
-            sequentialId: index + 1
-          }));
-          setCustomers(customersWithSequentialId);
+          setCustomers(customerList);
         }
       })
       .catch((error) => {
@@ -217,20 +243,28 @@ const CustomerListPage = () => {
       {
         show: false,
         accessor: 'id',
-        disableSortBy: true
+        disableSortBy: true,
+        width: 10,
+        sticky: 'left'
       },
       {
         show: false,
         accessor: 'firstName',
-        disableSortBy: true
+        disableSortBy: true,
+        width: 20,
+        sticky: 'left'
       },
       {
         show: false,
         accessor: 'lastName',
-        disableSortBy: true
+        disableSortBy: true,
+        width: 20,
+        sticky: 'left'
       },
       {
         title: 'Row Selection',
+        width: 10,
+        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -241,6 +275,8 @@ const CustomerListPage = () => {
       {
         Header: 'Customer Name',
         accessor: 'customerName',
+        width: 220,
+        sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
@@ -253,19 +289,27 @@ const CustomerListPage = () => {
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
+        width: 200,
+        sticky: 'left',
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
         Header: 'Email',
-        accessor: 'email'
+        accessor: 'email',
+        width: 200,
+        sticky: 'left'
       },
       {
         Header: 'City',
-        accessor: 'city'
+        accessor: 'city',
+        width: 200,
+        sticky: 'left'
       },
       {
         Header: 'Actions',
         className: 'cell-right',
+        width: 200,
+        sticky: 'left',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
