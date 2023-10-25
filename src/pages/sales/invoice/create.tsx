@@ -36,29 +36,45 @@ import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
 import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
 // third party
-// import * as yup from 'yup';
+import * as yup from 'yup';
 import { format } from 'date-fns';
 
 import { FieldArray, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router';
+import VendorAddressModel from 'sections/apps/invoice/VendorAddressModel';
 
-// const validationSchema = yup.object({
-//   customerInfo: yup
-//     .object({
-//       name: yup.string().required('Invoice receiver information is required')
-//     })
-//     .required('Invoice receiver information is required'),
-//   status: yup.string().required('Status selection is required'),
-//   invoice_detail: yup
-//     .array()
-//     .required('Invoice details is required')
-//     .of(
-//       yup.object().shape({
-//         name: yup.string().required('Product name is required')
-//       })
-//     )
-//     .min(1, 'Invoice must have at least 1 items')
-// });
+const validationSchema = yup.object({
+  id: yup.string().required('Invoice ID is required'),
+  invoiceNumber: yup.string().required('Invoice number is required'),
+  status: yup.string().required('Status selection is required'),
+  invoiceDate: yup.date().required('Invoice date is required'),
+  due_date: yup
+    .date()
+    .when('invoiceDate', (invoiceDate, schema) => {
+      return invoiceDate && schema.min(invoiceDate, "Due date can't be before invoice date");
+    })
+    .required('Due date is required'),
+  customerInfo: yup
+    .object({
+      firstName: yup.string().required('Invoice receiver information is required')
+    })
+    .required('Invoice receiver information is required'),
+  invoice_detail: yup
+    .array()
+    .of(
+      yup.object().shape({
+        name: yup.string().required('Product name is required'),
+        description: yup.string(),
+        qty: yup.number().min(1, 'Quantity must be at least 1'),
+        price: yup.number().min(0, 'Price must be at least 0')
+      })
+    )
+    .required('Invoice details is required')
+    .min(1, 'Invoice must have at least 1 item'),
+  discount: yup.number().min(0, 'Discount must be at least 0'),
+  tax: yup.number().min(0, 'Tax must be at least 0'),
+  note: yup.string().max(500, 'Notes cannot exceed 500 characters')
+});
 
 // ==============================|| INVOICE - CREATE ||============================== //
 
@@ -78,8 +94,8 @@ const Createinvoice = () => {
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'), // Replace with your desired date
-      dueDate: format(values.due_date, 'yyyy-MM-dd'), // Replace with your desired date
+      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'),
+      dueDate: format(values.due_date, 'yyyy-MM-dd'),
 
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
@@ -126,7 +142,7 @@ const Createinvoice = () => {
           close: false
         })
       );
-      navigation('/invoice/list');
+      navigation('/sales/invoices/list');
     });
   };
 
@@ -146,7 +162,7 @@ const Createinvoice = () => {
           invoiceNumber: '',
           status: '',
           invoiceDate: new Date(),
-          due_date: '',
+          due_date: null,
           cashierInfo: {
             name: 'Belle J. Richter',
             address: '1300 Cooks Mine, NM 87829',
@@ -155,6 +171,11 @@ const Createinvoice = () => {
           },
           customerInfo: {
             phoneNumber: '',
+            email: '',
+            firstName: '',
+            lastName: ''
+          },
+          vendorInfo: {
             email: '',
             firstName: '',
             lastName: ''
@@ -172,6 +193,7 @@ const Createinvoice = () => {
           tax: 0,
           note: ''
         }}
+        validationSchema={validationSchema}
         onSubmit={(values) => {
           handlerCreate(values);
         }}
@@ -271,10 +293,8 @@ const Createinvoice = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
+                            <Typography variant="subtitle1">{`${values?.vendorInfo?.firstName} ${values?.vendorInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.vendorInfo?.email}</Typography>
                           </Stack>
                         </Stack>
                       </Grid>
@@ -295,7 +315,7 @@ const Createinvoice = () => {
                           >
                             Change
                           </Button>
-                          <AddressModal
+                          <VendorAddressModel
                             open={open}
                             setOpen={(value) =>
                               dispatch(
@@ -304,7 +324,7 @@ const Createinvoice = () => {
                                 })
                               )
                             }
-                            handlerAddress={(address) => setFieldValue('cashierInfo', address)}
+                            handlerVendorAddress={(address) => setFieldValue('vendorInfo', address)}
                           />
                         </Box>
                       </Grid>
