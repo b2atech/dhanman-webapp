@@ -2,7 +2,20 @@ import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } f
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  styled,
+  useMediaQuery
+} from '@mui/material';
 
 // third-party
 import {
@@ -19,7 +32,7 @@ import {
   Cell,
   HeaderProps
 } from 'react-table';
-
+import { useSticky } from 'react-table-sticky';
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
@@ -45,7 +58,17 @@ import moment from 'moment';
 import AddVendor from '../createbills/Vendor/AddVendor';
 import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
 // ==============================|| REACT TABLE ||============================== //
-
+const TableWrapper = styled('div')(({ theme }) => ({
+  '.header': {
+    position: 'sticky',
+    zIndex: 1,
+    width: 'fit-content'
+  },
+  '& th[data-sticky-td]': {
+    position: 'sticky',
+    zIndex: '5 !important'
+  }
+}));
 interface Props {
   columns: Column[];
   data: IVendor[];
@@ -89,7 +112,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect
+    useRowSelect,
+    useSticky
   );
 
   const now = new Date();
@@ -123,47 +147,51 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             />
           </Stack>
         </Stack>
-        <Table {...getTableProps()}>
-          <TableHead>
-            {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-              <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                {headerGroup.headers.map((column: HeaderGroup) => (
-                  <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                    <HeaderSort column={column} />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody {...getTableBodyProps()}>
-            {page.map((row: Row, i: number) => {
-              prepareRow(row);
-              const rowProps = row.getRowProps();
-
-              return (
-                <Fragment key={i}>
-                  <TableRow
-                    {...row.getRowProps()}
-                    onClick={() => {
-                      row.toggleRowSelected();
-                    }}
-                    sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                  >
-                    {row.cells.map((cell: Cell) => (
-                      <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+        <ScrollX sx={{ height: 500 }}>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => (
+                      <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                        <HeaderSort column={column} />
+                      </TableCell>
                     ))}
                   </TableRow>
-                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
-                </Fragment>
-              );
-            })}
-            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
-                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  const rowProps = row.getRowProps();
+
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => (
+                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                        ))}
+                      </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
+                    </Fragment>
+                  );
+                })}
+                <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+                  <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+                    <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableWrapper>
+        </ScrollX>
       </Stack>
     </>
   );
@@ -183,11 +211,7 @@ const Vendors = () => {
     getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
-          const vendorsWithSequentialId = vendorList.map((vendor, index) => ({
-            ...vendor,
-            sequentialId: index + 1
-          }));
-          setVendors(vendorsWithSequentialId);
+          setVendors(vendorList);
         }
       })
       .catch((error) => {
@@ -210,6 +234,8 @@ const Vendors = () => {
     () => [
       {
         title: 'Row Selection',
+        width: 10,
+        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -220,6 +246,8 @@ const Vendors = () => {
       {
         Header: 'Vendor Name',
         accessor: 'vendorName',
+        width: 200,
+        sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
@@ -231,11 +259,15 @@ const Vendors = () => {
       },
       {
         Header: 'Email',
-        accessor: 'email'
+        accessor: 'email',
+        width: 200,
+        sticky: 'left'
       },
       {
         Header: 'Actions',
         className: 'cell-left',
+        width: 200,
+        sticky: 'left',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
