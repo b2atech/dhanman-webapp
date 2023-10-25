@@ -36,7 +36,6 @@ import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
 import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
 // third party
-// import * as yup from 'yup';
 import { format } from 'date-fns';
 
 import { FieldArray, Form, Formik } from 'formik';
@@ -78,8 +77,8 @@ const Createinvoice = () => {
       avatar: Number(Math.round(Math.random() * 10)),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'), // Replace with your desired date
-      dueDate: format(values.due_date, 'yyyy-MM-dd'), // Replace with your desired date
+      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'),
+      dueDate: format(values.due_date, 'yyyy-MM-dd'),
 
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
@@ -87,20 +86,19 @@ const Createinvoice = () => {
         }, 0)
       ),
       status: values.status,
-      totalAmount: 1000,
+      invoiceStatusId: 'f247baba-2aa4-4adf-9bd1-fa2dd8dd0d4d',
+      totalAmount: Number(values.totalAmount),
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
       note: values.note,
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       currency: 'INR',
-      paymentTerm: 10,
-      billStatusId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      vendorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      paymentTerm: 6,
       coaId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       billPaymentId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      customerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      customerId: values.customerInfo.id,
       invoiceDetails: undefined,
-      invoiceVoucher: 'YP001'
+      invoiceVoucher: 'YP002'
     };
 
     invoice.lines = values.invoice_detail.map((invoiceItem: any) => {
@@ -126,7 +124,7 @@ const Createinvoice = () => {
           close: false
         })
       );
-      navigation('/invoice/list');
+      navigation('/sales/invoices/list');
     });
   };
 
@@ -170,7 +168,8 @@ const Createinvoice = () => {
           ],
           discount: 0,
           tax: 0,
-          note: ''
+          note: '',
+          totalAmount: 0
         }}
         onSubmit={(values) => {
           handlerCreate(values);
@@ -183,7 +182,8 @@ const Createinvoice = () => {
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
           const discountRate = (values.discount * subtotal) / 100;
-          const totalAmount = subtotal - discountRate + taxRate;
+          const grandAmount = subtotal - discountRate + taxRate;
+          values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -492,9 +492,9 @@ const Createinvoice = () => {
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography variant="subtitle1">Grand Total:</Typography>
                                     <Typography variant="subtitle1">
-                                      {totalAmount % 1 === 0
-                                        ? country?.prefix + '' + totalAmount
-                                        : country?.prefix + '' + totalAmount.toFixed(2)}
+                                      {grandAmount % 1 === 0
+                                        ? country?.prefix + '' + grandAmount
+                                        : country?.prefix + '' + grandAmount.toFixed(2)}
                                     </Typography>
                                   </Stack>
                                 </Stack>
@@ -631,7 +631,7 @@ const Createinvoice = () => {
                         subtotal,
                         taxRate,
                         discountRate,
-                        totalAmount
+                        grandAmount
                       }}
                       items={values?.invoice_detail}
                       onAddNextInvoice={addNextInvoiceHandler}
