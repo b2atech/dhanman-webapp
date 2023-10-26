@@ -5,7 +5,9 @@ import { alpha, useTheme } from '@mui/material/styles';
 import {
   Button,
   Dialog,
+  FormControlLabel,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -75,9 +77,11 @@ interface Props {
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
+  showIdColumn: boolean;
+  handleSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
+function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -105,7 +109,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'firstName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] },
+      hiddenColumns: ['']
     },
     useGlobalFilter,
     useFilters,
@@ -118,6 +123,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   const now = new Date();
   const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+  const [isVendorIdVisible, setIsVendorIdVisible] = useState(false);
+
+  const handleSwitchChange = () => {
+    setIsVendorIdVisible((prevIsVendorIdVisible) => !prevIsVendorIdVisible);
+  };
+
+  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsAuditSwitchOn(event.target.checked);
+  };
 
   return (
     <>
@@ -145,6 +160,24 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
+            <Tooltip title={isVendorIdVisible ? 'Close ID' : 'Show ID'}>
+              <FormControlLabel
+                value=""
+                control={<Switch color="success" checked={isVendorIdVisible} onChange={handleSwitchChange} />}
+                label=""
+                labelPlacement="start"
+                sx={{ mr: 0 }}
+              />
+            </Tooltip>
+            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
+              <FormControlLabel
+                value=""
+                control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
+                label=""
+                labelPlacement="start"
+                sx={{ mr: 0 }}
+              />
+            </Tooltip>
           </Stack>
         </Stack>
         <ScrollX sx={{ height: 500 }}>
@@ -153,11 +186,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               <TableHead>
                 {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                    {headerGroup.headers.map((column: HeaderGroup) => (
-                      <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                        <HeaderSort column={column} />
-                      </TableCell>
-                    ))}
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (column.id === 'id' && !isVendorIdVisible) {
+                        return null;
+                      }
+                      return (
+                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableHead>
@@ -175,9 +213,14 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                         }}
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
-                        {row.cells.map((cell: Cell) => (
-                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                        ))}
+                        {row.cells.map((cell: Cell) => {
+                          if (cell.column.id === 'id' && !isVendorIdVisible) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
                       </TableRow>
                       {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
                     </Fragment>
@@ -206,6 +249,11 @@ const Vendors = () => {
   const [vendorDeleteId, setVendorDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
   const [vendors, setVendors] = useState<IVendor[]>([]);
+  const [showIdColumn, setShowIdColumn] = useState(false);
+
+  const handleSwitchChange = () => {
+    setShowIdColumn(!showIdColumn);
+  };
 
   useEffect(() => {
     getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
@@ -242,6 +290,12 @@ const Vendors = () => {
         accessor: 'selection',
         Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
         disableSortBy: true
+      },
+      {
+        Header: 'Vendor id',
+        accessor: 'id',
+        width: -200,
+        sticky: 'left'
       },
       {
         Header: 'Vendor Name',
@@ -335,10 +389,12 @@ const Vendors = () => {
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+          showIdColumn={showIdColumn}
+          handleSwitchChange={handleSwitchChange}
         />
       </ScrollX>
       <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
-      {/* add vendor dialog */}
+
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
