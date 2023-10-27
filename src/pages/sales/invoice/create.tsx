@@ -23,7 +23,7 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import AddressModal from 'sections/apps/invoice/AddressModal';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'store';
 import { toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
 import { customerPopup } from 'store/reducers/invoice';
@@ -87,7 +87,7 @@ const Createinvoice = () => {
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
       id: Math.floor(Math.random() * 90000) + 10000,
-      invoiceNumber: String(values.invoiceNumber),
+      invoiceNumber: values.invoiceNumber,
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
@@ -157,8 +157,8 @@ const Createinvoice = () => {
       <Formik
         initialValues={{
           id: 120,
-          invoiceNumber: '',
-          status: '',
+          invoiceNumber: null,
+          status: 'Unpaid',
           invoiceDate: new Date(),
           due_date: null,
           cashierInfo: {
@@ -171,7 +171,8 @@ const Createinvoice = () => {
             phoneNumber: '',
             email: '',
             firstName: '',
-            lastName: ''
+            lastName: '',
+            city: ''
           },
           vendorInfo: {
             email: '',
@@ -211,25 +212,29 @@ const Createinvoice = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
-                    <InputLabel>Invoice Id</InputLabel>
+                    <InputLabel>Invoice No.</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
                       <TextField
-                        required
-                        type="number"
                         name="invoiceNumber"
                         id="invoiceNumber"
                         value={values.invoiceNumber}
                         onChange={handleChange}
+                        inputProps={{
+                          maxLength: 16
+                        }}
                       />
                     </FormControl>
                   </Stack>
+                  {touched.invoiceNumber && errors.invoiceNumber && (
+                    <FormHelperText error={true}>{errors.invoiceNumber as string}</FormHelperText>
+                  )}
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
                     <InputLabel>Status</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
                       <Select
-                        value={values.status}
+                        value="Unpaid" // Set the default value to "Unpaid"
                         displayEmpty
                         name="status"
                         renderValue={(selected) => {
@@ -237,7 +242,6 @@ const Createinvoice = () => {
                             return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
                           }
                           return selected;
-                          // return selected.join(', ');
                         }}
                         onChange={handleChange}
                         error={Boolean(errors.status && touched.status)}
@@ -245,9 +249,15 @@ const Createinvoice = () => {
                         <MenuItem disabled value="">
                           Select status
                         </MenuItem>
-                        <MenuItem value="Paid">Paid</MenuItem>
-                        <MenuItem value="Unpaid">Unpaid</MenuItem>
-                        <MenuItem value="Cancelled">Cancelled</MenuItem>
+                        <MenuItem value="Paid" disabled>
+                          Paid
+                        </MenuItem>
+                        <MenuItem value="Unpaid" disabled>
+                          Unpaid
+                        </MenuItem>
+                        <MenuItem value="Cancelled" disabled>
+                          Cancelled
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Stack>
@@ -285,7 +295,6 @@ const Createinvoice = () => {
                   </Stack>
                   {touched.due_date && errors.due_date && <FormHelperText error={true}>{errors.due_date as string}</FormHelperText>}
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
                     <Grid container spacing={2}>
@@ -293,14 +302,16 @@ const Createinvoice = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{`${values?.vendorInfo?.firstName} ${values?.vendorInfo?.lastName}`}</Typography>
-                            <Typography color="secondary">{values?.vendorInfo?.email}</Typography>
+                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
+                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
+                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
+                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
                           </Stack>
                         </Stack>
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
-                          <Button
+                          {/* <Button
                             variant="outlined"
                             startIcon={<EditOutlined />}
                             color="secondary"
@@ -314,7 +325,7 @@ const Createinvoice = () => {
                             size="small"
                           >
                             Change
-                          </Button>
+                          </Button> */}
                           <VendorAddressModel
                             open={open}
                             setOpen={(value) =>
@@ -340,6 +351,7 @@ const Createinvoice = () => {
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
                             <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.city}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
