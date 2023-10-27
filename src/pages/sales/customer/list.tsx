@@ -5,7 +5,9 @@ import { alpha, useTheme } from '@mui/material/styles';
 import {
   Button,
   Dialog,
+  FormControlLabel,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -78,14 +80,16 @@ interface Props {
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
+  showIdColumn: boolean;
+  handleSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
+function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'customerName', desc: false };
+  const sortBy = { id: '', desc: false };
   const {
     getTableProps,
     getTableBodyProps,
@@ -107,7 +111,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id', 'avatar', 'firstName', 'lastName'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -119,9 +123,19 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 
   const moment = require('moment');
-
   const now = new Date();
-  const formattedFilename = `CustomersList ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
+  const formatedFilename = 'CustomersList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+  const [isCustomerIdVisible, setIsCustomerIdVisible] = useState(false);
+
+  const handleSwitchChange = () => {
+    setIsCustomerIdVisible((prevIsCustomerIdVisible) => !prevIsCustomerIdVisible);
+  };
+
+  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsAuditSwitchOn(event.target.checked);
+  };
+
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -146,8 +160,26 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formattedFilename}
+              filename={formatedFilename}
             />
+            <Tooltip title={isCustomerIdVisible ? 'Close ID' : 'Show ID'}>
+              <FormControlLabel
+                value=""
+                control={<Switch color="success" checked={isCustomerIdVisible} onChange={handleSwitchChange} />}
+                label=""
+                labelPlacement="start"
+                sx={{ mr: 0 }}
+              />
+            </Tooltip>
+            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
+              <FormControlLabel
+                value=""
+                control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
+                label=""
+                labelPlacement="start"
+                sx={{ mr: 0 }}
+              />
+            </Tooltip>
           </Stack>
         </Stack>
         <ScrollX sx={{ height: 500 }}>
@@ -156,11 +188,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               <TableHead>
                 {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                    {headerGroup.headers.map((column: HeaderGroup) => (
-                      <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                        <HeaderSort column={column} />
-                      </TableCell>
-                    ))}
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (column.id === 'id' && !isCustomerIdVisible) {
+                        return null;
+                      }
+                      return (
+                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableHead>
@@ -178,9 +215,14 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                         }}
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
-                        {row.cells.map((cell: Cell) => (
-                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                        ))}
+                        {row.cells.map((cell: Cell) => {
+                          if (cell.column.id === 'id' && !isCustomerIdVisible) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
                       </TableRow>
                       {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
                     </Fragment>
@@ -209,6 +251,11 @@ const CustomerListPage = () => {
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
   const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
+  const [showIdColumn, setShowIdColumn] = useState(false);
+
+  const handleSwitchChange = () => {
+    setShowIdColumn(!showIdColumn);
+  };
 
   useEffect(() => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -242,13 +289,6 @@ const CustomerListPage = () => {
     () => [
       {
         show: false,
-        accessor: 'id',
-        disableSortBy: true,
-        width: 10,
-        sticky: 'left'
-      },
-      {
-        show: false,
         accessor: 'firstName',
         disableSortBy: true,
         width: 20,
@@ -271,6 +311,12 @@ const CustomerListPage = () => {
         accessor: 'selection',
         Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
         disableSortBy: true
+      },
+      {
+        Header: 'Customer id',
+        accessor: 'id',
+        width: -200,
+        sticky: 'left'
       },
       {
         Header: 'Customer Name',
@@ -378,6 +424,8 @@ const CustomerListPage = () => {
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+          showIdColumn={showIdColumn}
+          handleSwitchChange={handleSwitchChange}
         />
       </ScrollX>
       <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
