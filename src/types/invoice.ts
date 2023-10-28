@@ -32,6 +32,33 @@ export interface IInvoiceList {
   notes: string;
 }
 
+export interface IInvoiceType {
+  id: number;
+  invoice_id: number;
+  customer_name: string;
+  email: string;
+  avatar: number;
+  invoiceDate: Date;
+  dueDate: Date | string | number;
+  quantity: number;
+  customer: {
+    firstName: string;
+    lastName: string;
+    phoneNumber: number;
+    email: string;
+    city: string;
+    tax: number | null;
+  };
+  invoiceStatus: string;
+  totalAmount: number;
+  lines: InvoiceItem[];
+  cashierInfo: InfoType;
+  discount: number | null;
+  tax: number | null;
+  customerInfo: InfoType;
+  note: string;
+}
+
 export interface Items {
   id: string | number;
   name: string;
@@ -40,6 +67,14 @@ export interface Items {
   price: string | number;
 }
 
+export interface InvoiceItem {
+  id: string | number;
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  amount: number;
+}
 export interface InvoiceProps {
   isOpen: boolean;
   isCustomerOpen: boolean;
@@ -64,6 +99,7 @@ export interface IInvoice {
   status: string;
   invoice_detail: Items[];
   cashierInfo: InfoType;
+  totalAmount: number;
   discount: number | null;
   tax: number | null;
   customerInfo: InfoType;
