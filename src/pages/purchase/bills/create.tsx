@@ -32,8 +32,9 @@ import { useTheme } from '@mui/material/styles';
 import { v4 as UIDV4 } from 'uuid';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
+
 // third party
-// import * as yup from 'yup';
+import * as yup from 'yup';
 import { format } from 'date-fns';
 
 import { FieldArray, Form, Formik } from 'formik';
@@ -43,23 +44,38 @@ import { createBillRequest } from 'api/services/BillService';
 import BillModal from 'sections/apps/bill/BillModal';
 import AddressBillModal from 'sections/apps/bill/BillAddressModal';
 
-// const validationSchema = yup.object({
-//   customerInfo: yup
-//     .object({
-//       name: yup.string().required('Bill receiver information is required')
-//     })
-//     .required('Bill receiver information is required'),
-//   status: yup.string().required('Status selection is required'),
-//   invoice_detail: yup
-//     .array()
-//     .required('Bill details is required')
-//     .of(
-//       yup.object().shape({
-//         name: yup.string().required('Product name is required')
-//       })
-//     )
-//     .min(1, 'Bill must have at least 1 items')
-// });
+const validationSchema = yup.object({
+  id: yup.string().required('Bill ID is required'),
+  billNumber: yup.string().required('bill number is required'),
+  status: yup.string().required('Status selection is required'),
+  billDate: yup.date().required('bill date is required'),
+  due_date: yup
+    .date()
+    .when('billDate', (billDate, schema) => {
+      return billDate && schema.min(billDate, "Due date can't be before bill date");
+    })
+    .required('Due date is required'),
+  customerInfo: yup
+    .object({
+      firstName: yup.string().required('bill receiver information is required')
+    })
+    .required('bill receiver information is required'),
+  invoice_detail: yup
+    .array()
+    .of(
+      yup.object().shape({
+        name: yup.string().required('Product name is required'),
+        description: yup.string(),
+        qty: yup.number().min(1, 'Quantity must be at least 1'),
+        price: yup.number().min(0, 'Price must be at least 0')
+      })
+    )
+    .required('bill details is required')
+    .min(1, 'bill must have at least 1 item'),
+  discount: yup.number().min(0, 'Discount must be at least 0'),
+  tax: yup.number().min(0, 'Tax must be at least 0'),
+  note: yup.string().max(500, 'Notes cannot exceed 500 characters')
+});
 
 // ==============================|| BILL - CREATE ||============================== //
 
@@ -73,34 +89,33 @@ const CreateBill = () => {
   const handlerCreate = (values: any) => {
     const bill: BillHeader_main = {
       id: Math.floor(Math.random() * 90000) + 10000,
-      billNumber: String(values.invoiceNumber),
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      vendorId: values.customerInfo.id,
+      coaId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      discount: Number(values.discount),
+      billNumber: String(values.billNumber),
+      currency: 'INR',
+      billDate: format(values.billDate, 'yyyy-MM-dd'),
+      paymentTerm: 10,
+      billStatusId: '86369b93-58f6-4809-88bd-bc07fbf406ab',
+      billPaymentId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      dueDate: format(values.due_date, 'yyyy-MM-dd'),
+      totalAmount: Number(values.totalAmount),
+      tax: Number(values.tax),
+      note: values.note,
+      billDetails: undefined,
+      billVoucher: 'YP001',
       customer_name: values.cashierInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
-      discount: Number(values.discount),
-      tax: Number(values.tax),
-      billDate: format(values.billDate, 'yyyy-MM-dd'),
-      dueDate: format(values.due_date, 'yyyy-MM-dd'),
-
       quantity: Number(
         values.invoice_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
         }, 0)
       ),
       status: values.status,
-      totalAmount: 1000,
       cashierInfo: values.cashierInfo,
-      customerInfo: values.customerInfo,
-      note: values.note,
-      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      currency: 'INR',
-      paymentTerm: 10,
-      billStatusId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      vendorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      coaId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      billPaymentId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      billDetails: undefined,
-      billVoucher: 'YP001'
+      customerInfo: values.customerInfo
     };
 
     bill.lines = values.invoice_detail.map((billItem: any) => {
@@ -126,11 +141,11 @@ const CreateBill = () => {
           close: false
         })
       );
-      navigation('/master/billslist');
+      navigation('/purchase/bills/list');
     });
   };
 
-  const addNextInvoiceHandler = () => {
+  const addNextBillHandler = () => {
     dispatch(
       reviewInvoicePopup({
         isOpen: false
@@ -146,7 +161,7 @@ const CreateBill = () => {
           billNumber: '',
           status: '',
           billDate: new Date(),
-          due_date: '',
+          due_date: null,
           cashierInfo: {
             name: 'Belle J. Richter',
             address: '1300 Cooks Mine, NM 87829',
@@ -170,8 +185,10 @@ const CreateBill = () => {
           ],
           discount: 0,
           tax: 0,
-          note: ''
+          note: '',
+          totalAmount: 0
         }}
+        validationSchema={validationSchema}
         onSubmit={(values) => {
           handlerCreate(values);
         }}
@@ -183,7 +200,8 @@ const CreateBill = () => {
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
           const discountRate = (values.discount * subtotal) / 100;
-          const totalAmount = subtotal - discountRate + taxRate;
+          const grandAmount = subtotal - discountRate + taxRate;
+          values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -215,7 +233,6 @@ const CreateBill = () => {
                             return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
                           }
                           return selected;
-                          // return selected.join(', ');
                         }}
                         onChange={handleChange}
                         error={Boolean(errors.status && touched.status)}
@@ -261,7 +278,6 @@ const CreateBill = () => {
                   </Stack>
                   {touched.due_date && errors.due_date && <FormHelperText error={true}>{errors.due_date as string}</FormHelperText>}
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
                     <Grid container spacing={2}>
@@ -309,7 +325,6 @@ const CreateBill = () => {
                     </Grid>
                   </MainCard>
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
                     <Grid container spacing={2}>
@@ -363,10 +378,9 @@ const CreateBill = () => {
                 <Grid item xs={12}>
                   <Typography variant="h5">Detail</Typography>
                 </Grid>
-
                 <Grid item xs={12}>
                   <FieldArray
-                    name="invoice_detail"
+                    name="bill_detail"
                     render={({ remove, push }) => {
                       return (
                         <>
@@ -490,9 +504,9 @@ const CreateBill = () => {
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography variant="subtitle1">Grand Total:</Typography>
                                     <Typography variant="subtitle1">
-                                      {totalAmount % 1 === 0
-                                        ? country?.prefix + '' + totalAmount
-                                        : country?.prefix + '' + totalAmount.toFixed(2)}
+                                      {grandAmount % 1 === 0
+                                        ? country?.prefix + '' + grandAmount
+                                        : country?.prefix + '' + grandAmount.toFixed(2)}
                                     </Typography>
                                   </Stack>
                                 </Stack>
@@ -629,10 +643,10 @@ const CreateBill = () => {
                         subtotal,
                         taxRate,
                         discountRate,
-                        totalAmount
+                        grandAmount
                       }}
                       items={values?.invoice_detail}
-                      onAddNextInvoice={addNextInvoiceHandler}
+                      onAddNextInvoice={addNextBillHandler}
                     />
                   </Stack>
                 </Grid>

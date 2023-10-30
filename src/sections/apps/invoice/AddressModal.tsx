@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -45,12 +44,12 @@ const AddressModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">Select Address</Typography>
           <Button startIcon={<PlusOutlined />} onClick={closeAddressModal} color="primary">
-          Coming Soon
+            Add
           </Button>
         </Stack>
       </DialogTitle>
       <Divider />
-      <DialogContent sx={{ p: 2.5, height: '500px' }}>
+      <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
         <FormControl sx={{ width: '100%', pb: 2 }}>
           <TextField
             autoFocus
@@ -91,10 +90,9 @@ const Address = ({ handlerAddress }: AddressProps) => {
   const [addressModel, setAddressModel] = useState([]);
   useEffect(() => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((response) => {
-        setAddressModel(response);
+      setAddressModel(response);
     });
   }, []);
-
 
   return (
     <>
@@ -115,7 +113,7 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-          {`${customerList.firstName} ${customerList.lastName}`}
+            {`${customerList.firstName} ${customerList.lastName}`}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
