@@ -766,13 +766,13 @@ const List = () => {
         </Grid>
       </Grid>
       <MainCard content={false}>
-        {loading ? ( // Step 3: Conditionally render loading indicator or content
-          <TableCell colSpan={7} align="center">
-            <Stack spacing={2} justifyContent="center" alignItems="center">
-              <Typography variant="h5">Loading Please Wait !</Typography>
-              <CircularProgress color="success" />
-            </Stack>
-          </TableCell>
+        {loading ? (
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+            <CircularProgress size={60} thickness={4} />
+            <Typography variant="body1" style={{ marginTop: '32x' }}>
+              Loading, please wait...
+            </Typography>
+          </Box>
         ) : (
           <ScrollX>
             <ReactTable columns={columns} data={invoice} renderRowSubComponent={renderRowSubComponent} />
