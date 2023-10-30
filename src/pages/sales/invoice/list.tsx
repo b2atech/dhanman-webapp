@@ -26,7 +26,6 @@ import ReactToPrint from 'react-to-print';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 
 // project import
-//import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
 import LogoSection from 'components/logo';
 import ExportPDFView from 'sections/apps/invoice/export-pdf';
