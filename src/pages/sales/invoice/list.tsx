@@ -18,7 +18,8 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Divider,CircularProgress
+  Divider,
+  CircularProgress
 } from '@mui/material';
 
 // third-party
@@ -37,7 +38,6 @@ import { useSelector } from 'store';
 import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
 import { getInvoice } from 'api/services/SalesService';
 import { IInvoiceType } from 'types/invoice';
-//import ScrollX from 'components/ScrollX';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
 
