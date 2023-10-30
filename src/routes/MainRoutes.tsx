@@ -15,6 +15,7 @@ const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/comi
 //Render Applications
 const AppInvoices = Loadable(lazy(() => import('pages/sales/invoice/list')));
 const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create')));
+const Invoicedetails = Loadable(lazy(() => import('pages/sales/invoice/details')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/list')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
@@ -100,6 +101,10 @@ const MainRoutes = {
             {
               path: 'create',
               element: <AppCreateInvoice />
+            },
+            {
+              path: 'details/:id',
+              element: <Invoicedetails />
             }
           ]
         },
