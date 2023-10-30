@@ -241,7 +241,7 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
         </Stack>
       </Stack>
       <Box ref={componentRef}>
-        <ScrollX sx={{ height: 500 }}>
+        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
@@ -284,15 +284,17 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
                     </Fragment>
                   );
                 })}
-                <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-                  <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
-                    <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-                  </TableCell>
-                </TableRow>
               </TableBody>
             </Table>
           </TableWrapper>
         </ScrollX>
+        <Box>
+          <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+            <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
+              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+            </TableCell>
+          </TableRow>
+        </Box>
       </Box>
     </>
   );
@@ -593,6 +595,7 @@ const Bills = () => {
           />
         </ScrollX>
       </MainCard>
+
       <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
     </>
   );
