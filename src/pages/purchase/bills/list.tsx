@@ -531,22 +531,15 @@ const Bills = () => {
           </Box>
         </Grid>
       </Grid>
-
       <MainCard content={false}>
-      {loading ?
-       (
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
-          <CircularProgress size={60} thickness={4} />
+        {loading ? ( <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+            <CircularProgress size={60} thickness={4} />
             <Typography variant="body1" style={{ marginTop: '16px' }}>
               Loading, please wait...
             </Typography>
-        </Box>
-        ) : (
-        <ScrollX>
-          <ReactTable columns={columns} data={bill} />
-        </ScrollX>
-        )
-      }
+            </Box>) : (<ScrollX>
+                          <ReactTable columns={columns} data={bill} />
+                        </ScrollX>)}
       </MainCard>
       <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
     </>
