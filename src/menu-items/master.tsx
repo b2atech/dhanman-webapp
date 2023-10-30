@@ -118,6 +118,13 @@ const master: NavItemType = {
           icon: icons.PlusSquareOutlined
         },
         {
+          id: 'invoicedetails',
+          title: <FormattedMessage id="invoicedetails" />,
+          type: 'item',
+          url: '/sales/invoices/details/:id',
+          icon: icons.PlusSquareOutlined
+        },
+        {
           id: 'paymentreceived',
           title: <FormattedMessage id="paymentreceived" />,
           type: 'item',

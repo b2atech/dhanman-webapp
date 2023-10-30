@@ -16,7 +16,9 @@ import {
   Tooltip,
   Typography,
   styled,
-  useMediaQuery
+  useMediaQuery,
+  CircularProgress,
+  Box
 } from '@mui/material';
 
 // third-party
@@ -250,6 +252,7 @@ const Vendors = () => {
   const [add, setAdd] = useState<boolean>(false);
   const [vendors, setVendors] = useState<IVendor[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
@@ -260,10 +263,12 @@ const Vendors = () => {
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
           setVendors(vendorList);
+          setLoading(false);
         }
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        setLoading(false);
       });
   }, []);
 
@@ -382,17 +387,21 @@ const Vendors = () => {
 
   return (
     <MainCard content={false}>
-      <ScrollX>
-        <ReactTable
-          columns={columns}
-          data={memoizedVendors}
-          handleAdd={handleAdd}
-          renderRowSubComponent={renderRowSubComponent}
-          getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-          showIdColumn={showIdColumn}
-          handleSwitchChange={handleSwitchChange}
-        />
-      </ScrollX>
+       {loading ?(<Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+              <CircularProgress size={60} thickness={4} />
+              <Typography variant="body1" style={{ marginTop: '16px' }}>
+                Loading, please wait...
+              </Typography>
+            </Box>) : (<ScrollX>
+              <ReactTable
+                columns={columns}
+                data={memoizedVendors}
+                handleAdd={handleAdd}
+                renderRowSubComponent={renderRowSubComponent}
+                getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+                showIdColumn={showIdColumn}
+                handleSwitchChange={handleSwitchChange}/>
+            </ScrollX>)}
       <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
 
       <Dialog

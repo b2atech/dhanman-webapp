@@ -31,11 +31,13 @@ import MainCard from 'components/MainCard';
 import LogoSection from 'components/logo';
 import ExportPDFView from 'sections/apps/invoice/export-pdf';
 
-import { dispatch, useSelector } from 'store';
-import { getInvoiceSingleList } from 'store/reducers/invoice';
+import { useSelector } from 'store';
+// import { getInvoiceSingleList } from 'store/reducers/invoice';
 
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
+import { getInvoice } from 'api/services/SalesService';
+import { IInvoiceType } from 'types/invoice';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
 
@@ -45,34 +47,38 @@ const Invoicedetails = () => {
   const navigation = useNavigate();
 
   const { country, list } = useSelector((state) => state.invoice);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [list1, setList] = useState<IInvoiceType>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(getInvoiceSingleList(Number(id))).then(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getInvoice('366c9d49-6ad3-4acf-98fe-75cc45de72a1').then((InvoiceHeader) => {
+      setList(InvoiceHeader);
+      setLoading(false);
+    });
   }, [id]);
 
-  const today = new Date(`${list?.date}`).toLocaleDateString('en-GB', {
+  const today = new Date(`${list1?.invoiceDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const due_dates = new Date(`${list?.due_date}`).toLocaleDateString('en-GB', {
+  const due_dates = new Date(`${list1?.dueDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const subtotal = list?.invoice_detail?.reduce((prev: any, curr: any) => {
-    if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
-    else return prev;
-  }, 0);
+  const moment = require('moment');
 
-  const taxRate = (Number(list?.tax) * subtotal) / 100;
-  const discountRate = (Number(list?.discount) * subtotal) / 100;
-  const total = subtotal - discountRate + taxRate;
+  const now = new Date();
+  const formattedFilename = `Invoice ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+  const subTotal = list1?.lines?.reduce((total, row) => {
+    return total + row.amount;
+  }, 0);
+  // const taxRate = (Number(list1?.tax) * subTotal) / 100;
+  // const discountRate = (Number(list1?.discount) * subTotal) / 100;
 
   if (loading) return <Loader />;
 
@@ -85,7 +91,7 @@ const Invoicedetails = () => {
               <IconButton onClick={() => navigation(`/apps/invoice/edit/${id}`)}>
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>
-              <PDFDownloadLink document={<ExportPDFView list={list} />} fileName={`${list?.invoice_id}-${list?.customer_name}.pdf`}>
+              <PDFDownloadLink document={<ExportPDFView list={list} />} fileName={`${formattedFilename}.pdf`}>
                 <IconButton>
                   <DownloadOutlined style={{ color: theme.palette.grey[900] }} />
                 </IconButton>
@@ -111,7 +117,7 @@ const Invoicedetails = () => {
                 <Box>
                   <Stack direction="row" spacing={2}>
                     <LogoSection />
-                    <Chip label="Paid" variant="light" color="success" size="small" />
+                    <Chip label={list1?.invoiceStatus} variant="light" color="success" size="small" />
                   </Stack>
                   <Typography color="secondary">{list?.invoice_id}</Typography>
                 </Box>
@@ -134,10 +140,10 @@ const Invoicedetails = () => {
                 <Stack spacing={1}>
                   <Typography variant="h5">From:</Typography>
                   <FormControl sx={{ width: '100%' }}>
-                    <Typography color="secondary">{list?.cashierInfo.name}</Typography>
-                    <Typography color="secondary">{list?.cashierInfo.address}</Typography>
-                    <Typography color="secondary">{list?.cashierInfo.phone}</Typography>
-                    <Typography color="secondary">{list?.cashierInfo.email}</Typography>
+                    <Typography color="secondary">Belle J. Richter</Typography>
+                    <Typography color="secondary">1300 Cooks Mine, NM 87829</Typography>
+                    <Typography color="secondary">305-829-7809</Typography>
+                    <Typography color="secondary">belljrc23@gmail.com</Typography>
                   </FormControl>
                 </Stack>
               </MainCard>
@@ -147,10 +153,10 @@ const Invoicedetails = () => {
                 <Stack spacing={1}>
                   <Typography variant="h5">To:</Typography>
                   <FormControl sx={{ width: '100%' }}>
-                    <Typography color="secondary">{list?.customerInfo.name}</Typography>
-                    <Typography color="secondary">{list?.customerInfo.address}</Typography>
-                    <Typography color="secondary">{list?.customerInfo.phone}</Typography>
-                    <Typography color="secondary">{list?.customerInfo.email}</Typography>
+                    <Typography color="secondary">{`${list1?.customer.firstName} ${list1?.customer.lastName}`}</Typography>
+                    <Typography color="secondary">{list1?.customer.city}</Typography>
+                    <Typography color="secondary">{list1?.customer.phoneNumber}</Typography>
+                    <Typography color="secondary">{list1?.customer.email}</Typography>
                   </FormControl>
                 </Stack>
               </MainCard>
@@ -169,14 +175,14 @@ const Invoicedetails = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {list?.invoice_detail?.map((row: any, index) => (
+                    {list1?.lines?.map((row: any, index) => (
                       <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>
-                        <TableCell align="right">{row.qty}</TableCell>
+                        <TableCell align="right">{row.quantity}</TableCell>
                         <TableCell align="right">{country?.prefix + '' + Number(row.price).toFixed(2)}</TableCell>
-                        <TableCell align="right">{country?.prefix + '' + Number(row.price * row.qty).toFixed(2)}</TableCell>
+                        <TableCell align="right">{country?.prefix + '' + Number(row.price * row.quantity).toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -191,33 +197,26 @@ const Invoicedetails = () => {
               <Stack spacing={2}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                  <Typography>{country?.prefix + '' + subtotal?.toFixed(2)}</Typography>
+                  <Typography variant="subtitle1">{subTotal}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Discount:</Typography>
-                  <Typography variant="h6" color={theme.palette.success.main}>
-                    {country?.prefix + '' + discountRate?.toFixed(2)}
-                  </Typography>
+                  <Typography>{list1?.discount}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Tax:</Typography>
-                  <Typography>{country?.prefix + '' + taxRate?.toFixed(2)}</Typography>
+                  <Typography>{list1?.tax}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="subtitle1">Grand Total:</Typography>
-                  <Typography variant="subtitle1">
-                    {total % 1 === 0 ? country?.prefix + '' + total : country?.prefix + '' + total?.toFixed(2)}
-                  </Typography>
+                  <Typography variant="subtitle1">{list1?.totalAmount}</Typography>
                 </Stack>
               </Stack>
             </Grid>
             <Grid item xs={12}>
               <Stack direction="row" spacing={1}>
                 <Typography color="secondary">Notes: </Typography>
-                <Typography>
-                  It was a pleasure working with you and your team. We hope you will keep us in mind for future freelance projects. Thank
-                  You!
-                </Typography>
+                <Typography>{list1?.note}</Typography>
               </Stack>
             </Grid>
           </Grid>
