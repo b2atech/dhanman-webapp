@@ -81,8 +81,6 @@ const Invoicedetails = () => {
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
   const grandAmount = Number(list1?.totalAmount);
 
-  //if (loading) return <Loader />;
-
   return (
     <MainCard content={false}>
       
