@@ -20,7 +20,8 @@ import {
   Typography,
   PaletteColor,
   Grid,
-  styled
+  styled,
+  CircularProgress
 } from '@mui/material';
 
 // third-party
@@ -263,18 +264,21 @@ const Bills = () => {
   const navigation = useNavigate();
   const { alertPopup } = useSelector((state) => state.invoice);
   const [getInvoiceId] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((billList) => {
         if (Array.isArray(billList)) {
           setBills(billList);
+          setLoading(false);
         } else {
           console.error('API response is not an array:', billList);
         }
       })
       .catch((error) => {
         console.error('Error fetching vendor data:', error);
+        setLoading(false);
       });
   }, []);
 
@@ -527,11 +531,15 @@ const Bills = () => {
           </Box>
         </Grid>
       </Grid>
-
       <MainCard content={false}>
-        <ScrollX>
-          <ReactTable columns={columns} data={bill} />
-        </ScrollX>
+        {loading ? ( <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+            <CircularProgress size={60} thickness={4} />
+            <Typography variant="body1" style={{ marginTop: '16px' }}>
+              Loading, please wait...
+            </Typography>
+            </Box>) : (<ScrollX>
+                          <ReactTable columns={columns} data={bill} />
+                        </ScrollX>)}
       </MainCard>
       <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
     </>
