@@ -535,12 +535,12 @@ const Bills = () => {
       <MainCard content={false}>
       {loading ?
        (
-        <TableCell colSpan={7} align="center">
-          <Stack spacing={2} justifyContent="center" alignItems="center">
-            <Typography variant="h5">Loading Please Wait !</Typography>
-            <CircularProgress color="success" />
-          </Stack>
-        </TableCell>
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+          <CircularProgress size={60} thickness={4} />
+            <Typography variant="body1" style={{ marginTop: '16px' }}>
+              Loading, please wait...
+            </Typography>
+        </Box>
         ) : (
         <ScrollX>
           <ReactTable columns={columns} data={bill} />
