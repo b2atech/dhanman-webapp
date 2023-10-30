@@ -18,7 +18,8 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Divider
+  Divider,
+  CircularProgress
 } from '@mui/material';
 
 // third-party
@@ -26,7 +27,6 @@ import ReactToPrint from 'react-to-print';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 
 // project import
-import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
 import LogoSection from 'components/logo';
 import ExportPDFView from 'sections/apps/invoice/export-pdf';
@@ -48,7 +48,7 @@ const Invoicedetails = () => {
 
   const { country, list } = useSelector((state) => state.invoice);
   const [list1, setList] = useState<IInvoiceType>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getInvoice('366c9d49-6ad3-4acf-98fe-75cc45de72a1').then((InvoiceHeader) => {
@@ -80,10 +80,17 @@ const Invoicedetails = () => {
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
   const grandAmount = Number(list1?.totalAmount);
 
-  if (loading) return <Loader />;
-
   return (
     <MainCard content={false}>
+      
+      {loading ? (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+        <CircularProgress size={60} thickness={4} />
+        <Typography variant="body1" style={{ marginTop: '32x' }}>
+          Loading, please wait...
+        </Typography>
+      </Box>
+      ) : (
       <Stack spacing={2.5}>
         <Box sx={{ p: 2.5, pb: 0 }}>
           <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
@@ -235,6 +242,9 @@ const Invoicedetails = () => {
           </PDFDownloadLink>
         </Stack>
       </Stack>
+      )
+      }
+      
     </MainCard>
   );
 };
