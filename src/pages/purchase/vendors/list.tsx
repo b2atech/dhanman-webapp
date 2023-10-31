@@ -246,7 +246,8 @@ const Vendors = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [vendor, setVendor] = useState<any>(null);
-  const [vendorDeleteId, setVendorDeleteId] = useState<any>('');
+  const [vendorDeleteName, setVendorDeleteName] = useState<any>('');
+  const [vendorDeleteId, setVendorDeleteId] = useState<string>('');
   const [add, setAdd] = useState<boolean>(false);
   const [vendors, setVendors] = useState<IVendor[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
@@ -359,8 +360,9 @@ const Vendors = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleClose();
+                    setVendorDeleteName(row.values.vendorName);
                     setVendorDeleteId(row.values.id);
+                    handleClose();
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -393,7 +395,7 @@ const Vendors = () => {
           handleSwitchChange={handleSwitchChange}
         />
       </ScrollX>
-      <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
+      <AlertVendorDelete title={vendorDeleteName} open={open} handleClose={handleClose} id={vendorDeleteId}/>
 
       <Dialog
         maxWidth="sm"

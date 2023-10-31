@@ -250,7 +250,8 @@ const CustomerListPage = () => {
   const [customer, setCustomer] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [customerDeleteId, setCustomerDeleteId] = useState<string | null>(null);
+  const [customerDeleteName, setcustomerDeleteName] = useState<any>('');
+  const [customerDeleteId, setCustomerDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
 
   const handleSwitchChange = () => {
@@ -277,11 +278,6 @@ const CustomerListPage = () => {
   };
 
   const handleClose = (confirmed: boolean) => {
-    if (confirmed) {
-      if (customerDeleteId) {
-        setCustomerDeleteId(null);
-      }
-    }
     setOpen(false);
   };
 
@@ -393,6 +389,7 @@ const CustomerListPage = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
+                    setcustomerDeleteName(row.values.customerName);
                     setCustomerDeleteId(row.values.id);
                     setOpen(true);
                   }}
@@ -428,7 +425,7 @@ const CustomerListPage = () => {
           handleSwitchChange={handleSwitchChange}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId || 'Default Title'} open={open} handleClose={handleClose} />
+      <AlertCustomerDelete title={customerDeleteName} open={open} handleClose={handleClose} id={customerDeleteId}/>
 
       <Dialog
         maxWidth="sm"
