@@ -404,7 +404,7 @@ const Vendors = () => {
                 showIdColumn={showIdColumn}
                 handleSwitchChange={handleSwitchChange}/>
             </ScrollX>)}
-      <AlertVendorDelete title={vendorDeleteId} open={open} handleClose={handleClose} />
+      <AlertVendorDelete title={vendorDeleteName} open={open} handleClose={handleClose} id={vendorDeleteId}/>
 
       <Dialog
         maxWidth="sm"
