@@ -126,7 +126,8 @@ const Invoiceedit = () => {
       cashierInfo: values.cashierInfo,
       customerInfo: values.customerInfo,
       invoice_detail: values.invoice_detail,
-      notes: values.notes
+      notes: values.notes,
+      totalAmount: 0
     };
 
     dispatch(getInvoiceUpdate(NewList)).then(() => {

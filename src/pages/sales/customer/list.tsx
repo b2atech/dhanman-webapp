@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } f
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import {
+  Box,
   Button,
   Dialog,
   FormControlLabel,
@@ -16,7 +17,8 @@ import {
   Tooltip,
   Typography,
   styled,
-  useMediaQuery
+  useMediaQuery,
+  CircularProgress
 } from '@mui/material';
 
 // third-party
@@ -253,6 +255,7 @@ const CustomerListPage = () => {
   const [customerDeleteName, setcustomerDeleteName] = useState<any>('');
   const [customerDeleteId, setCustomerDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
@@ -263,10 +266,12 @@ const CustomerListPage = () => {
       .then((customerList) => {
         if (Array.isArray(customerList)) {
           setCustomers(customerList);
+          setLoading(false);
         }
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
+        setLoading(false);
       });
   }, []);
 
@@ -415,15 +420,24 @@ const CustomerListPage = () => {
   return (
     <MainCard content={false}>
       <ScrollX>
-        <ReactTable
-          columns={columns}
-          data={memoizedCustomers}
-          handleAdd={handleAdd}
-          renderRowSubComponent={renderRowSubComponent}
-          getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-          showIdColumn={showIdColumn}
-          handleSwitchChange={handleSwitchChange}
-        />
+        {loading ? (
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+            <CircularProgress size={60} thickness={4} />
+            <Typography variant="body1" style={{ marginTop: '32x' }}>
+              Loading, please wait...
+            </Typography>
+          </Box>
+        ) : (
+          <ReactTable
+            columns={columns}
+            data={memoizedCustomers}
+            handleAdd={handleAdd}
+            renderRowSubComponent={renderRowSubComponent}
+            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            showIdColumn={showIdColumn}
+            handleSwitchChange={handleSwitchChange}
+          />
+        )}
       </ScrollX>
       <AlertCustomerDelete title={customerDeleteName} open={open} handleClose={handleClose} id={customerDeleteId}/>
 

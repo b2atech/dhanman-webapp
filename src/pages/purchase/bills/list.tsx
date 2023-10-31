@@ -7,7 +7,9 @@ import {
   Chip,
   Tabs,
   Tab,
+  FormControlLabel,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -20,7 +22,8 @@ import {
   Typography,
   PaletteColor,
   Grid,
-  styled
+  styled,
+  CircularProgress
 } from '@mui/material';
 
 // third-party
@@ -87,9 +90,12 @@ const TableWrapper = styled('div')(({ theme }) => ({
 interface Props {
   columns: Column[];
   data: IBill[];
+  showIdColumn: boolean;
+  handleSwitchChange: () => void;
+  getHeaderProps: (column: HeaderGroup) => {};
 }
 
-function ReactTable({ columns, data }: Props) {
+function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const defaultColumn = useMemo(() => ({ Filter: DateColumnFilter }), []);
@@ -144,7 +150,17 @@ function ReactTable({ columns, data }: Props) {
     {}
   );
 
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+  const [isBillIdVisible, setIsBillIdVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(groups[0]);
+
+  const handleSwitchChange = () => {
+    setIsBillIdVisible((prevIsBillIdVisible) => !prevIsBillIdVisible);
+  };
+
+  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsAuditSwitchOn(event.target.checked);
+  };
 
   useEffect(() => {
     setFilter('billStatus', activeTab === 'All' ? '' : activeTab);
@@ -205,20 +221,43 @@ function ReactTable({ columns, data }: Props) {
             </Stack>
           ))}
           <CSVExport data={data} filename={'Bill-list.csv'} />
+          <Tooltip title={isBillIdVisible ? 'Close ID' : 'Show ID'}>
+            <FormControlLabel
+              value=""
+              control={<Switch color="success" checked={isBillIdVisible} onChange={handleSwitchChange} />}
+              label=""
+              labelPlacement="start"
+              sx={{ margin: '0', padding: '0', marginRight: 0 }}
+            />
+          </Tooltip>
+          <Tooltip title={isAuditSwitchOn ? 'Close Audit Columns' : 'Show Audit Columns'}>
+            <FormControlLabel
+              value=""
+              control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
+              label=""
+              labelPlacement="start"
+              sx={{ margin: '0', padding: '0', marginRight: 0 }}
+            />
+          </Tooltip>
         </Stack>
       </Stack>
       <Box ref={componentRef}>
-        <ScrollX sx={{ height: 500 }}>
+        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
                 {headerGroups.map((headerGroup) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                    {headerGroup.headers.map((column: HeaderGroup<{}>) => (
-                      <TableCell {...column.getHeaderProps([{ className: column.className }])}>
-                        <HeaderSort column={column} sort />
-                      </TableCell>
-                    ))}
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (column.id === 'id' && !isBillIdVisible) {
+                        return null;
+                      }
+                      return (
+                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableHead>
@@ -234,22 +273,29 @@ function ReactTable({ columns, data }: Props) {
                         }}
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
-                        {row.cells.map((cell: Cell) => (
-                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                        ))}
+                        {row.cells.map((cell: Cell) => {
+                          if (cell.column.id === 'id' && !isBillIdVisible) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
                       </TableRow>
                     </Fragment>
                   );
                 })}
-                <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-                  <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
-                    <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-                  </TableCell>
-                </TableRow>
               </TableBody>
             </Table>
           </TableWrapper>
         </ScrollX>
+        <Box>
+          <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+            <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
+              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+            </TableCell>
+          </TableRow>
+        </Box>
       </Box>
     </>
   );
@@ -263,18 +309,26 @@ const Bills = () => {
   const navigation = useNavigate();
   const { alertPopup } = useSelector((state) => state.invoice);
   const [getInvoiceId] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [showIdColumn, setShowIdColumn] = useState(false);
+
+  const handleSwitchChange = () => {
+    setShowIdColumn(!showIdColumn);
+  };
 
   useEffect(() => {
     getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((billList) => {
         if (Array.isArray(billList)) {
           setBills(billList);
+          setLoading(false);
         } else {
           console.error('API response is not an array:', billList);
         }
       })
       .catch((error) => {
         console.error('Error fetching vendor data:', error);
+        setLoading(false);
       });
   }, []);
 
@@ -313,6 +367,12 @@ const Bills = () => {
           Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
           disableSortBy: true,
           disableFilters: true
+        },
+        {
+          Header: 'Bill ID',
+          accessor: 'id',
+          width: -200,
+          sticky: 'left'
         },
         {
           Header: 'Create Date',
@@ -527,12 +587,27 @@ const Bills = () => {
           </Box>
         </Grid>
       </Grid>
-
       <MainCard content={false}>
-        <ScrollX>
-          <ReactTable columns={columns} data={bill} />
-        </ScrollX>
+        {loading ? (
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+            <CircularProgress size={60} thickness={4} />
+            <Typography variant="body1" style={{ marginTop: '16px' }}>
+              Loading, please wait...
+            </Typography>
+          </Box>
+        ) : (
+          <ScrollX>
+            <ReactTable
+              columns={columns}
+              data={bill}
+              showIdColumn={showIdColumn}
+              handleSwitchChange={handleSwitchChange}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            />
+          </ScrollX>
+        )}
       </MainCard>
+
       <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
     </>
   );

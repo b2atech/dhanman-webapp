@@ -19,11 +19,8 @@ import {
   useMediaQuery,
   Tooltip,
   Chip,
-  styled,
-  Skeleton,
-  CircularProgress
+  Skeleton
 } from '@mui/material';
-
 import { alpha, useTheme } from '@mui/material/styles';
 
 // third-party
@@ -42,7 +39,6 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { useSticky } from 'react-table-sticky';
 import {
   DeleteTwoTone,
   DownOutlined,
@@ -93,12 +89,8 @@ export interface InvoiceWidgets {
 }
 
 // ==============================|| SUB TABLE ||============================== //
-interface SubTableProps {
-  columns: Column[];
-  data: [];
-  loading: boolean;
-}
-function ReactSubTable({ columns, data, loading }: SubTableProps) {
+
+function ReactSubTable({ columns, data, loading }: { columns: Column[]; data: []; loading: boolean }) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
     columns,
     data
@@ -157,7 +149,6 @@ function ReactSubTable({ columns, data, loading }: SubTableProps) {
     </Table>
   );
 }
-
 // ==============================|| SUB ROW - ASYNC DATA ||============================== //
 
 function SubRowAsync({ invoiceId }: { invoiceId: string }) {
@@ -167,10 +158,10 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
 
   useEffect(() => {
     getInvoiceDetailsByHeaderId(invoiceId)
-      .then((invoiceDetailList) => {
-        if (Array.isArray(invoiceDetailList)) {
+      .then((invoiceList) => {
+        if (Array.isArray(invoiceList)) {
         }
-        setData(invoiceDetailList);
+        setData(invoiceList);
         setLoading(false);
       })
       .catch((error) => {
@@ -195,7 +186,7 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
         Header: 'Price',
         accessor: 'price',
         Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true} />
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         )
       },
       {
@@ -207,7 +198,7 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
         accessor: 'amount',
         disableFilters: true,
         Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} fixedDecimalScale={true} />
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         )
       }
     ],
@@ -228,23 +219,12 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
 }
 
 // ==============================|| REACT TABLE ||============================== //
-const TableWrapper = styled('div')(({ theme }) => ({
-  '.header': {
-    position: 'sticky',
-    zIndex: 1,
-    width: 'fit-content'
-  },
-  '& th[data-sticky-td]': {
-    position: 'sticky',
-    zIndex: '5 !important'
-  }
-}));
+
 interface Props {
   columns: Column[];
   data: IInvoiceList[];
   renderRowSubComponent: FC<any>;
 }
-const moment = require('moment');
 
 function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props) {
   const theme = useTheme();
@@ -290,8 +270,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect,
-    useSticky
+    useRowSelect
   );
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
@@ -380,50 +359,46 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent }: Props
         </Stack>
       </Stack>
       <Box ref={componentRef}>
-        <ScrollX sx={{ height: 500 }}>
-          <TableWrapper>
-            <Table {...getTableProps()} stickyHeader>
-              <TableHead>
-                {headerGroups.map((headerGroup) => (
-                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                    {headerGroup.headers.map((column: HeaderGroup<{}>) => (
-                      <TableCell {...column.getHeaderProps([{ className: column.className }])}>
-                        <HeaderSort column={column} sort />
-                      </TableCell>
+        <Table {...getTableProps()}>
+          <TableHead>
+            {headerGroups.map((headerGroup) => (
+              <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                {headerGroup.headers.map((column: HeaderGroup<{}>) => (
+                  <TableCell {...column.getHeaderProps([{ className: column.className }])}>
+                    <HeaderSort column={column} sort />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {page.map((row: Row, i: number) => {
+              prepareRow(row);
+              const rowProps = row.getRowProps();
+              return (
+                <Fragment key={i}>
+                  <TableRow
+                    {...row.getRowProps()}
+                    onClick={() => {
+                      row.toggleRowSelected();
+                    }}
+                    sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                  >
+                    {row.cells.map((cell: Cell) => (
+                      <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                     ))}
                   </TableRow>
-                ))}
-              </TableHead>
-              <TableBody {...getTableBodyProps()}>
-                {page.map((row: Row, i: number) => {
-                  prepareRow(row);
-                  const rowProps = row.getRowProps();
-                  return (
-                    <Fragment key={i}>
-                      <TableRow
-                        {...row.getRowProps()}
-                        onClick={() => {
-                          row.toggleRowSelected();
-                        }}
-                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                      >
-                        {row.cells.map((cell: Cell) => (
-                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                        ))}
-                      </TableRow>
-                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
-                    </Fragment>
-                  );
-                })}
-                <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-                  <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
-                    <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableWrapper>
-        </ScrollX>
+                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
+                </Fragment>
+              );
+            })}
+            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </Box>
     </>
   );
@@ -437,17 +412,14 @@ const List = () => {
   const [invoiceId, setInvoiceId] = useState(0);
   const [getInvoiceId, setGetInvoiceId] = useState(0);
   const [expandedRows, setExpandedRows] = useState({});
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((invoiceList) => {
         setList(invoiceList);
-        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
-        setLoading(false);
       });
   }, []);
 
@@ -480,8 +452,6 @@ const List = () => {
       {
         Header: () => null,
         id: 'expander',
-        width: 10,
-        sticky: 'left',
         className: 'cell-center',
         Cell: ({ row }: CellProps<any>) => {
           const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
@@ -505,8 +475,6 @@ const List = () => {
       },
       {
         title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -518,50 +486,27 @@ const List = () => {
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        width: 100,
-        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Create Date',
-        accessor: 'invoiceDate',
-        width: 100,
-        sticky: 'left',
-        Cell: ({ row }: any) => moment(row.values.invoiceDate).format('DD MMM YYYY'),
-        disableFilters: true
+        accessor: 'invoiceDate'
       },
       {
         Header: 'Due Date',
-        accessor: 'dueDate',
-        width: 100,
-        sticky: 'left',
-        Cell: ({ row }: any) => moment(row.values.dueDate).format('DD MMM YYYY'),
-        disableFilters: true
+        accessor: 'dueDate'
       },
       {
         Header: 'Amount',
         accessor: 'totalAmount',
-        width: 100,
-        sticky: 'left',
         Cell: ({ value }: { value: number }) => (
-          <div style={{ textAlign: 'right' }}>
-            <NumericFormat
-              value={value}
-              displayType="text"
-              thousandSeparator={true}
-              prefix={'₹'}
-              decimalScale={2}
-              fixedDecimalScale={true}
-            />
-          </div>
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         ),
         disableFilters: true
       },
       {
         Header: 'Status',
         accessor: 'invoiceStatus',
-        width: 100,
-        sticky: 'left',
         disableFilters: true,
         filter: 'includes',
         Cell: ({ value }: { value: string }) => {
@@ -577,26 +522,8 @@ const List = () => {
         }
       },
       {
-        Header: 'Tax',
-        accessor: 'tax',
-        width: 100,
-        sticky: 'left',
-        className: 'cell-center',
-        disableFilters: true
-      },
-      {
-        Header: 'Term',
-        accessor: 'paymentTerm',
-        width: 100,
-        sticky: 'left',
-        className: 'cell-center',
-        disableFilters: true
-      },
-      {
         Header: 'Actions',
-        className: 'cell-right',
-        width: 100,
-        sticky: 'left',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
@@ -765,21 +692,13 @@ const List = () => {
           </Box>
         </Grid>
       </Grid>
+
       <MainCard content={false}>
-        {loading ? ( // Step 3: Conditionally render loading indicator or content
-          <TableCell colSpan={7} align="center">
-            <Stack spacing={2} justifyContent="center" alignItems="center">
-              <Typography variant="h5">Loading Please Wait !</Typography>
-              <CircularProgress color="success" />
-            </Stack>
-          </TableCell>
-        ) : (
-          <ScrollX>
-            <ReactTable columns={columns} data={invoice} renderRowSubComponent={renderRowSubComponent} />
-          </ScrollX>
-        )}
-        <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
+        <ScrollX>
+          <ReactTable columns={columns} data={invoice} renderRowSubComponent={renderRowSubComponent} />
+        </ScrollX>
       </MainCard>
+      <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
     </>
   );
 };
