@@ -4,6 +4,9 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 // project import
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
+import { openSnackbar } from 'store/reducers/snackbar';
+import { deleteCustomerRequest } from 'api/services/SalesService';
+import { useDispatch } from 'store';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
@@ -13,9 +16,29 @@ interface AlertCustomerDeleteProps {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  id: string;
 }
 
-export default function AlertCustomerDelete({ title, open, handleClose }: AlertCustomerDeleteProps) {
+export default function AlertCustomerDelete({ title, open, handleClose, id }: AlertCustomerDeleteProps) {
+  const dispatch = useDispatch();
+  const deleteCustomer = () => {
+    handleClose(true);
+    deleteCustomerRequest(id).then(() => {
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Customer deleted successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+      window.location.reload();
+    });
+  }
   return (
     <Dialog
       open={open}
@@ -35,13 +58,21 @@ export default function AlertCustomerDelete({ title, open, handleClose }: AlertC
             <Typography variant="h4" align="center">
               Are you sure you want to delete?
             </Typography>
+            <Typography align="center">
+              By deleting
+              <Typography variant="subtitle1" component="span">
+                {' '}
+                "{title}"{' '}
+              </Typography>
+              user, all task assigned to that user will also be deleted.
+            </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deleteCustomer} autoFocus>
               Delete
             </Button>
           </Stack>

@@ -55,6 +55,19 @@ export const InvoiceAPI = {
     });
     return response.data;
   },
+  deleteCustomerRequest = async function (id: string) {
+    try {
+      const response = await apiSales.request({
+        url: `v1/customer/${id}`, // Include the vendor ID in the URL
+        method: 'DELETE',
+      });
+      return response.data;
+    } catch (error) {
+      // Handle any errors that may occur during the request
+      console.error("Error deleting invoice:", error);
+      throw error;
+    }
+  },
   getAllPRs = async function (repo: string, cancel = false) {
     const response = await apiSales.request({
       url: `v1/GetAllPRs/${repo}`,
