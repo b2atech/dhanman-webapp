@@ -21,11 +21,13 @@ import {
   useMediaQuery,
   Tooltip,
   Chip,
-  Skeleton
+  Skeleton,
+  styled
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
 // third-party
+import { useSticky } from 'react-table-sticky';
 import {
   useExpanded,
   useFilters,
@@ -222,6 +224,17 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
 
 // ==============================|| REACT TABLE ||============================== //
 
+const TableWrapper = styled('div')(({ theme }) => ({
+  '.header': {
+    position: 'sticky',
+    zIndex: 1,
+    width: 'fit-content'
+  },
+  '& th[data-sticky-td]': {
+    position: 'sticky',
+    zIndex: '5 !important'
+  }
+}));
 interface Props {
   columns: Column[];
   data: IInvoiceList[];
@@ -275,7 +288,8 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect
+    useRowSelect,
+    useSticky
   );
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
@@ -393,53 +407,57 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
       </Stack>
       <Box ref={componentRef}>
         <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
-          <Table {...getTableProps()}>
-            <TableHead>
-              {headerGroups.map((headerGroup) => (
-                <TableRow {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column: HeaderGroup<{}>) => {
-                    if (column.id === 'id' && !isInvoiceIdVisible) {
-                      return null;
-                    }
-                    return (
-                      <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                        <HeaderSort column={column} sort />
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHead>
-            <TableBody {...getTableBodyProps()}>
-              {page.map((row: Row, i: number) => {
-                prepareRow(row);
-                const rowProps = row.getRowProps();
-                return (
-                  <Fragment key={i}>
-                    <TableRow
-                      {...row.getRowProps()}
-                      onClick={() => {
-                        row.toggleRowSelected();
-                      }}
-                      sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                    >
-                      {row.cells.map((cell: Cell) => {
-                        if (cell.column.id === 'id' && !isInvoiceIdVisible) {
-                          return null;
-                        }
-                        return <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>;
-                      })}
-                    </TableRow>
-                    {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
-                  </Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup<{}>) => {
+                      if (column.id === 'id' && !isInvoiceIdVisible) {
+                        return null;
+                      }
+                      return (
+                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <HeaderSort column={column} sort />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  const rowProps = row.getRowProps();
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          if (cell.column.id === 'id' && !isInvoiceIdVisible) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
+                      </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableWrapper>
         </ScrollX>
         <Box>
           <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-            <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
+            <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
               <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
             </TableCell>
           </TableRow>
@@ -506,6 +524,8 @@ const List = () => {
       {
         Header: () => null,
         id: 'expander',
+        width: -200,
+        sticky: 'left',
         className: 'cell-center',
         Cell: ({ row }: CellProps<any>) => {
           const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
@@ -529,7 +549,8 @@ const List = () => {
       },
       {
         title: 'Row Selection',
-        width: 40,
+        width: 70,
+        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -545,21 +566,26 @@ const List = () => {
       {
         Header: 'Customer Name',
         accessor: 'customerName',
+        width: 150,
+        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Create Date',
         accessor: 'invoiceDate',
+        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Due Date',
         accessor: 'dueDate',
+        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Amount',
         accessor: 'totalAmount',
+        sticky: 'left',
         Cell: ({ value }: { value: number }) => (
           <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         ),
@@ -568,6 +594,8 @@ const List = () => {
       {
         Header: 'Status',
         accessor: 'invoiceStatus',
+        width: 100,
+        sticky: 'left',
         disableFilters: true,
         filter: 'includes',
         Cell: ({ value }: { value: string }) => {
@@ -584,11 +612,12 @@ const List = () => {
       },
       {
         Header: 'Actions',
-        className: 'cell-center',
+        className: '',
+        style: { textAlign: 'center' },
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
+            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
