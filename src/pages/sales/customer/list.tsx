@@ -439,7 +439,7 @@ const CustomerListPage = () => {
           />
         )}
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteName} open={open} handleClose={handleClose} id={customerDeleteId}/>
+      <AlertCustomerDelete title={customerDeleteName} open={open} handleClose={handleClose} id={customerDeleteId} />
 
       <Dialog
         maxWidth="sm"

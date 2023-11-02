@@ -38,7 +38,7 @@ export default function AlertCustomerDelete({ title, open, handleClose, id }: Al
       );
       window.location.reload();
     });
-  }
+  };
   return (
     <Dialog
       open={open}

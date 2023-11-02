@@ -59,12 +59,12 @@ export const InvoiceAPI = {
     try {
       const response = await apiSales.request({
         url: `v1/customer/${id}`, // Include the vendor ID in the URL
-        method: 'DELETE',
+        method: 'DELETE'
       });
       return response.data;
     } catch (error) {
       // Handle any errors that may occur during the request
-      console.error("Error deleting invoice:", error);
+      console.error('Error deleting invoice:', error);
       throw error;
     }
   },

@@ -21,9 +21,8 @@ interface Props {
 
 // ==============================|| VENDOR - DELETE ||============================== //
 
-export default function AlertVendorDelete({ title, open, handleClose, id}: Props) {
-  
-const dispatch = useDispatch();
+export default function AlertVendorDelete({ title, open, handleClose, id }: Props) {
+  const dispatch = useDispatch();
   const deleteVendor = () => {
     handleClose(true);
     deleteInvoiceRequest(id).then(() => {
@@ -41,8 +40,8 @@ const dispatch = useDispatch();
       );
       window.location.reload();
     });
-  }
-  
+  };
+
   return (
     <Dialog
       open={open}
@@ -55,7 +54,7 @@ const dispatch = useDispatch();
     >
       <DialogContent sx={{ mt: 2, my: 1 }}>
         <Stack alignItems="center" spacing={3.5}>
-        <Avatar color="error" sx={{ width: 72, height: 72, fontSize: '1.75rem' }}>
+          <Avatar color="error" sx={{ width: 72, height: 72, fontSize: '1.75rem' }}>
             <DeleteFilled />
           </Avatar>
           <Stack spacing={2}>
