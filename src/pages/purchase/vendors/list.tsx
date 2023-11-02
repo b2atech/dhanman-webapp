@@ -389,22 +389,27 @@ const Vendors = () => {
 
   return (
     <MainCard content={false}>
-       {loading ?(<Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
-              <CircularProgress size={60} thickness={4} />
-              <Typography variant="body1" style={{ marginTop: '16px' }}>
-                Loading, please wait...
-              </Typography>
-            </Box>) : (<ScrollX>
-              <ReactTable
-                columns={columns}
-                data={memoizedVendors}
-                handleAdd={handleAdd}
-                renderRowSubComponent={renderRowSubComponent}
-                getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-                showIdColumn={showIdColumn}
-                handleSwitchChange={handleSwitchChange}/>
-            </ScrollX>)}
-      <AlertVendorDelete title={vendorDeleteName} open={open} handleClose={handleClose} id={vendorDeleteId}/>
+      {loading ? (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+          <CircularProgress size={60} thickness={4} />
+          <Typography variant="body1" style={{ marginTop: '16px' }}>
+            Loading, please wait...
+          </Typography>
+        </Box>
+      ) : (
+        <ScrollX>
+          <ReactTable
+            columns={columns}
+            data={memoizedVendors}
+            handleAdd={handleAdd}
+            renderRowSubComponent={renderRowSubComponent}
+            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            showIdColumn={showIdColumn}
+            handleSwitchChange={handleSwitchChange}
+          />
+        </ScrollX>
+      )}
+      <AlertVendorDelete title={vendorDeleteName} open={open} handleClose={handleClose} id={vendorDeleteId} />
 
       <Dialog
         maxWidth="sm"
