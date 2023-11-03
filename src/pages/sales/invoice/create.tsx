@@ -40,7 +40,7 @@ import * as yup from 'yup';
 import { format } from 'date-fns';
 import { FieldArray, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router';
-import VendorAddressModel from 'sections/apps/invoice/VendorAddressModel';
+import VendorAddressModel from 'sections/apps/bill/VendorAddressModel';
 
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
@@ -174,11 +174,6 @@ const Createinvoice = () => {
             lastName: '',
             city: ''
           },
-          vendorInfo: {
-            email: '',
-            firstName: '',
-            lastName: ''
-          },
           invoice_detail: [
             {
               name: '',
@@ -311,21 +306,6 @@ const Createinvoice = () => {
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
-                          {/* <Button
-                            variant="outlined"
-                            startIcon={<EditOutlined />}
-                            color="secondary"
-                            onClick={() =>
-                              dispatch(
-                                toggleCustomerPopup({
-                                  open: true
-                                })
-                              )
-                            }
-                            size="small"
-                          >
-                            Change
-                          </Button> */}
                           <VendorAddressModel
                             open={open}
                             setOpen={(value) =>

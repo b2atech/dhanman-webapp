@@ -119,9 +119,11 @@ const VendorAddress = ({ handlerVendorAddress }: VendorAddressProps) => {
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-                {vendorList.email}
+              {vendorList.email}
             </Typography>
-            </Stack>
+            <Typography textAlign="left">{vendorList.phoneNumber}</Typography>
+            <Typography textAlign="left">{vendorList.city}</Typography>
+          </Stack>
         </Box>
         ))}
     </>
