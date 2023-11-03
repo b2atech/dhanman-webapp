@@ -561,7 +561,9 @@ const List = () => {
       },
       {
         Header: 'Invoice ID',
-        accessor: 'id'
+        accessor: 'id',
+        sticky: 'left',
+        width: -200
       },
       {
         Header: 'Customer Name',

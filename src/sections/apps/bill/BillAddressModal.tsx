@@ -49,7 +49,7 @@ const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) =
         </Stack>
       </DialogTitle>
       <Divider />
-      <DialogContent sx={{ p: 2.5 }}>
+      <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
         <FormControl sx={{ width: '100%', pb: 2 }}>
           <TextField
             autoFocus
