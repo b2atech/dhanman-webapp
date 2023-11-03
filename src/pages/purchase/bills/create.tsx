@@ -23,11 +23,11 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import BillAddressModal from 'sections/apps/bill/BillAddressModal';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'store';
 import { toggleCustomerPopup, selectCountry, reviewInvoicePopup } from 'store/reducers/invoice';
 import { customerPopup } from 'store/reducers/invoice';
-import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
+import BillItem from 'sections/apps/bill/billItem';
 import { useTheme } from '@mui/material/styles';
 import { v4 as UIDV4 } from 'uuid';
 import { openSnackbar } from 'store/reducers/snackbar';
@@ -41,8 +41,8 @@ import { FieldArray, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router';
 import { BillHeader_main, BillLine } from 'types/billiingDetails';
 import { createBillRequest } from 'api/services/BillService';
-import BillModal from 'sections/apps/bill/BillModal';
 import AddressBillModal from 'sections/apps/bill/BillAddressModal';
+// import BillModal from 'sections/apps/bill/BillModal';
 
 const validationSchema = yup.object({
   id: yup.string().required('Bill ID is required'),
@@ -55,12 +55,12 @@ const validationSchema = yup.object({
       return billDate && schema.min(billDate, "Due date can't be before bill date");
     })
     .required('Due date is required'),
-  customerInfo: yup
+  vendorInfo: yup
     .object({
-      firstName: yup.string().required('bill receiver information is required')
+      phoneNumber: yup.string().required('bill receiver information is required')
     })
     .required('bill receiver information is required'),
-  invoice_detail: yup
+  bill_detail: yup
     .array()
     .of(
       yup.object().shape({
@@ -82,7 +82,7 @@ const validationSchema = yup.object({
 const CreateBill = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { open, isCustomerOpen, country, countries, isOpen } = useSelector((state) => state.invoice);
+  const { open, isCustomerOpen, country, countries } = useSelector((state) => state.invoice);
   const notesLimit: number = 500;
   const navigation = useNavigate();
 
@@ -90,7 +90,7 @@ const CreateBill = () => {
     const bill: BillHeader_main = {
       id: Math.floor(Math.random() * 90000) + 10000,
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      vendorId: values.customerInfo.id,
+      vendorId: values.vendorInfo.id,
       coaId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       discount: Number(values.discount),
       billNumber: String(values.billNumber),
@@ -105,20 +105,20 @@ const CreateBill = () => {
       note: values.note,
       billDetails: undefined,
       billVoucher: 'YP001',
-      customer_name: values.cashierInfo?.name,
+      customer_name: values.vendorInfo?.name,
       email: values.cashierInfo?.email,
       avatar: Number(Math.round(Math.random() * 10)),
       quantity: Number(
-        values.invoice_detail?.reduce((sum: any, i: any) => {
+        values.bill_detail?.reduce((sum: any, i: any) => {
           return sum + i.qty;
         }, 0)
       ),
       status: values.status,
       cashierInfo: values.cashierInfo,
-      customerInfo: values.customerInfo
+      vendorInfo: values.vendorInfo
     };
 
-    bill.lines = values.invoice_detail.map((billItem: any) => {
+    bill.lines = values.bill_detail.map((billItem: any) => {
       let billLine = {} as BillLine;
       billLine.amount = parseInt(billItem.price) * billItem.qty;
       billLine.name = billItem.name;
@@ -145,13 +145,13 @@ const CreateBill = () => {
     });
   };
 
-  const addNextBillHandler = () => {
-    dispatch(
-      reviewInvoicePopup({
-        isOpen: false
-      })
-    );
-  };
+  // const addNextBillHandler = () => {
+  //   dispatch(
+  //     reviewInvoicePopup({
+  //       isOpen: false
+  //     })
+  //   );
+  // };
 
   return (
     <MainCard>
@@ -159,7 +159,7 @@ const CreateBill = () => {
         initialValues={{
           id: 120,
           billNumber: '',
-          status: '',
+          status: 'Unpaid',
           billDate: new Date(),
           due_date: null,
           cashierInfo: {
@@ -168,13 +168,14 @@ const CreateBill = () => {
             phone: '305-829-7809',
             email: 'belljrc23@gmail.com'
           },
-          customerInfo: {
+          vendorInfo: {
             phoneNumber: '',
             email: '',
             firstName: '',
-            lastName: ''
+            lastName: '',
+            city: ''
           },
-          invoice_detail: [
+          bill_detail: [
             {
               name: '',
               description: '',
@@ -194,7 +195,7 @@ const CreateBill = () => {
         }}
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
-          const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
+          const subtotal = values?.bill_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
             else return prev;
           }, 0);
@@ -207,25 +208,19 @@ const CreateBill = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
-                    <InputLabel>Bill Id</InputLabel>
+                    <InputLabel>Bill No.</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
-                      <TextField
-                        required
-                        type="number"
-                        name="billNumber"
-                        id="billNumber"
-                        value={values.billNumber}
-                        onChange={handleChange}
-                      />
+                      <TextField name="billNumber" id="billNumber" value={values.billNumber} onChange={handleChange} />
                     </FormControl>
                   </Stack>
+                  {touched.billNumber && errors.billNumber && <FormHelperText error={true}>{errors.billNumber as string}</FormHelperText>}
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
                     <InputLabel>Status</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
                       <Select
-                        value={values.status}
+                        value="Unpaid"
                         displayEmpty
                         name="status"
                         renderValue={(selected) => {
@@ -240,9 +235,15 @@ const CreateBill = () => {
                         <MenuItem disabled value="">
                           Select status
                         </MenuItem>
-                        <MenuItem value="Paid">Paid</MenuItem>
-                        <MenuItem value="Unpaid">Unpaid</MenuItem>
-                        <MenuItem value="Cancelled">Cancelled</MenuItem>
+                        <MenuItem value="Paid" disabled>
+                          Paid
+                        </MenuItem>
+                        <MenuItem value="Unpaid" disabled>
+                          Unpaid
+                        </MenuItem>
+                        <MenuItem value="Cancelled" disabled>
+                          Cancelled
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Stack>
@@ -294,21 +295,6 @@ const CreateBill = () => {
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
-                          <Button
-                            variant="outlined"
-                            startIcon={<EditOutlined />}
-                            color="secondary"
-                            onClick={() =>
-                              dispatch(
-                                toggleCustomerPopup({
-                                  open: true
-                                })
-                              )
-                            }
-                            size="small"
-                          >
-                            Change
-                          </Button>
                           <BillAddressModal
                             open={open}
                             setOpen={(value) =>
@@ -332,9 +318,10 @@ const CreateBill = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.email}</Typography>
+                            <Typography variant="subtitle1">{`${values?.vendorInfo?.firstName} ${values?.vendorInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.vendorInfo?.city}</Typography>
+                            <Typography color="secondary">{values?.vendorInfo?.phoneNumber}</Typography>
+                            <Typography color="secondary">{values?.vendorInfo?.email}</Typography>
                           </Stack>
                         </Stack>
                       </Grid>
@@ -364,20 +351,17 @@ const CreateBill = () => {
                                 })
                               )
                             }
-                            handlerAddress={(value) => setFieldValue('customerInfo', value)}
+                            handlerAddress={(value) => setFieldValue('vendorInfo', value)}
                           />
                         </Box>
                       </Grid>
                     </Grid>
                   </MainCard>
-                  {touched.customerInfo && errors.customerInfo && (
-                    <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
+                  {touched.vendorInfo && errors.vendorInfo && (
+                    <FormHelperText error={true}>{errors?.vendorInfo?.phoneNumber as string}</FormHelperText>
                   )}
                 </Grid>
 
-                <Grid item xs={12}>
-                  <Typography variant="h5">Detail</Typography>
-                </Grid>
                 <Grid item xs={12}>
                   <FieldArray
                     name="bill_detail"
@@ -398,10 +382,10 @@ const CreateBill = () => {
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {values.invoice_detail?.map((item: any, index: number) => (
+                                {values.bill_detail?.map((item: any, index: number) => (
                                   <TableRow key={item.id}>
-                                    <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
-                                    <InvoiceItem
+                                    <TableCell>{values.bill_detail.indexOf(item) + 1}</TableCell>
+                                    <BillItem
                                       key={item.id}
                                       id={item.id}
                                       index={index}
@@ -421,9 +405,9 @@ const CreateBill = () => {
                             </Table>
                           </TableContainer>
                           <Divider />
-                          {touched.invoice_detail && errors.invoice_detail && !Array.isArray(errors?.invoice_detail) && (
+                          {touched.bill_detail && errors.bill_detail && !Array.isArray(errors?.bill_detail) && (
                             <Stack direction="row" justifyContent="center" sx={{ p: 1.5 }}>
-                              <FormHelperText error={true}>{errors.invoice_detail as string}</FormHelperText>
+                              <FormHelperText error={true}>{errors.bill_detail as string}</FormHelperText>
                             </Stack>
                           )}
                           <Grid container justifyContent="space-between">
@@ -628,7 +612,7 @@ const CreateBill = () => {
                     <Button color="primary" variant="contained" type="submit">
                       Create & Send
                     </Button>
-                    <BillModal
+                    {/* <BillModal
                       Open={isOpen}
                       setIsOpen={(value: any) =>
                         dispatch(
@@ -645,9 +629,9 @@ const CreateBill = () => {
                         discountRate,
                         grandAmount
                       }}
-                      items={values?.invoice_detail}
+                      items={values?.bill_detail}
                       onAddNextInvoice={addNextBillHandler}
-                    />
+                    /> */}
                   </Stack>
                 </Grid>
               </Grid>

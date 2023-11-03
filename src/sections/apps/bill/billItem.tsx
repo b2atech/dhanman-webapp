@@ -7,7 +7,7 @@ import { Box, Button, Stack, TableCell, Tooltip, Typography } from '@mui/materia
 import { getIn } from 'formik';
 
 // project import
-import InvoiceField from './InvoiceField';
+import BillField from './BillField';
 import { dispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
@@ -17,7 +17,7 @@ import AlertProductDelete from './AlertProductDelete';
 
 // ==============================|| INVOICE - ITEMS ||============================== //
 
-const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditItem, index, Blur, errors, touched }: any) => {
+const BillItem = ({ id, name, description, qty, price, onDeleteItem, onEditItem, index, Blur, errors, touched }: any) => {
   const { country } = useSelector((state) => state.invoice);
 
   const [open, setOpen] = useState(false);
@@ -28,7 +28,7 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Product Deleted successfully',
+          message: 'Item Deleted successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -40,7 +40,7 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
     }
   };
 
-  const Name = `invoice_detail[${index}].name`;
+  const Name = `bill_detail[${index}].name`;
   const touchedName = getIn(touched, Name);
   const errorName = getIn(errors, Name);
 
@@ -48,7 +48,7 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
     {
       placeholder: 'Item name',
       label: 'Item Name',
-      name: `invoice_detail.${index}.name`,
+      name: `bill_detail.${index}.name`,
       type: 'text',
       id: id,
       value: name,
@@ -58,20 +58,20 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
     {
       placeholder: 'Description',
       label: 'Description',
-      name: `invoice_detail.${index}.description`,
+      name: `bill_detail.${index}.description`,
       type: 'text',
       id: id,
       value: description
     },
-    { placeholder: '', label: 'Qty', type: 'number', name: `invoice_detail.${index}.qty`, id: id, value: qty },
-    { placeholder: '', label: 'price', type: 'number', name: `invoice_detail.${index}.price`, id: id, value: price }
+    { placeholder: '', label: 'Qty', type: 'number', name: `bill_detail.${index}.qty`, id: id, value: qty },
+    { placeholder: '', label: 'price', type: 'number', name: `bill_detail.${index}.price`, id: id, value: price }
   ];
 
   return (
     <>
       {textFieldItem.map((item: any) => {
         return (
-          <InvoiceField
+          <BillField
             onEditItem={(event: any) => onEditItem(event)}
             onBlur={(event: any) => Blur(event)}
             cellData={{
@@ -106,4 +106,4 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
   );
 };
 
-export default InvoiceItem;
+export default BillItem;

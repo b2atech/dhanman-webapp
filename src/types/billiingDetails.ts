@@ -67,7 +67,7 @@ export interface BillHeader_main {
   status: string;
   lines?: BillLine[];
   cashierInfo: InfoType;
-  customerInfo: InfoType;
+  vendorInfo: InfoType;
 }
 
 export interface BillLine {

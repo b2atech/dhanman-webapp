@@ -1,9 +1,9 @@
 // material-ui
 import { TableCell, TextField } from '@mui/material';
 
-// ==============================|| INVOICE - TEXT FIELD ||============================== //
+// ==============================|| Bill - TEXT FIELD ||============================== //
 
-const InvoiceField = ({ onEditItem, cellData }: any) => {
+const BillField = ({ onEditItem, cellData }: any) => {
   return (
     <TableCell sx={{ '& .MuiFormHelperText-root': { position: 'absolute', bottom: -24, ml: 0 } }}>
       <TextField
@@ -23,4 +23,4 @@ const InvoiceField = ({ onEditItem, cellData }: any) => {
   );
 };
 
-export default InvoiceField;
+export default BillField;
