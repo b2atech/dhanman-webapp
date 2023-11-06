@@ -625,7 +625,7 @@ const List = () => {
                   color="secondary"
                   onClick={(e: any) => {
                     e.stopPropagation();
-                    navigation(`/apps/invoice/details/${row.values.id}`);
+                    navigation(`/sales/invoices/details/${row.values.id}`);
                   }}
                 >
                   <EyeTwoTone twoToneColor={theme.palette.secondary.main} />

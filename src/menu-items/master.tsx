@@ -119,7 +119,7 @@ const master: NavItemType = {
         },
         {
           id: 'invoicedetails',
-          title: <FormattedMessage id="invoicedetails" />,
+          title: <FormattedMessage id="details" />,
           type: 'item',
           url: '/sales/invoices/details/:id',
           icon: icons.PlusSquareOutlined

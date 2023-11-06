@@ -46,15 +46,17 @@ const Invoicedetails = () => {
   const { id } = useParams();
   const navigation = useNavigate();
 
-  const { country, list } = useSelector((state) => state.invoice);
+  const { list } = useSelector((state) => state.invoice);
   const [list1, setList] = useState<IInvoiceType>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    getInvoice('366c9d49-6ad3-4acf-98fe-75cc45de72a1').then((InvoiceHeader) => {
-      setList(InvoiceHeader);
-      setLoading(false);
-    });
+    if (id) {
+      getInvoice(id).then((InvoiceHeader) => {
+        setList(InvoiceHeader);
+        setLoading(false);
+      });
+    }
   }, [id]);
 
   const today = new Date(`${list1?.invoiceDate}`).toLocaleDateString('en-GB', {
@@ -74,11 +76,11 @@ const Invoicedetails = () => {
   const now = new Date();
   const formattedFilename = `Invoice ${moment(now).format('YYYY-MM-DD')} : ${moment(now).format('HH-mm-ss')}`;
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-  const subTotal = list1?.lines?.reduce((total, row) => {
+  const subTotal = (list1?.lines ?? []).reduce((total, row) => {
     return total + row.amount;
   }, 0);
-  // const taxRate = (Number(list1?.tax) * subTotal) / 100;
-  // const discountRate = (Number(list1?.discount) * subTotal) / 100;
+  const taxRate = (Number(list1?.tax) * subTotal) / 100;
+  const discountRate = (Number(list1?.discount) * subTotal) / 100;
 
   if (loading) return <Loader />;
 
@@ -117,7 +119,12 @@ const Invoicedetails = () => {
                 <Box>
                   <Stack direction="row" spacing={2}>
                     <LogoSection />
-                    <Chip label={list1?.invoiceStatus} variant="light" color="success" size="small" />
+                    <Chip
+                      label={list1?.invoiceStatus}
+                      variant="light"
+                      size="small"
+                      color={list1?.invoiceStatus === 'Closed' ? 'error' : list1?.invoiceStatus === 'Paid' ? 'success' : 'info'}
+                    />
                   </Stack>
                   <Typography color="secondary">{list?.invoice_id}</Typography>
                 </Box>
@@ -181,8 +188,8 @@ const Invoicedetails = () => {
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>
                         <TableCell align="right">{row.quantity}</TableCell>
-                        <TableCell align="right">{country?.prefix + '' + Number(row.price).toFixed(2)}</TableCell>
-                        <TableCell align="right">{country?.prefix + '' + Number(row.price * row.quantity).toFixed(2)}</TableCell>
+                        <TableCell align="right">₹{Number(row.price).toFixed(2)}</TableCell>
+                        <TableCell align="right">₹{Number(row.price * row.quantity).toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -200,12 +207,12 @@ const Invoicedetails = () => {
                   <Typography variant="subtitle1">{subTotal}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography color={theme.palette.grey[500]}>Discount:</Typography>
-                  <Typography>{list1?.discount}</Typography>
+                  <Typography color={theme.palette.success[500]}>Discount:</Typography>
+                  <Typography>{discountRate}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Tax:</Typography>
-                  <Typography>{list1?.tax}</Typography>
+                  <Typography>{taxRate}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="subtitle1">Grand Total:</Typography>
