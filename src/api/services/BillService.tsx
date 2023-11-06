@@ -41,16 +41,27 @@ export const BillAPI = {
 
     return response.data.items;
   },
-  deleteInvoiceRequest = async function (id: string) {
+  deleteVendorRequest = async function (id: string) {
     try {
       const response = await apiPurchase.request({
-        url: `v1/vendor/${id}`, // Include the vendor ID in the URL
-        method: 'DELETE',
+        url: `v1/vendor/${id}`,
+        method: 'DELETE'
       });
       return response.data;
     } catch (error) {
-      // Handle any errors that may occur during the request
-      console.error("Error deleting invoice:", error);
+      console.error('Error deleting invoice:', error);
+      throw error;
+    }
+  },
+  deleteBillRequest = async function (id: string) {
+    try {
+      const response = await apiPurchase.request({
+        url: `v1/bill/${id}`,
+        method: 'DELETE'
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting invoice:', error);
       throw error;
     }
   };
