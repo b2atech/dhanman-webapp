@@ -122,20 +122,16 @@ const CustomerView = ({ data }: any) => {
                         </Grid>
                       </Grid>
                     </ListItem>
+                    <ListItem>
+                      <Grid item xs={12} md={6}>
+                        <Stack spacing={0.5}>
+                          <Typography color="secondary">Address</Typography>
+                          <Typography>{data.addressLine}</Typography>
+                        </Stack>
+                      </Grid>
+                    </ListItem>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">Country</Typography>
-                            <Typography>{address?.country}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">State</Typography>
-                            <Typography>{address?.state}</Typography>
-                          </Stack>
-                        </Grid>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">City</Typography>
@@ -151,13 +147,19 @@ const CustomerView = ({ data }: any) => {
                             </Typography>
                           </Stack>
                         </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">State</Typography>
+                            <Typography>{address?.state}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">Country</Typography>
+                            <Typography>{address?.country}</Typography>
+                          </Stack>
+                        </Grid>
                       </Grid>
-                    </ListItem>
-                    <ListItem>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">Address</Typography>
-                        <Typography>{data.addressLine}</Typography>
-                      </Stack>
                     </ListItem>
                   </List>
                 </MainCard>
