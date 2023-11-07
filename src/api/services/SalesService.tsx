@@ -58,12 +58,23 @@ export const InvoiceAPI = {
   deleteCustomerRequest = async function (id: string) {
     try {
       const response = await apiSales.request({
-        url: `v1/customer/${id}`, // Include the vendor ID in the URL
+        url: `v1/customer/${id}`,
         method: 'DELETE'
       });
       return response.data;
     } catch (error) {
-      // Handle any errors that may occur during the request
+      console.error('Error deleting customer:', error);
+      throw error;
+    }
+  },
+  deleteInvoiceRequest = async function (id: string) {
+    try {
+      const response = await apiSales.request({
+        url: `v1/invoice/${id}`,
+        method: 'DELETE'
+      });
+      return response.data;
+    } catch (error) {
       console.error('Error deleting invoice:', error);
       throw error;
     }
