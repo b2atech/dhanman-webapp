@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import Logo from 'assets/images/logo.png';
 
 // types
-import { IInvoice } from 'types/invoice';
+import { IInvoiceType } from 'types/invoice';
 
 const textPrimary = '#262626';
 const textSecondary = '#8c8c8c';
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  list: IInvoice | null;
+  list: IInvoiceType | null;
 }
 
 // ==============================|| INVOICE EXPORT - HEADER  ||============================== //
@@ -80,7 +80,7 @@ const Header = ({ list }: Props) => {
       <View style={styles.container}>
         <View style={styles.leftColumn}>
           <Image src={Logo} style={styles.image} />
-          <Text style={[styles.caption, { marginTop: 4 }]}>{`#${list?.invoice_id}`}</Text>
+          <Text style={[styles.caption, { marginTop: 4 }]}>{`#${list?.invoiceNumber}`}</Text>
         </View>
         <View style={styles.detailColumn}>
           <View
@@ -88,32 +88,32 @@ const Header = ({ list }: Props) => {
               styles.chip,
               {
                 backgroundColor:
-                  list?.status === 'Paid'
+                  list?.invoiceStatus === 'Paid'
                     ? theme.palette.success.light + 20
-                    : list?.status === 'Unpaid'
+                    : list?.invoiceStatus === 'Unpaid'
                     ? theme.palette.info.light + 20
                     : theme.palette.error.light + 20,
                 color:
-                  list?.status === 'Paid'
+                  list?.invoiceStatus === 'Paid'
                     ? theme.palette.success.main
-                    : list?.status === 'Unpaid'
+                    : list?.invoiceStatus === 'Unpaid'
                     ? theme.palette.info.main
                     : theme.palette.error.main
               }
             ]}
           >
-            <Text style={styles.chipTitle}>{list?.status}</Text>
+            <Text style={styles.chipTitle}>{list?.invoiceStatus}</Text>
           </View>
         </View>
       </View>
       <View>
         <View style={[styles.row, { marginTop: 8 }]}>
           <Text style={styles.title}>Date</Text>
-          <Text style={styles.caption}> {list?.date && format(new Date(list?.date as string), 'dd/MM/yyyy')}</Text>
+          <Text style={styles.caption}> {list?.invoiceDate && format(new Date(list?.invoiceDate as string), 'dd/MM/yyyy')}</Text>
         </View>
         <View style={[styles.row, { marginTop: 8 }]}>
           <Text style={styles.title}>Due Date</Text>
-          <Text style={styles.caption}> {list?.due_date && format(new Date(list?.due_date as string), 'dd/MM/yyyy')}</Text>
+          <Text style={styles.caption}> {list?.dueDate && format(new Date(list?.dueDate as string), 'dd/MM/yyyy')}</Text>
         </View>
       </View>
     </View>
