@@ -116,10 +116,11 @@ const BillModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: 
                       <Grid item md={8}>
                         <Typography variant="h5">To:</Typography>
                         <FormControl sx={{ width: '100%' }}>
-                          <Typography variant="subtitle1">{invoiceInfo.customerInfo.name}</Typography>
-                          <Typography color="secondary">{invoiceInfo.customerInfo.address}</Typography>
-                          <Typography color="secondary">{invoiceInfo.customerInfo.phone}</Typography>
-                          <Typography color="secondary">{invoiceInfo.customerInfo.email}</Typography>
+                          <Typography variant="subtitle1">{invoiceInfo.vendorInfo.firstName}</Typography>
+                          <Typography variant="subtitle1">{invoiceInfo.vendorInfo.lastName}</Typography>
+                          <Typography color="secondary">{invoiceInfo.vendorInfo.city}</Typography>
+                          <Typography color="secondary">{invoiceInfo.vendorInfo.phoneNumber}</Typography>
+                          <Typography color="secondary">{invoiceInfo.vendorInfo.email}</Typography>
                         </FormControl>
                       </Grid>
                     </Grid>
@@ -193,7 +194,7 @@ const BillModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: 
           <PDFDownloadLink
             document={<ExportPDFView list={invoiceInfo} />}
             fileName={`${invoiceInfo?.invoiceId || invoiceInfo?.invoice_id}-${
-              invoiceInfo?.customer_name || invoiceInfo?.from?.name || invoiceInfo?.customerInfo?.name
+              invoiceInfo?.customer_name || invoiceInfo?.from?.name || invoiceInfo?.vendorInfo?.firstName
             }.pdf`}
             style={{ textDecoration: 'none' }}
           >

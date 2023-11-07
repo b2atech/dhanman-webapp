@@ -49,7 +49,7 @@ const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) =
         </Stack>
       </DialogTitle>
       <Divider />
-      <DialogContent sx={{ p: 2.5 }}>
+      <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
         <FormControl sx={{ width: '100%', pb: 2 }}>
           <TextField
             autoFocus
@@ -87,14 +87,14 @@ type AddressProps = {
 };
 const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
-  const [billAddress, setAddress] = useState([]);
+  const [Address, setAddress] = useState([]);
   useEffect(() => {
     getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3').then((billAddressList) => setAddress(billAddressList));
   }, []);
 
   return (
     <>
-      {billAddress.map((vendorList: any) => (
+      {Address.map((vendorList: any) => (
         <Box
           onClick={() => handlerAddress(vendorList)}
           key={vendorList.id}
@@ -116,6 +116,12 @@ const Address = ({ handlerAddress }: AddressProps) => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
               {vendorList.email}
+            </Typography>
+            <Typography textAlign="left" variant="body2" color="secondary">
+              {vendorList.phoneNumber}
+            </Typography>
+            <Typography textAlign="left" variant="body2" color="secondary">
+              {vendorList.city}
             </Typography>
           </Stack>
         </Box>

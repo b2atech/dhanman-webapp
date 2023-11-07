@@ -71,7 +71,7 @@ const master: NavItemType = {
           id: 'chartofaccounts',
           title: <FormattedMessage id="chartofaccounts" />,
           type: 'item',
-          url: '/sales/chartOfAccounts/list',
+          url: '/company/coa/list',
           icon: icons.TableOutlined
         },
         {

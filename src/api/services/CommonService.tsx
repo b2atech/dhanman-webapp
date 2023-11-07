@@ -20,6 +20,24 @@ export const CommonAPI = {
     });
 
     return response.data.items;
+  },
+  getAllRootChartOfAccount = async function (clientId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/GetAllRootCOAs/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllRootChartOfAccount.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
+  GetCOAOrder = async function (clientId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/GetCOAOrder/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[GetCOAOrder.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
   };
 
 const cancelApiObject = defineCancelApiObject(CommonAPI);
