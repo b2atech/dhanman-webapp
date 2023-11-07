@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -24,6 +24,10 @@ import IconButton from 'components/@extended/IconButton';
 // third-party
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
+import { getAllCountries } from 'api/services/CommonService';
+import { getAllCities } from 'api/services/CommonService';
+import { getAllStates } from 'api/services/CommonService';
+import { ICountry, ICity, IState } from 'types/address';
 
 // project imports
 import AlertCustomerDelete from './AlertCustomerDelete';
@@ -56,7 +60,10 @@ const getInitialValues = (customer: FormikValues | null) => {
       lastName: '',
       email: '',
       phoneNumber: '',
-      city: ''
+      cityName: '',
+      country: '',
+      state: '',
+      address: ''
     };
 
     return newCustomer;
@@ -71,6 +78,49 @@ export interface Props {
 }
 
 const AddCustomer = ({ customer, onCancel }: Props) => {
+  const [countries, setCountries] = useState<ICountry[]>();
+  const [states, setStates] = useState<IState[]>();
+  const [cities, setCities] = useState<ICity[]>();
+  const [selectedCountryId, setSelectedCountryId] = useState('');
+  const [selectedStateId, setSelectedStateId] = useState('');
+  const [selectedCityId, setselectedCityId] = useState('');
+
+  useEffect(() => {
+    getAllCountries()
+      .then((CountryList) => {
+        if (Array.isArray(CountryList)) {
+          setCountries(CountryList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    getAllStates(selectedCountryId)
+      .then((StateList) => {
+        if (Array.isArray(StateList)) {
+          setStates(StateList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, [selectedCountryId]);
+
+  useEffect(() => {
+    getAllCities(selectedStateId)
+      .then((CityList) => {
+        if (Array.isArray(CityList)) {
+          setCities(CityList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, [selectedStateId]);
+
   const theme = useTheme();
   const isCreating = !customer;
 
@@ -84,7 +134,10 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       .max(255)
       .required('Please Enter E-mail Address')
       .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, 'E-Mail Address Is Not Valid'),
-    city: Yup.string().max(255).required('Please Enter City Name')
+    cityName: Yup.string().max(255).required('Please Select City Name'),
+    country: Yup.string().max(255).required('Please Select Country Name'),
+    state: Yup.string().max(255).required('Please Select State Name'),
+    address: Yup.string().max(255).required('Please Enter Address')
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -134,8 +187,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     }
   });
 
-  const { values, setFieldValue, errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
-  const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Philadelphia'];
+  const {  errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
 
   return (
     <>
@@ -243,22 +295,101 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-city">City</InputLabel>
+                      <InputLabel htmlFor="vendor-country">Select Country</InputLabel>
                         <Autocomplete
                           fullWidth
                           autoHighlight
-                          options={cities}
-                          value={values.city}
-                          onChange={(event, newValue) => setFieldValue('city', newValue)}
+                          id="vendor-country"
+                          options={countries || []}
+                          getOptionLabel={(option) => option.name}
+                          value={countries?.find((country) => country.id === selectedCountryId)}
+                          onChange={(event, newValue) => {
+                            if (newValue) {
+                              setSelectedCountryId(newValue.id);
+                            } else {
+                              setSelectedCountryId('');
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Enter Country Name"
+                              // error={Boolean(touched.country && errors.country)}
+                              // helperText={touched.country && errors.country}
+                            />
+                          )}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="vendor-state">Select State</InputLabel>
+                        <Autocomplete
+                          fullWidth
+                          autoHighlight
+                          id="vendor-state"
+                          options={states || []}
+                          getOptionLabel={(option) => option.name}
+                          value={states?.find((states) => states.id === selectedStateId)}
+                          onChange={(event, newValue) => {
+                            if (newValue) {
+                              setSelectedStateId(newValue.id);
+                            } else {
+                              setSelectedStateId('');
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Enter state Name"
+                              // error={Boolean(touched.state && errors.state)}
+                              // helperText={touched.state && errors.state}
+                            />
+                          )}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="vendor-city">Select City</InputLabel>
+                        <Autocomplete
+                          fullWidth
+                          autoHighlight
+                          id="customer-city"
+                          options={cities || []}
+                          getOptionLabel={(option) => `${option.name}     (${option.postalCode})`}
+                          value={cities?.find((cities) => cities.id === selectedCityId)}
+                          onChange={(event, newValue) => {
+                            if (newValue) {
+                              setselectedCityId(newValue.id);
+                            } else {
+                              setselectedCityId('');
+                            }
+                          }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
                               id="customer-city"
                               placeholder="Enter City Name"
-                              error={Boolean(touched.city && errors.city)}
-                              helperText={touched.city && errors.city ? (errors.city as React.ReactNode) : ''}
+                              // error={Boolean(touched.city && errors.city)}
+                              // helperText={touched.city && errors.city ? (errors.city as React.ReactNode) : ''}
                             />
                           )}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="vendor-address">Address</InputLabel>
+                        <TextField
+                          autoFocus
+                          fullWidth
+                          id="address"
+                          type="text"
+                          placeholder="Enter Address"
+                          {...getFieldProps('address')}
+                          // error={Boolean(touched.address && errors.address)}
+                          // helperText={touched.address && errors.address}
                         />
                       </Stack>
                     </Grid>
