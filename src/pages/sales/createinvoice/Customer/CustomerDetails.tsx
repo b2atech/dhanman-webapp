@@ -24,13 +24,25 @@ import Transitions from 'components/@extended/Transitions';
 
 // assets
 import { EnvironmentOutlined, LinkOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-
+import { useEffect, useState } from 'react';
+import { GetAllAddress } from 'api/services/CommonService';
+import { IAddress } from 'types/address';
 // ==============================|| CUSTOMER - VIEW ||============================== //
 
 const CustomerView = ({ data }: any) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('md'));
+  const [address, setAddress] = useState<IAddress>();
 
+  useEffect(() => {
+    GetAllAddress(data.cityId)
+      .then((addressData) => {
+        setAddress(addressData);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, [data]);
   return (
     <TableRow sx={{ '&:hover': { bgcolor: `transparent !important` }, overflow: 'hidden' }}>
       <TableCell colSpan={8} sx={{ p: 2.5, overflow: 'hidden' }}>
@@ -76,7 +88,7 @@ const CustomerView = ({ data }: any) => {
                           <EnvironmentOutlined />
                         </ListItemIcon>
                         <ListItemSecondaryAction>
-                          <Typography align="right">{data.city}</Typography>
+                          <Typography align="right">{address?.city}</Typography>
                         </ListItemSecondaryAction>
                       </ListItem>
                       <ListItem>
@@ -114,15 +126,28 @@ const CustomerView = ({ data }: any) => {
                       <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
-                            <Typography color="secondary">City</Typography>
-                            <Typography>{data.city}</Typography>
+                            <Typography color="secondary">Country</Typography>
+                            <Typography>{address?.country}</Typography>
                           </Stack>
                         </Grid>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
-                            <Typography color="secondary">Zip Code</Typography>
+                            <Typography color="secondary">State</Typography>
+                            <Typography>{address?.state}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">City</Typography>
+                            <Typography>{address?.city}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">Pin Code</Typography>
+                            <Typography>{address?.pinCode}</Typography>
                             <Typography>
-                              <PatternFormat displayType="text" format="### ###" mask="_" defaultValue={data.contact} />
+                              <PatternFormat displayType="text" format="### ###" mask="_" defaultValue={address?.pinCode} />
                             </Typography>
                           </Stack>
                         </Grid>
@@ -131,7 +156,7 @@ const CustomerView = ({ data }: any) => {
                     <ListItem>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">Address</Typography>
-                        <Typography>{data.Address}</Typography>
+                        <Typography>{data.addressLine}</Typography>
                       </Stack>
                     </ListItem>
                   </List>
