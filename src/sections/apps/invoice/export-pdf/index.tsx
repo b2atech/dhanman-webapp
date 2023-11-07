@@ -28,8 +28,8 @@ interface Props {
 }
 
 const ExportPDFView = ({ list }: Props) => {
-  let title = list?.id;
-  let customer_name = list?.customer.firstName + list?.customer.lastName;
+  let title = list?.invoiceNumber;
+  let customer_name = list?.customer.firstName + '' + list?.customer.lastName;
 
   return (
     <Document title={`${title} ${customer_name}`}>
