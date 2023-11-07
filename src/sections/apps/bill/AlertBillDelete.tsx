@@ -4,6 +4,9 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 // project import
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
+import { openSnackbar } from 'store/reducers/snackbar';
+import { deleteBillRequest } from 'api/services/BillService';
+import { useDispatch } from 'store';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
@@ -13,11 +16,31 @@ interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  id: string;
 }
 
-// ==============================|| KANBAN BOARD - COLUMN DELETE ||============================== //
+// ==============================|| Bill DELETE ||============================== //
 
-export default function AlertColumnDelete({ title, open, handleClose }: Props) {
+export default function AlertBillDelete({ title, open, handleClose, id }: Props) {
+  const dispatch = useDispatch();
+  const deleteBill = () => {
+    handleClose(true);
+    deleteBillRequest(id).then(() => {
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Bill deleted successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+      window.location.reload();
+    });
+  };
   return (
     <Dialog
       open={open}
@@ -37,13 +60,21 @@ export default function AlertColumnDelete({ title, open, handleClose }: Props) {
             <Typography variant="h4" align="center">
               Are you sure you want to delete the selected invoice?
             </Typography>
+            <Typography align="center">
+              By deleting
+              <Typography variant="subtitle1" component="span">
+                {' '}
+                "{title}"{' '}
+              </Typography>
+              user, all task assigned to that user will also be deleted.
+            </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deleteBill} autoFocus>
               Delete
             </Button>
           </Stack>
