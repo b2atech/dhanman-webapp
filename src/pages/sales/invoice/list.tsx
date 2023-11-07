@@ -1,4 +1,4 @@
-import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, useCallback, FC } from 'react';
+import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, useCallback, FC, MouseEvent } from 'react';
 import { useNavigate } from 'react-router';
 
 // material-ui
@@ -66,15 +66,12 @@ import {
   TableRowSelection
 } from 'components/third-party/ReactTable';
 
-import { dispatch, useSelector } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-import { alertPopupToggle, getInvoiceDelete } from 'store/reducers/invoice';
 import { renderFilterTypes, GlobalFilter, DateColumnFilter } from 'utils/react-table';
 import { NumericFormat } from 'react-number-format';
 
 // types
 import { IInvoiceList } from 'types/invoice';
-import AlertColumnDelete from 'sections/apps/invoice/AlertColumnDelete';
+import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
 import { getAllInvoices, getInvoiceDetailsByHeaderId } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
@@ -470,10 +467,10 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
 // ==============================|| INVOICE - LIST ||============================== //
 
 const List = () => {
-  const { alertPopup } = useSelector((state) => state.invoice);
   const [invoice, setList] = useState<IInvoiceList[]>([]);
-  const [invoiceId, setInvoiceId] = useState(0);
-  const [getInvoiceId, setGetInvoiceId] = useState(0);
+  const [open, setOpen] = useState<boolean>(false);
+  const [invoiceId, setInvoiceId] = useState<string>('');
+  const [getInvoiceName, setGetInvoiceName] = useState<any>('');
   const [expandedRows, setExpandedRows] = useState({});
   const [showIdColumn, setShowIdColumn] = useState(false);
 
@@ -496,27 +493,9 @@ const List = () => {
   }, []);
 
   const navigation = useNavigate();
-  const handleClose = (invoiceStatus: boolean) => {
-    if (invoiceStatus) {
-      dispatch(getInvoiceDelete(invoiceId));
-      dispatch(
-        openSnackbar({
-          open: true,
-          message: 'Column deleted successfully',
-          anchorOrigin: { vertical: 'top', horizontal: 'right' },
-          variant: 'alert',
-          alert: {
-            color: 'success'
-          },
-          close: false
-        })
-      );
-    }
-    dispatch(
-      alertPopupToggle({
-        alertToggle: false
-      })
-    );
+
+  const handleClose = () => {
+    setOpen(!open);
   };
 
   const columns = useMemo(
@@ -645,15 +624,11 @@ const List = () => {
               <Tooltip title="Delete">
                 <IconButton
                   color="error"
-                  onClick={(e: any) => {
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
+                    setGetInvoiceName(row.values.customerName);
                     setInvoiceId(row.values.id);
-                    setGetInvoiceId(row.values.invoice_id);
-                    dispatch(
-                      alertPopupToggle({
-                        alertToggle: true
-                      })
-                    );
+                    setOpen(true);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -797,7 +772,7 @@ const List = () => {
           />
         </ScrollX>
       </MainCard>
-      <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
+      <AlertInvoiceDelete title={getInvoiceName} open={open} handleClose={handleClose} id={invoiceId} />
     </>
   );
 };
