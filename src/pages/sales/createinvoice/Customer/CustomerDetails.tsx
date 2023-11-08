@@ -126,7 +126,7 @@ const CustomerView = ({ data }: any) => {
                       <Grid item xs={12} md={6}>
                         <Stack spacing={0.5}>
                           <Typography color="secondary">Address</Typography>
-                          <Typography>{data.addressLine}</Typography>
+                          <Typography>{address?.city}</Typography>
                         </Stack>
                       </Grid>
                     </ListItem>
