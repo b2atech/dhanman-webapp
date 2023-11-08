@@ -38,6 +38,15 @@ export const CommonAPI = {
     });
 
     return response.data.items;
+  },
+  GetAllAddress = async function (cityId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/getAllAddress/${cityId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[GetAllAddress.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
   };
 
 const cancelApiObject = defineCancelApiObject(CommonAPI);
