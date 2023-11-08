@@ -65,7 +65,7 @@ export const CommonAPI = {
     });
 
     return response.data.items;
-
+  },
   GetAllAddress = async function (cityId: string, cancel = false) {
     const response = await apiCommon.request({
       url: `v1/getAllAddress/${cityId}`,
@@ -74,7 +74,5 @@ export const CommonAPI = {
     });
 
     return response.data;
-
   };
-
 const cancelApiObject = defineCancelApiObject(CommonAPI);
