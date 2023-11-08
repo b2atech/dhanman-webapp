@@ -15,4 +15,10 @@ export interface ICity {
   name: string;
   postalCode: string;
   stateId: string;
+  
+export interface IAddress {
+  country: string;
+  state: string;
+  city: string;
+  pinCode: string;
 }
