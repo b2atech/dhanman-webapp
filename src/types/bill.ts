@@ -26,8 +26,9 @@ export interface Items {
   id: string | number;
   name: string;
   description: string;
-  qty: number;
+  quantity: number;
   price: string | number;
+  amount: number;
 }
 
 export interface IBill {
@@ -46,4 +47,27 @@ export interface IBill {
   tax: number | null;
   customerInfo: InfoType;
   notes: string;
+}
+
+export interface IBillType {
+  id: number;
+  billPaymentId: number;
+  billNumber: number;
+  billDate: Date | string | number;
+  paymentTerm: number;
+  billStatus: string;
+  vendor: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    addressLine: string;
+    phoneNumber: number;
+  };
+  currency: string;
+  dueDate: Date | string | number;
+  totalAmount: number;
+  tax: number;
+  discount: number | null;
+  note: string;
+  lines: Items[];
 }

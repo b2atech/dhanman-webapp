@@ -64,6 +64,15 @@ export const BillAPI = {
       console.error('Error deleting invoice:', error);
       throw error;
     }
+  },
+  getBillById = async function (id: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/GetBill/${id}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getBillById.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
   };
 
 export async function createBillRequest(billdata: BillHeader) {

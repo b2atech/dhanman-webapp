@@ -23,6 +23,7 @@ const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
 const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 const AppPullRequests = Loadable(lazy(() => import('pages/dev/pr')));
+const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -163,6 +164,10 @@ const MainRoutes = {
             {
               path: 'list',
               element: <AppBills />
+            },
+            {
+              path: 'details/:id',
+              element: <AppBilldetails />
             },
             {
               path: 'create',
