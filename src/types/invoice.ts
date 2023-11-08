@@ -36,9 +36,10 @@ export interface IInvoiceType {
   id: number;
   invoice_id: number;
   customer_name: string;
+  invoiceNumber: string;
   email: string;
   avatar: number;
-  invoiceDate: Date;
+  invoiceDate: Date | string | number;
   dueDate: Date | string | number;
   quantity: number;
   customer: {
