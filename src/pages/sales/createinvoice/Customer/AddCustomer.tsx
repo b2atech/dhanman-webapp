@@ -380,7 +380,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               id="customer-cityName"
                               placeholder="Enter City Name"
                               error={Boolean(touched.cityName && errors.cityName)}
-                              helperText={touched.cityName && errors.cityName ? (errors.cityName as React.ReactNode) : ''}
+                              helperText={touched.cityName && errors.cityName ? 'Please Select City Name' : ''}
                             />
                           )}
                         />
