@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { Text, View, StyleSheet } from '@react-pdf/renderer';
 
 // types
-import { IInvoice } from 'types/invoice';
+import { IInvoiceType } from 'types/invoice';
 
 const textPrimary = '#262626';
 const textSecondary = '#8c8c8c';
@@ -95,37 +95,44 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  list: IInvoice | null;
+  list: IInvoiceType | null;
 }
 
 // ==============================|| INVOICE EXPORT - CONTENT  ||============================== //
 
 const Content = ({ list }: Props) => {
   const theme = useTheme();
-  const subtotal = list?.invoice_detail?.reduce((prev: any, curr: any) => {
-    if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
-    else return prev;
+  const subTotal = (list?.lines ?? []).reduce((total, row) => {
+    return total + row.amount;
   }, 0);
-
-  const taxRate = (Number(list?.tax) * subtotal) / 100;
-  const discountRate = (Number(list?.discount) * subtotal) / 100;
-  const total = subtotal - discountRate + taxRate;
+  const taxRate = (Number(list?.tax) * subTotal) / 100;
+  const discountRate = (Number(list?.discount) * subTotal) / 100;
+  const cashierInfo = {
+    name: 'Belle J. Richter',
+    address: '1300 Cooks Mine, NM 87829',
+    phoneNumber: '305-829-7809',
+    email: 'belljrc23@gmail.com'
+  };
   return (
     <View style={styles.container}>
       <View style={[styles.row, styles.subRow]}>
         <View style={styles.card}>
           <Text style={[styles.title, { marginBottom: 8 }]}>From:</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.cashierInfo?.name}</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.cashierInfo?.address}</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.cashierInfo?.phone}</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.cashierInfo?.email}</Text>
+          <Text style={[styles.caption, styles.pb5]}>{cashierInfo?.name}</Text>
+          <Text style={[styles.caption, styles.pb5]}>{cashierInfo?.address}</Text>
+          <Text style={[styles.caption, styles.pb5]}>{cashierInfo?.phoneNumber}</Text>
+          <Text style={[styles.caption, styles.pb5]}>{cashierInfo?.email}</Text>
         </View>
         <View style={styles.card}>
           <Text style={[styles.title, { marginBottom: 8 }]}>To:</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.customerInfo?.name}</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.customerInfo?.address}</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.customerInfo?.phone}</Text>
-          <Text style={[styles.caption, styles.pb5]}>{list?.customerInfo?.email}</Text>
+          <Text style={[styles.caption, styles.pb5]}>
+            {list?.customer?.firstName && list?.customer?.lastName
+              ? `${list.customer.firstName} ${list.customer.lastName}`
+              : list?.customer?.firstName}
+          </Text>
+          {/* <Text style={[styles.caption, styles.pb5]}>{list?.customer?.city}</Text> */}
+          <Text style={[styles.caption, styles.pb5]}>{list?.customer?.phoneNumber}</Text>
+          <Text style={[styles.caption, styles.pb5]}>{list?.customer?.email}</Text>
         </View>
       </View>
       <View>
@@ -133,19 +140,19 @@ const Content = ({ list }: Props) => {
           <Text style={[styles.tableTitle, styles.flex03]}>#</Text>
           <Text style={[styles.tableTitle, styles.flex17]}>NAME</Text>
           <Text style={[styles.tableTitle, styles.flex20]}>DESCRIPTION</Text>
-          <Text style={[styles.tableTitle, styles.flex07]}>QTY</Text>
+          <Text style={[styles.tableTitle, styles.flex07]}>QUANTITY</Text>
           <Text style={[styles.tableTitle, styles.flex07]}>PRICE</Text>
           <Text style={[styles.tableTitle, styles.flex07]}>AMOUNT</Text>
         </View>
-        {list?.invoice_detail.map((row: any, index: number) => {
+        {list?.lines.map((row: any, index: number) => {
           return (
             <View style={[styles.row, styles.tableRow]} key={row.id}>
               <Text style={[styles.tableCell, styles.flex03]}>{index + 1}</Text>
               <Text style={[styles.tableCell, styles.flex17, { textOverflow: 'ellipsis' }]}>{row.name}</Text>
               <Text style={[styles.tableCell, styles.flex20]}>{row.description}</Text>
-              <Text style={[styles.tableCell, styles.flex07]}>{row.qty}</Text>
+              <Text style={[styles.tableCell, styles.flex07]}>{row.quantity}</Text>
               <Text style={[styles.tableCell, styles.flex07]}>{`$${Number(row.price).toFixed(2)}`}</Text>
-              <Text style={[styles.tableCell, styles.flex07]}>{`$${Number(row.price * row.qty).toFixed(2)}`}</Text>
+              <Text style={[styles.tableCell, styles.flex07]}>{`$${Number(row.price * row.quantity).toFixed(2)}`}</Text>
             </View>
           );
         })}
@@ -153,7 +160,7 @@ const Content = ({ list }: Props) => {
       <View style={[styles.row, { paddingTop: 25, margin: 0, paddingRight: 25, justifyContent: 'flex-end' }]}>
         <View style={[styles.row, styles.amountRow]}>
           <Text style={styles.caption}>Sub Total:</Text>
-          <Text style={styles.tableCell}>${subtotal?.toFixed(2)}</Text>
+          <Text style={styles.tableCell}>${subTotal?.toFixed(2)}</Text>
         </View>
       </View>
       <View style={[styles.row, styles.amountSection]}>
@@ -171,12 +178,12 @@ const Content = ({ list }: Props) => {
       <View style={[styles.row, styles.amountSection]}>
         <View style={[styles.row, styles.amountRow]}>
           <Text style={styles.tableCell}>Grand Total:</Text>
-          <Text style={styles.tableCell}>${total % 1 === 0 ? total : total?.toFixed(2)}</Text>
+          <Text style={styles.tableCell}>${list?.totalAmount?.toFixed(2)}</Text>
         </View>
       </View>
       <View style={[styles.row, { alignItems: 'flex-start', marginTop: 20, width: '95%' }]}>
-        <Text style={styles.caption}>Notes </Text>
-        <Text style={styles.tableCell}> It was a pleasure working with you and your team. Thank You!</Text>
+        <Text style={styles.caption}>Note </Text>
+        <Text style={styles.tableCell}> {list?.note}</Text>
       </View>
     </View>
   );

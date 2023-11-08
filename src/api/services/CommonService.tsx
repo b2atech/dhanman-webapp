@@ -38,6 +38,41 @@ export const CommonAPI = {
     });
 
     return response.data.items;
-  };
+  },
+  getAllCountries = async function (cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/getAllCountries/`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllCountries.name].handleRequestCancellation().signal : undefined
+    });
 
+    return response.data.items;
+  },
+  getAllCities = async function (clientId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/getAllCities/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllCities.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
+  getAllStates = async function (clientId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/getAllStates/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStates.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
+  GetAllAddress = async function (cityId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/getAllAddress/${cityId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[GetAllAddress.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
+  };
 const cancelApiObject = defineCancelApiObject(CommonAPI);
