@@ -25,8 +25,8 @@ import Transitions from 'components/@extended/Transitions';
 // assets
 import { EnvironmentOutlined, LinkOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { GetAllAddress } from 'api/services/CommonService';
 import { IAddress } from 'types/address';
+import { GetAllAddress } from 'api/services/CommonService';
 // ==============================|| CUSTOMER - VIEW ||============================== //
 
 const CustomerView = ({ data }: any) => {
