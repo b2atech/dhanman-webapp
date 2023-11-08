@@ -154,6 +154,13 @@ const master: NavItemType = {
           icon: icons.UnorderedListOutlined
         },
         {
+          id: 'billdetails',
+          title: <FormattedMessage id="details" />,
+          type: 'item',
+          url: '/purchase/bills/details/:id',
+          icon: icons.PlusSquareOutlined
+        },
+        {
           id: 'createbills',
           title: <FormattedMessage id="createbills" />,
           type: 'item',

@@ -460,8 +460,9 @@ const Bills = () => {
                 <Tooltip title="View">
                   <IconButton
                     color="secondary"
-                    onClick={() => {
-                      navigation('./create');
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      navigation(`/purchase/bills/details/${row.values.id}`);
                     }}
                   >
                     <EyeTwoTone twoToneColor={theme.palette.secondary.main} />

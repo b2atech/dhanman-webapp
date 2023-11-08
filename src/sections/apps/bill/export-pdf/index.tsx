@@ -6,7 +6,7 @@ import Header from './Header';
 import Content from './Content';
 
 // types
-import { IInvoice } from 'types/invoice';
+import { IBillType } from 'types/bill';
 
 const styles = StyleSheet.create({
   page: {
@@ -21,15 +21,15 @@ const styles = StyleSheet.create({
   }
 });
 
-// ==============================|| INVOICE EXPORT  ||============================== //
+// ==============================|| BILL EXPORT  ||============================== //
 
 interface Props {
-  list: IInvoice | any;
+  list: IBillType | any;
 }
 
 const ExportPDFView = ({ list }: Props) => {
-  let title = list?.invoiceId || list?.invoice_id;
-  let customer_name = list?.customer_name || list?.from?.name || list?.customerInfo?.name;
+  let title = list?.billNumber;
+  let customer_name = list?.vendor.firstName + '' + list?.vendor.lastName;
 
   return (
     <Document title={`${title} ${customer_name}`}>
