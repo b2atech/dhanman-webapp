@@ -1,7 +1,7 @@
-import { VendorInfo } from 'types/vendorInfo';
 import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { BillHeader } from 'types/billiingDetails';
+import { VendorData } from 'types/customerinfo';
 
 export const BillAPI = {
     get: async function (clientId: string, cancel = false) {
@@ -63,13 +63,13 @@ export async function createBillRequest(billdata: BillHeader) {
   });
   return response.data;
 }
-export async function createVendorRequest(vendordata: VendorInfo) {
+export async function createVendorRequest(vendordata: VendorData) {
   const response = await apiPurchase.request({
     url: `v1/vendors`,
     method: 'POST',
     data: vendordata
   });
-  return response.data;
+  return response.status;
 }
 
 const cancelApiObject = defineCancelApiObject(BillAPI);
