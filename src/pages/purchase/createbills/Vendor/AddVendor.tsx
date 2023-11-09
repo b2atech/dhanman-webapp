@@ -267,14 +267,14 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="vendor-phoneNumber">Phone Number</InputLabel>
+                        <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
                         <TextField
                           fullWidth
-                          id="vendor-phoneNumber"
+                          id="customer-phoneNumber"
                           placeholder="Enter Phone Number"
                           {...getFieldProps('phoneNumber')}
                           error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                          helperText={touched.phoneNumber && errors.phoneNumber ? 'Please Enter Valid Phone Number' : ''}
+                          helperText={touched.phoneNumber && errors.phoneNumber ? (errors.phoneNumber as React.ReactNode) : ''}
                           inputProps={{
                             inputMode: 'numeric',
                             pattern: '[0-9]*',
