@@ -32,43 +32,28 @@ import { ICountry, ICity, IState } from 'types/address';
 import AlertCustomerDelete from './AlertCustomerDelete';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
+import { createCustomerRequest } from 'api/services/SalesService';
 
 // types
 import { ThemeMode } from 'types/config';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  if (customer) {
-    const newCustomer = {
-      id: customer.id,
-      clientId: '',
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-      phoneNumber: customer.phoneNumber,
-      cityName: customer.cityName,
-      state: customer.state,
-      country: customer.country,
-      addressLine: customer.addressLine
-    };
+  const newCustomer = {
+    userId: '0f6dd08e-cfe7-498b-9fed-167d759b1a3b',
+    clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    email: '',
+    cityName: '',
+    cityId: '',
+    country: '',
+    state: '',
+    addressLine: ''
+  };
 
-    return newCustomer;
-  } else {
-    const newCustomer = {
-      id: '',
-      clientId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      cityName: '',
-      country: '',
-      state: '',
-      addressLine: ''
-    };
-
-    return newCustomer;
-  }
+  return newCustomer;
 };
 
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
@@ -97,6 +82,12 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         console.error('Error fetching data:', error);
       });
   }, []);
+
+  useEffect(() => {
+    setSelectedCountryId('');
+    setSelectedStateId('');
+    setselectedCityId('');
+  }, [customer, onCancel]);
 
   useEffect(() => {
     getAllStates(selectedCountryId)
@@ -149,16 +140,27 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   };
 
   const formik = useFormik({
-    enableReinitialize: true,
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
-    onSubmit: (values, { setSubmitting }) => {
+    onSubmit: async (values, { setSubmitting }) => {
       try {
+        const customerData = {
+          userId: values.userId,
+          clientId: values.clientId,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          cityId: values.cityId,
+          phoneNumber: values.phoneNumber,
+          city: values.cityName,
+          addressLine: values.addressLine
+        };
         if (customer) {
           dispatch(
             openSnackbar({
               open: true,
               message: 'Customer updated successfully.',
+              anchorOrigin: { vertical: 'top', horizontal: 'right' },
               variant: 'alert',
               alert: {
                 color: 'success'
@@ -167,17 +169,22 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
           );
         } else {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'Customer added successfully.',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          const response = await createCustomerRequest(customerData);
+          if (response === 200) {
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: 'Customer added successfully.',
+                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                variant: 'alert',
+                alert: {
+                  color: 'success'
+                },
+                close: false
+              })
+            );
+            window.location.reload();
+          }
         }
 
         setSubmitting(false);
@@ -196,7 +203,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
+              <DialogTitle>{customer ? 'Add Customer' : 'New Customer'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -238,7 +245,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter First Name"
                           {...getFieldProps('firstName')}
                           error={Boolean(touched.firstName && errors.firstName)}
-                          helperText={touched.firstName && errors.firstName ? (errors.firstName as React.ReactNode) : ''}
+                          helperText={touched.firstName && errors.firstName ? 'Please Enter First Name' : ''}
                         />
                       </Stack>
                     </Grid>
@@ -252,7 +259,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           placeholder="Enter Last Name"
                           {...getFieldProps('lastName')}
                           error={Boolean(touched.lastName && errors.lastName)}
-                          helperText={touched.lastName && errors.lastName ? (errors.lastName as React.ReactNode) : ''}
+                          helperText={touched.lastName && errors.lastName ? 'Please Enter Last Name' : ''}
                         />
                       </Stack>
                     </Grid>
@@ -327,14 +334,14 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="vendor-state">Select State</InputLabel>
+                        <InputLabel htmlFor="customer-state">Select State</InputLabel>
                         <Autocomplete
                           fullWidth
                           autoHighlight
-                          id="vendor-state"
+                          id="customer-state"
                           options={states || []}
                           getOptionLabel={(option) => option.name}
-                          value={states?.find((states) => states.id === selectedStateId)}
+                          value={states?.find((state) => state.id === selectedStateId)}
                           onChange={(event, newValue) => {
                             if (newValue) {
                               setSelectedStateId(newValue.id);
@@ -357,7 +364,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="vendor-cityName">Select City</InputLabel>
+                        <InputLabel htmlFor="customer-cityName">Select City</InputLabel>
                         <Autocomplete
                           fullWidth
                           autoHighlight
@@ -369,9 +376,11 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                             if (newValue) {
                               setselectedCityId(newValue.id);
                               formik.setFieldValue('cityName', newValue.name);
+                              formik.setFieldValue('cityId', newValue.id);
                             } else {
                               setselectedCityId('');
                               formik.setFieldValue('cityName', '');
+                              formik.setFieldValue('cityId', '');
                             }
                           }}
                           renderInput={(params) => (
@@ -388,7 +397,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="vendor-address">Address</InputLabel>
+                        <InputLabel htmlFor="customer-address">Address</InputLabel>
                         <TextField
                           autoFocus
                           fullWidth
