@@ -61,6 +61,7 @@ import { IVendor } from 'types/bill';
 import moment from 'moment';
 import AddVendor from '../createbills/Vendor/AddVendor';
 import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
+import { PatternFormat } from 'react-number-format';
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
@@ -182,7 +183,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Tooltip>
           </Stack>
         </Stack>
-        <ScrollX sx={{ height: 500 }}>
+        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
@@ -318,8 +319,21 @@ const Vendors = () => {
         }
       },
       {
+        Header: 'Contact',
+        accessor: 'phoneNumber',
+        width: 200,
+        sticky: 'left',
+        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
+      },
+      {
         Header: 'Email',
         accessor: 'email',
+        width: 200,
+        sticky: 'left'
+      },
+      {
+        Header: 'City',
+        accessor: 'cityName',
         width: 200,
         sticky: 'left'
       },

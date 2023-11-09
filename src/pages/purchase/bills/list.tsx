@@ -1,4 +1,4 @@
-import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent } from 'react';
+import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router';
 
 // material-ui
@@ -43,7 +43,6 @@ import {
   HeaderProps
 } from 'react-table';
 import { DeleteTwoTone, EditTwoTone, EyeTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { dispatch, useSelector } from 'store';
 
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
@@ -53,15 +52,13 @@ import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
-import AlertColumnDelete from 'sections/apps/invoice/AlertColumnDelete';
+import AlertBillDelete from 'sections/apps/bill/AlertBillDelete';
 import { CSVExport, HeaderSort, IndeterminateCheckbox, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 import { getAllBills } from 'api/services/BillService';
 
 import { GlobalFilter, renderFilterTypes, DateColumnFilter } from 'utils/react-table';
 import { IBill } from 'types/bill';
 import { alpha, useTheme } from '@mui/material/styles';
-import { openSnackbar } from 'store/reducers/snackbar';
-import { alertPopupToggle } from 'store/reducers/invoice';
 import { NumericFormat } from 'react-number-format';
 
 const moment = require('moment');
@@ -307,10 +304,11 @@ const Bills = () => {
   const [bill, setBills] = useState([] as IBill[]);
   const theme = useTheme();
   const navigation = useNavigate();
-  const { alertPopup } = useSelector((state) => state.invoice);
-  const [getInvoiceId] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showIdColumn, setShowIdColumn] = useState(false);
+  const [billId, setBillId] = useState<string>('');
+  const [getBillName, setGetBillName] = useState<any>('');
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
@@ -332,26 +330,8 @@ const Bills = () => {
       });
   }, []);
 
-  const handleClose = (invoiceStatus: boolean) => {
-    if (invoiceStatus) {
-      dispatch(
-        openSnackbar({
-          open: true,
-          message: 'Column deleted successfully',
-          anchorOrigin: { vertical: 'top', horizontal: 'right' },
-          variant: 'alert',
-          alert: {
-            color: 'success'
-          },
-          close: false
-        })
-      );
-    }
-    dispatch(
-      alertPopupToggle({
-        alertToggle: false
-      })
-    );
+  const handleClose = () => {
+    setOpen(!open);
   };
   const columns = useMemo(
     () =>
@@ -460,8 +440,9 @@ const Bills = () => {
                 <Tooltip title="View">
                   <IconButton
                     color="secondary"
-                    onClick={() => {
-                      navigation('./create');
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      navigation(`/purchase/bills/details/${row.values.id}`);
                     }}
                   >
                     <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
@@ -473,7 +454,15 @@ const Bills = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete">
-                  <IconButton color="error">
+                  <IconButton
+                    color="error"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      setGetBillName(row.values.vendorName);
+                      setBillId(row.values.id);
+                      handleClose();
+                    }}
+                  >
                     <DeleteTwoTone twoToneColor={theme.palette.error.main} />
                   </IconButton>
                 </Tooltip>
@@ -482,6 +471,7 @@ const Bills = () => {
           }
         }
       ] as Column[],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [navigation, theme.palette.error.main, theme.palette.primary.main, theme.palette.secondary.main]
   );
 
@@ -608,7 +598,7 @@ const Bills = () => {
         )}
       </MainCard>
 
-      <AlertColumnDelete title={`${getInvoiceId}`} open={alertPopup} handleClose={handleClose} />
+      <AlertBillDelete title={getBillName} open={open} handleClose={handleClose} id={billId} />
     </>
   );
 };

@@ -5,7 +5,7 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { deleteVendorRequest } from 'api/services/BillService';
+import { deleteInvoiceRequest } from 'api/services/SalesService';
 import { useDispatch } from 'store';
 
 // assets
@@ -19,17 +19,17 @@ interface Props {
   id: string;
 }
 
-// ==============================|| VENDOR - DELETE ||============================== //
+// ==============================|| KANBAN BOARD - COLUMN DELETE ||============================== //
 
-export default function AlertVendorDelete({ title, open, handleClose, id }: Props) {
+export default function AlertInvoiceDelete({ title, open, handleClose, id }: Props) {
   const dispatch = useDispatch();
-  const deleteVendor = () => {
+  const deleteInvoice = () => {
     handleClose(true);
-    deleteVendorRequest(id).then(() => {
+    deleteInvoiceRequest(id).then(() => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Vendor deleted successfully',
+          message: 'Invoice deleted successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -41,7 +41,6 @@ export default function AlertVendorDelete({ title, open, handleClose, id }: Prop
       window.location.reload();
     });
   };
-
   return (
     <Dialog
       open={open}
@@ -59,7 +58,7 @@ export default function AlertVendorDelete({ title, open, handleClose, id }: Prop
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete?
+              Are you sure you want to delete the selected invoice?
             </Typography>
             <Typography align="center">
               By deleting
@@ -75,7 +74,7 @@ export default function AlertVendorDelete({ title, open, handleClose, id }: Prop
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={deleteVendor} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deleteInvoice} autoFocus>
               Delete
             </Button>
           </Stack>

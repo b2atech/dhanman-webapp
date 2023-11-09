@@ -15,7 +15,7 @@ const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/comi
 //Render Applications
 const AppInvoices = Loadable(lazy(() => import('pages/sales/invoice/list')));
 const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create')));
-const Invoicedetails = Loadable(lazy(() => import('pages/sales/invoice/details')));
+const AppInvoicedetails = Loadable(lazy(() => import('pages/sales/invoice/details')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/index')));
 const AppCoaContainer = Loadable(lazy(() => import('pages/company/chartOfAccounts/coaContainer')));
@@ -23,6 +23,7 @@ const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
 const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 const AppPullRequests = Loadable(lazy(() => import('pages/dev/pr')));
+const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -119,7 +120,7 @@ const MainRoutes = {
             },
             {
               path: 'details/:id',
-              element: <Invoicedetails />
+              element: <AppInvoicedetails />
             }
           ]
         },
@@ -163,6 +164,10 @@ const MainRoutes = {
             {
               path: 'list',
               element: <AppBills />
+            },
+            {
+              path: 'details/:id',
+              element: <AppBilldetails />
             },
             {
               path: 'create',
