@@ -78,6 +78,7 @@ import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import { PaletteColor } from '@mui/material';
 
+const moment = require('moment');
 export interface InvoiceWidgets {
   title: string;
   count: string;
@@ -554,12 +555,14 @@ const List = () => {
       {
         Header: 'Create Date',
         accessor: 'invoiceDate',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
         sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Due Date',
         accessor: 'dueDate',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
         sticky: 'left',
         disableFilters: true
       },
