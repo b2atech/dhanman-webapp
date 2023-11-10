@@ -1,4 +1,4 @@
-import { CustomerInfo } from 'types/customerinfo';
+import { CustomerData } from 'types/customerinfo';
 import { apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { InvoiceHeader } from 'types/invoiceDetails';
@@ -47,13 +47,13 @@ export const InvoiceAPI = {
     });
     return response.data;
   },
-  createCustomerRequest = async function (customerdata: CustomerInfo) {
+  createCustomerRequest = async function (customerData: CustomerData) {
     const response = await apiSales.request({
       url: `v1/customers`,
       method: 'POST',
-      data: customerdata
+      data: customerData
     });
-    return response.data;
+    return response.status;
   },
   deleteCustomerRequest = async function (id: string) {
     try {

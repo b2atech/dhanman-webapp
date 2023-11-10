@@ -1,11 +1,13 @@
-export interface CustomerInfo {
+export interface CustomerData {
+  userId: string;
+  clientId: string;
   firstName: string;
   lastName: string;
   email: string;
+  cityId: string;
   phoneNumber: string;
   city: string;
-  postCode: string;
-  address: string;
+  addressLine: string;
 }
 
 export interface VendorData {
