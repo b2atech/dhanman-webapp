@@ -615,7 +615,7 @@ const List = () => {
                   color="primary"
                   onClick={(e: any) => {
                     e.stopPropagation();
-                    navigation(`/apps/invoice/edit/${row.values.id}`);
+                    navigation(`/sales/invoices/edit/${row.values.id}`);
                   }}
                 >
                   <EditTwoTone twoToneColor={theme.palette.primary.main} />

@@ -47,6 +47,14 @@ export const InvoiceAPI = {
     });
     return response.data;
   },
+  updateInvoiceRequest = async function (invoicedata: InvoiceHeader) {
+    const response = await apiSales.request({
+      url: `v1/invoices`,
+      method: 'PUT',
+      data: invoicedata
+    });
+    return response.data;
+  },
   createCustomerRequest = async function (customerData: CustomerData) {
     const response = await apiSales.request({
       url: `v1/customers`,

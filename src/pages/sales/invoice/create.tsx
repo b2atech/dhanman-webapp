@@ -119,10 +119,10 @@ const Createinvoice = () => {
 
     invoice.lines = values.invoice_detail.map((invoiceItem: any) => {
       let invoiceLine = {} as InvoiceLine;
-      invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
+      invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.quantity;
       invoiceLine.name = invoiceItem.name;
       invoiceLine.description = invoiceItem.description;
-      invoiceLine.quantity = invoiceItem.qty;
+      invoiceLine.quantity = invoiceItem.quantity;
       invoiceLine.price = invoiceItem.price;
       return invoiceLine;
     });
@@ -178,7 +178,7 @@ const Createinvoice = () => {
             {
               name: '',
               description: '',
-              qty: 0,
+              quantity: 0,
               price: 0,
               amount: 0
             }
@@ -195,7 +195,7 @@ const Createinvoice = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
@@ -407,7 +407,7 @@ const Createinvoice = () => {
                                       index={index}
                                       name={item.name}
                                       description={item.description}
-                                      qty={item.qty}
+                                      qty={item.quantity}
                                       price={item.price}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
@@ -437,7 +437,7 @@ const Createinvoice = () => {
                                       id: UIDV4(),
                                       name: '',
                                       description: '',
-                                      qty: 1,
+                                      quantity: 1,
                                       price: '1.00'
                                     })
                                   }

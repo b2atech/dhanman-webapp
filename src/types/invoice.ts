@@ -58,6 +58,7 @@ export interface IInvoiceType {
   tax: number | null;
   customerInfo: InfoType;
   note: string;
+  currency: string;
 }
 
 export interface Items {

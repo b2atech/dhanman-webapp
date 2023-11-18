@@ -11,7 +11,7 @@ import { CountryType, IInvoice, InvoiceProps } from 'types/invoice';
 const countries: CountryType[] = [
   { code: 'US', label: 'United States Dollar', currency: 'Dollar', prefix: '$' },
   { code: 'GB', label: 'United Kingdom Pound', currency: 'Pound', prefix: '£' },
-  { code: 'IN', label: 'India Rupee', currency: 'Rupee', prefix: '₹' },
+  { code: 'INR', label: 'India Rupee', currency: 'Rupee', prefix: '₹' },
   { code: 'JP', label: 'Japan Yun', currency: 'Yun', prefix: '¥' }
 ];
 
