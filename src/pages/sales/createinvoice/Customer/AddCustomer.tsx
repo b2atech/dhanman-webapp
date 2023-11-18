@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import {
-  Box,
   Button,
   DialogActions,
   DialogContent,
@@ -15,7 +13,7 @@ import {
   TextField,
   Autocomplete
 } from '@mui/material';
-import { UserAddOutlined, CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import IconButton from 'components/@extended/IconButton';
@@ -35,7 +33,6 @@ import { openSnackbar } from 'store/reducers/snackbar';
 import { createCustomerRequest } from 'api/services/SalesService';
 
 // types
-import { ThemeMode } from 'types/config';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -113,7 +110,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       });
   }, [selectedStateId]);
 
-  const theme = useTheme();
   const isCreating = !customer;
 
   const CustomerSchema = Yup.object().shape({
@@ -210,206 +206,183 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             </Stack>
             <Divider />
             <DialogContent sx={{ p: 2.5 }}>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={3}>
-                  <Stack direction="row" justifyContent="center" sx={{ mt: 3 }}>
-                    <UserAddOutlined style={{ fontSize: '80px' }}>
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          backgroundColor: theme.palette.mode === ThemeMode.DARK ? 'rgba(255, 255, 255, .75)' : 'rgba(0,0,0,.65)',
-                          width: '100%',
-                          height: '100%',
-                          opacity: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
+              <Grid item xs={12} md={8}>
+                <Grid container spacing={3}>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-name">First Name</InputLabel>
+                      <TextField
+                        autoFocus
+                        fullWidth
+                        id="firstName"
+                        type="text"
+                        placeholder="Enter First Name"
+                        {...getFieldProps('firstName')}
+                        error={Boolean(touched.firstName && errors.firstName)}
+                        helperText={touched.firstName && errors.firstName ? 'Please Enter First Name' : ''}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-lastName">Last Name</InputLabel>
+                      <TextField
+                        fullWidth
+                        id="customer-lastName"
+                        type="text"
+                        placeholder="Enter Last Name"
+                        {...getFieldProps('lastName')}
+                        error={Boolean(touched.lastName && errors.lastName)}
+                        helperText={touched.lastName && errors.lastName ? 'Please Enter Last Name' : ''}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
+                      <TextField
+                        fullWidth
+                        id="customer-phoneNumber"
+                        placeholder="Enter Phone Number"
+                        {...getFieldProps('phoneNumber')}
+                        error={Boolean(touched.phoneNumber && errors.phoneNumber)}
+                        helperText={touched.phoneNumber && errors.phoneNumber ? (errors.phoneNumber as React.ReactNode) : ''}
+                        inputProps={{
+                          inputMode: 'numeric',
+                          pattern: '[0-9]*',
+                          maxLength: 10,
+                          onInput: (e) => {
+                            e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                            if (e.currentTarget.value.length > 10) {
+                              e.currentTarget.value = e.currentTarget.value.slice(0, 10);
+                            }
+                          }
                         }}
-                      ></Box>
-                    </UserAddOutlined>
-                    <TextField type="file" id="change-avtar" placeholder="Outlined" variant="outlined" sx={{ display: 'none' }} />
-                  </Stack>
-                </Grid>
-                <Grid item xs={12} md={8}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">First Name</InputLabel>
-                        <TextField
-                          autoFocus
-                          fullWidth
-                          id="firstName"
-                          type="text"
-                          placeholder="Enter First Name"
-                          {...getFieldProps('firstName')}
-                          error={Boolean(touched.firstName && errors.firstName)}
-                          helperText={touched.firstName && errors.firstName ? 'Please Enter First Name' : ''}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-lastName">Last Name</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-lastName"
-                          type="text"
-                          placeholder="Enter Last Name"
-                          {...getFieldProps('lastName')}
-                          error={Boolean(touched.lastName && errors.lastName)}
-                          helperText={touched.lastName && errors.lastName ? 'Please Enter Last Name' : ''}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-phoneNumber"
-                          placeholder="Enter Phone Number"
-                          {...getFieldProps('phoneNumber')}
-                          error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                          helperText={touched.phoneNumber && errors.phoneNumber ? (errors.phoneNumber as React.ReactNode) : ''}
-                          inputProps={{
-                            inputMode: 'numeric',
-                            pattern: '[0-9]*',
-                            maxLength: 10,
-                            onInput: (e) => {
-                              e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
-                              if (e.currentTarget.value.length > 10) {
-                                e.currentTarget.value = e.currentTarget.value.slice(0, 10);
-                              }
-                            }
-                          }}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">E-mail</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-email"
-                          type="email"
-                          placeholder="Enter Email"
-                          {...getFieldProps('email')}
-                          error={Boolean(touched.email && errors.email)}
-                          helperText={touched.email && errors.email ? (errors.email as React.ReactNode) : ''}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-country">Select Country</InputLabel>
-                        <Autocomplete
-                          fullWidth
-                          autoHighlight
-                          id="country"
-                          options={countries || []}
-                          getOptionLabel={(option) => option.name}
-                          value={countries?.find((country) => country.id === selectedCountryId)}
-                          onChange={(event, newValue) => {
-                            if (newValue) {
-                              setSelectedCountryId(newValue.id);
-                              formik.setFieldValue('country', newValue.name);
-                            } else {
-                              setSelectedCountryId('');
-                              formik.setFieldValue('country', '');
-                            }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Enter Country Name"
-                              {...getFieldProps('country')}
-                              error={Boolean(touched.country && errors.country)}
-                              helperText={touched.country && errors.country ? 'Please Select Country Name' : ''}
-                            />
-                          )}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-state">Select State</InputLabel>
-                        <Autocomplete
-                          fullWidth
-                          autoHighlight
-                          id="customer-state"
-                          options={states || []}
-                          getOptionLabel={(option) => option.name}
-                          value={states?.find((state) => state.id === selectedStateId)}
-                          onChange={(event, newValue) => {
-                            if (newValue) {
-                              setSelectedStateId(newValue.id);
-                              formik.setFieldValue('state', newValue.name);
-                            } else {
-                              setSelectedStateId('');
-                              formik.setFieldValue('state', '');
-                            }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="Enter state Name"
-                              error={Boolean(touched.state && errors.state)}
-                              helperText={touched.state && errors.state ? 'Please Select State Name' : ''}
-                            />
-                          )}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-cityName">Select City</InputLabel>
-                        <Autocomplete
-                          fullWidth
-                          autoHighlight
-                          id="customer-cityName"
-                          options={cities || []}
-                          getOptionLabel={(option) => `${option.name}     (${option.postalCode})`}
-                          value={cities?.find((cities) => cities.id === selectedCityId)}
-                          onChange={(event, newValue) => {
-                            if (newValue) {
-                              setselectedCityId(newValue.id);
-                              formik.setFieldValue('cityName', newValue.name);
-                              formik.setFieldValue('cityId', newValue.id);
-                            } else {
-                              setselectedCityId('');
-                              formik.setFieldValue('cityName', '');
-                              formik.setFieldValue('cityId', '');
-                            }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              id="customer-cityName"
-                              placeholder="Enter City Name"
-                              error={Boolean(touched.cityName && errors.cityName)}
-                              helperText={touched.cityName && errors.cityName ? 'Please Select City Name' : ''}
-                            />
-                          )}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-address">Address</InputLabel>
-                        <TextField
-                          autoFocus
-                          fullWidth
-                          id="addressLine"
-                          type="text"
-                          placeholder="Enter Address"
-                          {...getFieldProps('addressLine')}
-                          error={Boolean(touched.addressLine && errors.addressLine)}
-                          helperText={touched.addressLine && errors.addressLine ? 'Please Enter Address' : ''}
-                        />
-                      </Stack>
-                    </Grid>
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-email">E-mail</InputLabel>
+                      <TextField
+                        fullWidth
+                        id="customer-email"
+                        type="email"
+                        placeholder="Enter Email"
+                        {...getFieldProps('email')}
+                        error={Boolean(touched.email && errors.email)}
+                        helperText={touched.email && errors.email ? (errors.email as React.ReactNode) : ''}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-country">Select Country</InputLabel>
+                      <Autocomplete
+                        fullWidth
+                        autoHighlight
+                        id="country"
+                        options={countries || []}
+                        getOptionLabel={(option) => option.name}
+                        value={countries?.find((country) => country.id === selectedCountryId)}
+                        onChange={(event, newValue) => {
+                          if (newValue) {
+                            setSelectedCountryId(newValue.id);
+                            formik.setFieldValue('country', newValue.name);
+                          } else {
+                            setSelectedCountryId('');
+                            formik.setFieldValue('country', '');
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Enter Country Name"
+                            {...getFieldProps('country')}
+                            error={Boolean(touched.country && errors.country)}
+                            helperText={touched.country && errors.country ? 'Please Select Country Name' : ''}
+                          />
+                        )}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-state">Select State</InputLabel>
+                      <Autocomplete
+                        fullWidth
+                        autoHighlight
+                        id="customer-state"
+                        options={states || []}
+                        getOptionLabel={(option) => option.name}
+                        value={states?.find((state) => state.id === selectedStateId)}
+                        onChange={(event, newValue) => {
+                          if (newValue) {
+                            setSelectedStateId(newValue.id);
+                            formik.setFieldValue('state', newValue.name);
+                          } else {
+                            setSelectedStateId('');
+                            formik.setFieldValue('state', '');
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Enter state Name"
+                            error={Boolean(touched.state && errors.state)}
+                            helperText={touched.state && errors.state ? 'Please Select State Name' : ''}
+                          />
+                        )}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-cityName">Select City</InputLabel>
+                      <Autocomplete
+                        fullWidth
+                        autoHighlight
+                        id="customer-cityName"
+                        options={cities || []}
+                        getOptionLabel={(option) => `${option.name}     (${option.postalCode})`}
+                        value={cities?.find((cities) => cities.id === selectedCityId)}
+                        onChange={(event, newValue) => {
+                          if (newValue) {
+                            setselectedCityId(newValue.id);
+                            formik.setFieldValue('cityName', newValue.name);
+                            formik.setFieldValue('cityId', newValue.id);
+                          } else {
+                            setselectedCityId('');
+                            formik.setFieldValue('cityName', '');
+                            formik.setFieldValue('cityId', '');
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            id="customer-cityName"
+                            placeholder="Enter City Name"
+                            error={Boolean(touched.cityName && errors.cityName)}
+                            helperText={touched.cityName && errors.cityName ? 'Please Select City Name' : ''}
+                          />
+                        )}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Stack spacing={1.25}>
+                      <InputLabel htmlFor="customer-address">Address</InputLabel>
+                      <TextField
+                        autoFocus
+                        fullWidth
+                        id="addressLine"
+                        type="text"
+                        placeholder="Enter Address"
+                        {...getFieldProps('addressLine')}
+                        error={Boolean(touched.addressLine && errors.addressLine)}
+                        helperText={touched.addressLine && errors.addressLine ? 'Please Enter Address' : ''}
+                      />
+                    </Stack>
                   </Grid>
                 </Grid>
               </Grid>
