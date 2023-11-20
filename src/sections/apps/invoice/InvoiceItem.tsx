@@ -28,7 +28,7 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Product Deleted successfully',
+          message: 'invoicve item deleted successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -63,7 +63,7 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
       id: id,
       value: description
     },
-    { placeholder: '', label: 'Qty', type: 'number', name: `invoice_detail.${index}.qty`, id: id, value: qty },
+    { placeholder: '', label: 'Qty', type: 'number', name: `invoice_detail.${index}.quantity`, id: id, value: qty },
     { placeholder: '', label: 'price', type: 'number', name: `invoice_detail.${index}.price`, id: id, value: price }
   ];
 
