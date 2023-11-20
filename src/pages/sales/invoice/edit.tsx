@@ -549,7 +549,7 @@ const Invoiceedit = () => {
                         fullWidth
                         options={countries}
                         defaultValue={countries[2]}
-                        value={countries.find((option: CountryType) => option.code === values.currency)}
+                        value={countries.find((option: CountryType) => option.code === country?.code)}
                         onChange={(event, value) => {
                           dispatch(
                             selectCountry({
