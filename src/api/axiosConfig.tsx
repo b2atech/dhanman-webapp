@@ -17,6 +17,10 @@ export const apiCommon = axios.create({
   baseURL: 'https://api-dhanman-common-nonprod.azurewebsites.net/api/'
 });
 
+export const apiInventory = axios.create({
+  baseURL: 'https://api-dhanman-inventory-nonprod.azurewebsites.net/api/'
+});
+
 export const apiGit = axios.create({
   baseURL: 'https://api.github.com/repos/b2atech/'
 });
