@@ -18,7 +18,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 import { createProductRequest } from 'api/services/InventoryService';
 
 // constant
-const getInitialValues = (vendor: FormikValues | null) => {
+const getInitialValues = (product: FormikValues | null) => {
   const newProduct = {
     clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
     productName: '',
@@ -40,17 +40,10 @@ export interface Props {
 const AddProduct = ({ product, onCancel }: Props) => {
   const ProductSchema = Yup.object().shape({
     productName: Yup.string().max(255).required('Please Enter Product Name'),
-    quantityInStock: Yup.string().max(255).required('Please Enter Quntity'),
-    unitPrice: Yup.string().max(255).required('Please Enter price'),
+    quantityInStock: Yup.number().positive('Please Enter a positive quantity').required('Please Enter Quantity'),
+    unitPrice: Yup.number().positive('Please Enter a positive unit price').required('Please Enter Price'),
     description: Yup.string().max(255).required('Please Enter Description')
   });
-
-  //const [openAlert, setOpenAlert] = useState(false);
-
-  // const handleAlertClose = () => {
-  //   setOpenAlert(!openAlert);
-  //   onCancel();
-  // };
 
   const formik = useFormik({
     initialValues: getInitialValues(product!),
@@ -69,7 +62,7 @@ const AddProduct = ({ product, onCancel }: Props) => {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Vendor updated successfully.',
+              message: 'Product updated successfully.',
               anchorOrigin: { vertical: 'top', horizontal: 'right' },
               variant: 'alert',
               alert: {
@@ -212,7 +205,6 @@ const AddProduct = ({ product, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {/* {!isCreating && <AlertVendorDelete title={vendor.fatherName} open={openAlert} handleClose={handleAlertClose} id={vendor.Id} />} */}
     </>
   );
 };
