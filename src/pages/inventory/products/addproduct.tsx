@@ -106,7 +106,7 @@ const AddProduct = ({ product, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{product ? 'Add Product' : 'New Product'}</DialogTitle>
+              <DialogTitle>{product ? 'Edit Product' : 'New Product'}</DialogTitle>
               <IconButton shape="rounded" type="reset" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -193,7 +193,7 @@ const AddProduct = ({ product, onCancel }: Props) => {
                 <Grid item>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
                     <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
-                      Add
+                      {product ? 'Edit' : 'Add'}
                     </Button>
                     <Button variant="contained" type="reset" color="error" onClick={onCancel}>
                       Cancel
