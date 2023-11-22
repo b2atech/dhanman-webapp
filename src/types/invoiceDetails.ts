@@ -19,6 +19,20 @@ export interface InvoiceHeader {
   lines?: InvoiceLine[];
 }
 
+export interface InvoiceEdit {
+  invoiceNumber: string;
+  invoiceHeaederId: string;
+  customerId: string;
+  invoiceDate: Date | string | number;
+  dueDate: Date | string | number;
+  totalAmount: number | null;
+  currency: string;
+  tax: number | null;
+  discount: number | null;
+  note: string;
+  lines?: InvoiceLine[];
+}
+
 export interface InvoiceHeader_main {
   invoiceDetails: any;
   invoiceNumber: string;
@@ -53,4 +67,5 @@ export interface InvoiceLine {
   price: string | number;
   quantity: number;
   amount: string | number;
+  id: string | number;
 }

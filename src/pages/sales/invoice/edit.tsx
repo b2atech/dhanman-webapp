@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { v4 as UIDV4 } from 'uuid';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -31,7 +30,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // third-party
 import { format } from 'date-fns';
 import { FieldArray, Form, Formik } from 'formik';
-import * as yup from 'yup';
+// import * as yup from 'yup';
 
 // project import
 import Loader from 'components/Loader';
@@ -50,31 +49,31 @@ import { CountryType, IInvoice, IInvoiceType } from 'types/invoice';
 //asset
 import { PlusOutlined } from '@ant-design/icons';
 import { getInvoice, updateInvoiceRequest } from 'api/services/SalesService';
-import { InvoiceHeader_main, InvoiceLine } from 'types/invoiceDetails';
+import { InvoiceEdit, InvoiceLine } from 'types/invoiceDetails';
 
-const validationSchema = yup.object({
-  date: yup.date().required('Invoice date is required'),
-  due_date: yup
-    .date()
-    .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
-    .nullable()
-    .required('Due date is required'),
-  customerInfo: yup
-    .object({
-      name: yup.string().required('Invoice receiver information is required')
-    })
-    .required('Invoice receiver information is required'),
-  status: yup.string().required('Status selection is required'),
-  invoice_detail: yup
-    .array()
-    .required('Invoice details is required')
-    .of(
-      yup.object().shape({
-        name: yup.string().required('Product name is required')
-      })
-    )
-    .min(1, 'Invoice must have at least 1 items')
-});
+// const validationSchema = yup.object({
+//   date: yup.date().required('Invoice date is required'),
+//   due_date: yup
+//     .date()
+//     .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
+//     .nullable()
+//     .required('Due date is required'),
+//   customerInfo: yup
+//     .object({
+//       name: yup.string().required('Invoice receiver information is required')
+//     })
+//     .required('Invoice receiver information is required'),
+//   status: yup.string().required('Status selection is required'),
+//   invoice_detail: yup
+//     .array()
+//     .required('Invoice details is required')
+//     .of(
+//       yup.object().shape({
+//         name: yup.string().required('Product name is required')
+//       })
+//     )
+//     .min(1, 'Invoice must have at least 1 items')
+// });
 
 // ==============================|| INVOICE - EDIT ||============================== //
 
@@ -107,45 +106,27 @@ const Invoiceedit = () => {
   const notesLimit: number = 500;
 
   const handlerEdit = (values: any) => {
-    const NewList: InvoiceHeader_main = {
-      id: Number(list?.id),
+    const NewList: InvoiceEdit = {
+      invoiceHeaederId: values.id,
       invoiceNumber: values.invoiceNumber,
-      customer_name: values.cashierInfo?.name,
-      email: values.cashierInfo?.email,
-      avatar: Number(list?.avatar),
       discount: Number(values.discount),
       tax: Number(values.tax),
-      invoiceDate: format(values.invoiceDate, 'yyyy-MM-dd'),
+      invoiceDate: format(values.date, 'yyyy-MM-dd'),
       dueDate: format(values.due_date, 'yyyy-MM-dd'),
-
-      quantity: Number(
-        values.invoice_detail?.reduce((sum: any, i: any) => {
-          return sum + i.qty;
-        }, 0)
-      ),
-      status: values.status,
-      cashierInfo: values.cashierInfo,
-      customerInfo: values.customerInfo,
       totalAmount: Number(values.totalAmount),
-      invoiceDetails: undefined,
       currency: 'INR',
       customerId: values.customerInfo.id,
-      note: values.note,
-      invoiceVoucher: '',
-      paymentTerm: 0,
-      clientId: '',
-      coaId: '',
-      billPaymentId: null,
-      invoiceStatusId: null
+      note: values.notes
     };
 
     NewList.lines = values.invoice_detail.map((invoiceItem: any) => {
       let invoiceLine = {} as InvoiceLine;
-      invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.qty;
+      invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.quantity;
       invoiceLine.name = invoiceItem.name;
       invoiceLine.description = invoiceItem.description;
-      invoiceLine.quantity = invoiceItem.qty;
+      invoiceLine.quantity = invoiceItem.quantity;
       invoiceLine.price = invoiceItem.price;
+      invoiceLine.id = invoiceItem.id;
       return invoiceLine;
     });
 
@@ -189,6 +170,7 @@ const Invoiceedit = () => {
           due_date: new Date(list1?.dueDate!) || null,
           cashierInfo: list?.cashierInfo || invoiceSingleList,
           customerInfo: {
+            id: list1?.customer.id,
             phoneNumber: list1?.customer.phoneNumber,
             email: list1?.customer.email,
             firstName: list1?.customer.firstName,
@@ -199,10 +181,12 @@ const Invoiceedit = () => {
           discount: list1?.discount || 0,
           tax: list1?.tax || 0,
           notes: list1?.note || '',
-          currency: list1?.currency
+          currency: list1?.currency,
+          totalAmount: list1?.totalAmount
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={(values) => {
+          console.log('Submitting form:', values);
           handlerEdit(values);
         }}
       >
@@ -215,7 +199,7 @@ const Invoiceedit = () => {
           const taxRate = (values?.tax * subtotal) / 100;
           const discountRate = (values.discount * subtotal) / 100;
           const total = subtotal - discountRate + taxRate;
-
+          values.totalAmount = total;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -433,7 +417,6 @@ const Invoiceedit = () => {
                                   startIcon={<PlusOutlined />}
                                   onClick={() =>
                                     push({
-                                      id: UIDV4(),
                                       name: '',
                                       description: '',
                                       quantity: 1,

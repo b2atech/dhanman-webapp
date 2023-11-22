@@ -1,7 +1,7 @@
 import { CustomerData } from 'types/customerinfo';
 import { apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
-import { InvoiceHeader } from 'types/invoiceDetails';
+import { InvoiceEdit, InvoiceHeader } from 'types/invoiceDetails';
 
 export const InvoiceAPI = {
     get: async function (clientId: string, cancel = false) {
@@ -47,13 +47,13 @@ export const InvoiceAPI = {
     });
     return response.data;
   },
-  updateInvoiceRequest = async function (invoicedata: InvoiceHeader) {
+  updateInvoiceRequest = async function (invoicedata: InvoiceEdit) {
     const response = await apiSales.request({
       url: `v1/invoices`,
       method: 'PUT',
       data: invoicedata
     });
-    return response.data;
+    return response.status;
   },
   createCustomerRequest = async function (customerData: CustomerData) {
     const response = await apiSales.request({

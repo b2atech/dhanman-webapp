@@ -33,7 +33,7 @@ export interface IInvoiceList {
 }
 
 export interface IInvoiceType {
-  id: number;
+  id: string;
   invoice_id: number;
   customer_name: string;
   invoiceNumber: string;
@@ -43,6 +43,7 @@ export interface IInvoiceType {
   dueDate: Date | string | number;
   quantity: number;
   customer: {
+    id: string | number;
     firstName: string;
     lastName: string;
     phoneNumber: number;
