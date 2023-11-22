@@ -126,6 +126,14 @@ export interface ICustomer {
   phoneNumber: string;
   city: string;
 }
+
+export interface IInventory {
+  clientId: string;
+  productName: string;
+  quantityInStock: string;
+  description: string;
+  unitPrice: string;
+}
 export interface ICoa {
   clientId: string;
   name: string;
