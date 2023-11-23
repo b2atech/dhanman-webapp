@@ -292,7 +292,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
-  // ================ Tab ================
+  // =============================================== Tab ================================================================
 
   const groups = ['All', ...new Set(data.map((item: IInvoiceList) => item.invoiceStatus))];
   const countGroup = data.map((item: IInvoiceList) => item.invoiceStatus);
@@ -383,7 +383,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
             </Stack>
           ))}
           <CSVExport data={data} filename={'invoice-list.csv'} />
-          <Tooltip title={isInvoiceIdVisible ? 'Close ID' : 'Show ID'}>
+          <Tooltip title={isInvoiceIdVisible ? 'Hide ID' : 'Show ID'}>
             <FormControlLabel
               value=""
               control={<Switch color="success" checked={isInvoiceIdVisible} onChange={handleSwitchChange} />}
@@ -392,7 +392,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
               sx={{ margin: '0', padding: '0', marginRight: 0 }}
             />
           </Tooltip>
-          <Tooltip title={isAuditSwitchOn ? 'Close Audit Columns' : 'Show Audit Columns'}>
+          <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
             <FormControlLabel
               value=""
               control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}

@@ -58,15 +58,7 @@ export default function AlertInvoiceDelete({ title, open, handleClose, id }: Pro
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete the selected invoice?
-            </Typography>
-            <Typography align="center">
-              By deleting
-              <Typography variant="subtitle1" component="span">
-                {' '}
-                "{title}"{' '}
-              </Typography>
-              user, all task assigned to that user will also be deleted.
+              Are you sure you want to delete the invoice of "{title}"?
             </Typography>
           </Stack>
 
