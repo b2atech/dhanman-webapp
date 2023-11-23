@@ -18,7 +18,8 @@ import {
   Typography,
   styled,
   useMediaQuery,
-  CircularProgress
+  CircularProgress,
+  Theme
 } from '@mui/material';
 
 // third-party
@@ -36,7 +37,8 @@ import {
   HeaderGroup,
   Row,
   Cell,
-  HeaderProps
+  HeaderProps,
+  CellProps
 } from 'react-table';
 
 // project import
@@ -62,9 +64,10 @@ import AddCustomer from '../createinvoice/Customer/AddCustomer';
 import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
+import moment from 'moment';
 
 // ==============================|| REACT TABLE ||============================== //
-const TableWrapper = styled('div')(({ theme }) => ({
+const TableWrapper = styled('div')(({ theme, isAuditSwitchOn }: { theme?: Theme; isAuditSwitchOn: boolean }) => ({
   '.header': {
     position: 'sticky',
     zIndex: 1,
@@ -72,9 +75,27 @@ const TableWrapper = styled('div')(({ theme }) => ({
   },
   '& th[data-sticky-td]': {
     position: 'sticky',
-    zIndex: '5 !important'
-  }
+    zIndex: theme ? theme.zIndex.drawer + 1 : 'auto',
+    backgroundColor: theme && theme.palette ? theme.palette.background.paper : 'transparent'
+  },
+  overflowX: 'auto',
+  whiteSpace: 'nowrap'
 }));
+
+// const DynamicTableCell = styled(TableCell, {
+//   shouldForwardProp: (prop) => prop !== 'isColumnVisible'
+// })(({ theme, isSmallScreen, isColumnVisible }: any) => ({
+//   position: 'relative',
+//   width: isColumnVisible ? 'auto' : 0,
+//   overflow: 'hidden',
+//   whiteSpace: 'nowrap',
+//   textOverflow: 'ellipsis',
+//   paddingLeft: '4px',
+//   paddingRight: '4px',
+//   [theme.breakpoints.down('sm')]: {
+//     width: isColumnVisible && isSmallScreen ? 100 : 0
+//   }
+// }));
 
 interface Props {
   columns: Column[];
@@ -84,11 +105,23 @@ interface Props {
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
+  showCreatedOnColumn: boolean;
+  handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({
+  columns,
+  data,
+  renderRowSubComponent,
+  handleAdd,
+  getHeaderProps,
+  showIdColumn,
+  showCreatedOnColumn,
+  handleAuditColumnSwitchChange
+}: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
+  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
@@ -135,9 +168,14 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     setIsCustomerIdVisible((prevIsCustomerIdVisible) => !prevIsCustomerIdVisible);
   };
 
-  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAuditSwitchOn(event.target.checked);
+  const handleAuditSwitchChange = () => {
+    setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
+
+  // const adjustedWidth =
+  //   isSmallScreen && (columns.find((column) => column.id === 'createdBy') || columns.find((column) => column.id === 'modifiedBy'))
+  //     ? 100
+  //     : 200;
 
   return (
     <>
@@ -165,7 +203,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isCustomerIdVisible ? 'Close ID' : 'Show ID'}>
+            <Tooltip title={isCustomerIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="success" checked={isCustomerIdVisible} onChange={handleSwitchChange} />}
@@ -174,7 +212,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -185,17 +223,33 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Tooltip>
           </Stack>
         </Stack>
-        <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflow: 'auto' }}>
-            <TableWrapper>
+        <Box ref={componentRef} sx={{ overflowX: 'auto' }}>
+          <ScrollX sx={{ maxHeight: 400 }}>
+            <TableWrapper isAuditSwitchOn={isAuditSwitchOn}>
               <Table {...getTableProps()} stickyHeader>
                 <TableHead>
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                     <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                       {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isCustomerIdVisible) {
+                        if (
+                          (column.id === 'id' && !isCustomerIdVisible) ||
+                          (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                          (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                          (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                          (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                        ) {
                           return null;
                         }
+
+                        // const isColumnVisible = !(
+                        //   (column.id === 'createdOnUtc' && !showCreatedOnColumn) ||
+                        //   (column.id === 'modifiedOnUtc' && !showCreatedOnColumn) ||
+                        //   (column.id === 'createdBy' && !showCreatedOnColumn) ||
+                        //   (column.id === 'modifiedBy' && !showCreatedOnColumn)
+                        // );
+
+                        // const adjustedWidth = isSmallScreen && (column.id === 'createdBy' || column.id === 'modifiedBy') ? 100 : 200;
+
                         return (
                           <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
                             <HeaderSort column={column} />
@@ -211,7 +265,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                     const rowProps = row.getRowProps();
 
                     return (
-                      <Fragment key={i}>
+                      <Fragment key={row.id}>
                         <TableRow
                           {...row.getRowProps()}
                           onClick={() => {
@@ -220,9 +274,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                           sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                         >
                           {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isCustomerIdVisible) {
+                            if (
+                              (cell.column.id === 'id' && !isCustomerIdVisible) ||
+                              (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                              (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                              (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                              (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                            ) {
                               return null;
                             }
+
                             return (
                               <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                             );
@@ -238,7 +299,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           </ScrollX>
           <Box>
             <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={columns.length}>
                 <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
               </TableCell>
             </TableRow>
@@ -260,10 +321,15 @@ const CustomerListPage = () => {
   const [customerDeleteName, setcustomerDeleteName] = useState<any>('');
   const [customerDeleteId, setCustomerDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
+  const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
+  };
+
+  const handleAuditColumnSwitchChange = () => {
+    setshowCreatedOnColumn(!showCreatedOnColumn);
   };
 
   useEffect(() => {
@@ -294,6 +360,17 @@ const CustomerListPage = () => {
   const columns = useMemo(
     () => [
       {
+        title: 'Row Selection',
+        width: 10,
+        sticky: 'left',
+        Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
+          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
+        ),
+        accessor: 'selection',
+        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
+        disableSortBy: true
+      },
+      {
         show: false,
         accessor: 'firstName',
         disableSortBy: true,
@@ -308,17 +385,6 @@ const CustomerListPage = () => {
         sticky: 'left'
       },
       {
-        title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
-        Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-        ),
-        accessor: 'selection',
-        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-        disableSortBy: true
-      },
-      {
         Header: 'Customer id',
         accessor: 'id',
         width: -200,
@@ -327,7 +393,8 @@ const CustomerListPage = () => {
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        width: 220,
+        minWidth: 100,
+        maxWidth: 200,
         sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
@@ -341,28 +408,36 @@ const CustomerListPage = () => {
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
-        width: 200,
+        minWidth: 100,
+        maxWidth: 200,
         sticky: 'left',
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
         Header: 'Email',
         accessor: 'email',
-        width: 200,
+        minWidth: 100,
+        maxWidth: 150,
         sticky: 'left'
       },
       {
         Header: 'City',
         accessor: 'city',
-        width: 200,
-        sticky: 'left'
+        minWidth: 50,
+        maxWidth: 100,
+        sticky: 'left',
+        Cell: ({ value }: { value: any }) => {
+          return <div>Jaysingpur</div>;
+        }
       },
       {
         Header: 'Actions',
         className: 'cell-right',
-        width: 200,
+        minWidth: 100,
+        maxWidth: 200,
         sticky: 'left',
         disableSortBy: true,
+        style: { textAlign: 'center' },
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
             <CloseOutlined style={{ color: theme.palette.error.main }} />
@@ -410,6 +485,36 @@ const CustomerListPage = () => {
             </Stack>
           );
         }
+      },
+      {
+        Header: 'Created On',
+        accessor: 'createdOnUtc',
+        minWidth: showCreatedOnColumn ? 120 : 100,
+        maxWidth: showCreatedOnColumn ? 150 : 120,
+        sticky: 'left',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        minWidth: showCreatedOnColumn ? 150 : 100,
+        maxWidth: showCreatedOnColumn ? 200 : 150,
+        sticky: 'left',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Created By',
+        accessor: 'createdBy',
+        minWidth: showCreatedOnColumn ? 200 : 150,
+        maxWidth: showCreatedOnColumn ? 250 : 200,
+        sticky: 'left'
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy',
+        minWidth: showCreatedOnColumn ? 150 : 100,
+        maxWidth: showCreatedOnColumn ? 200 : 150,
+        sticky: 'left'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -441,6 +546,8 @@ const CustomerListPage = () => {
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
+            handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
+            showCreatedOnColumn={showCreatedOnColumn}
           />
         )}
       </ScrollX>

@@ -203,7 +203,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Add Customer' : 'New Customer'}</DialogTitle>
+              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
