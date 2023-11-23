@@ -22,6 +22,7 @@ const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAcco
 const AppCoaContainer = Loadable(lazy(() => import('pages/company/chartOfAccounts/coaContainer')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
+const AppBillEdit = Loadable(lazy(() => import('pages/purchase/bills/edit')));
 const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 const AppPullRequests = Loadable(lazy(() => import('pages/dev/pr')));
 const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details')));
@@ -174,6 +175,10 @@ const MainRoutes = {
             {
               path: 'details/:id',
               element: <AppBilldetails />
+            },
+            {
+              path: 'edit/:id',
+              element: <AppBillEdit />
             },
             {
               path: 'create',
