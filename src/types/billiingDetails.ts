@@ -76,6 +76,7 @@ export interface BillLine {
   price: string | number;
   quantity: number;
   amount: string | number;
+  id: string | number;
 }
 export interface BillingList {
   note: String;
@@ -104,6 +105,21 @@ export interface BillingList {
   tax: number | null;
   customerInfo: InfoType;
   // notes: string;
+}
+
+export interface BillEdit {
+  billNumber: string;
+  billHeaederId: string;
+  vendorId: string;
+  vendorInfo: InfoType;
+  billDate: Date | string | number;
+  dueDate: Date | string | number;
+  totalAmount: number | null;
+  currency: string;
+  tax: number | null;
+  discount: number | null;
+  note: string;
+  lines?: BillLine[];
 }
 
 export interface BillHeader {

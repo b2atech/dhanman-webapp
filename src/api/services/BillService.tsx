@@ -1,6 +1,6 @@
 import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
-import { BillHeader } from 'types/billiingDetails';
+import { BillEdit, BillHeader } from 'types/billiingDetails';
 import { VendorData } from 'types/customerinfo';
 
 export const BillAPI = {
@@ -64,6 +64,14 @@ export const BillAPI = {
       console.error('Error deleting invoice:', error);
       throw error;
     }
+  },
+  updateBillRequest = async function (billdata: BillEdit) {
+    const response = await apiPurchase.request({
+      url: `v1/bill`,
+      method: 'PUT',
+      data: billdata
+    });
+    return response.status;
   },
   getBillById = async function (id: string, cancel = false) {
     const response = await apiPurchase.request({

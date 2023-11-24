@@ -57,10 +57,12 @@ export interface IBillType {
   paymentTerm: number;
   billStatus: string;
   vendor: {
+    id: string | number;
     firstName: string;
     lastName: string;
     email: string;
     addressLine: string;
+    city: string;
     phoneNumber: number;
   };
   currency: string;

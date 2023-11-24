@@ -449,7 +449,13 @@ const Bills = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Edit">
-                  <IconButton color="primary">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      navigation(`/purchase/bills/edit/${row.values.id}`);
+                    }}
+                  >
                     <EditTwoTone twoToneColor={theme.palette.primary.main} />
                   </IconButton>
                 </Tooltip>
