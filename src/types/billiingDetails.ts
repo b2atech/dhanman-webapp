@@ -111,6 +111,7 @@ export interface BillEdit {
   billNumber: string;
   billHeaederId: string;
   vendorId: string;
+  vendorInfo: InfoType;
   billDate: Date | string | number;
   dueDate: Date | string | number;
   totalAmount: number | null;

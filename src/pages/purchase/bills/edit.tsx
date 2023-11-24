@@ -36,16 +36,8 @@ import * as yup from 'yup';
 import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
 import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
-import AddressModal from 'sections/apps/invoice/AddressModal';
 
-import {
-  reviewInvoicePopup,
-  customerPopup,
-  toggleCustomerPopup,
-  selectCountry
-  // getInvoiceSingleList,
-  // getInvoiceUpdate
-} from 'store/reducers/invoice';
+import { reviewInvoicePopup, customerPopup, selectCountry } from 'store/reducers/invoice';
 import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
@@ -93,7 +85,7 @@ const EditBill = () => {
   const [list1, setList] = useState<IBillType>();
 
   const [loading, setLoading] = useState<boolean>(true);
-  const { open, isCustomerOpen, countries, country, list } = useSelector((state) => state.invoice);
+  const { isCustomerOpen, countries, country, list } = useSelector((state) => state.invoice);
 
   useEffect(() => {
     if (id) {
@@ -107,7 +99,7 @@ const EditBill = () => {
   const notesLimit: number = 500;
 
   const handlerEdit = (values: any) => {
-    const NewList: BillEdit = {
+    const updateBill: BillEdit = {
       billHeaederId: values.id,
       billNumber: values.invoiceNumber,
       discount: Number(values.discount),
@@ -116,11 +108,12 @@ const EditBill = () => {
       dueDate: format(values.due_date, 'yyyy-MM-dd'),
       totalAmount: Number(values.totalAmount),
       currency: 'INR',
-      vendorId: values.customerInfo.id,
+      vendorInfo: values.vendorInfo,
+      vendorId: values.vendorInfo.id,
       note: values.notes
     };
 
-    NewList.lines = values.invoice_detail.map((billItem: any) => {
+    updateBill.lines = values.invoice_detail.map((billItem: any) => {
       let billLine = {} as BillLine;
       billLine.amount = parseInt(billItem.price) * billItem.quantity;
       billLine.name = billItem.name;
@@ -131,7 +124,7 @@ const EditBill = () => {
       return billLine;
     });
 
-    updateBillRequest(NewList).then(() => {
+    updateBillRequest(updateBill).then(() => {
       dispatch(
         openSnackbar({
           open: true,
@@ -279,21 +272,6 @@ const EditBill = () => {
                             <Typography color="secondary">belljrc23@gmail.com</Typography>
                           </FormControl>
                         </Stack>
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
-                          <AddressModal
-                            open={open}
-                            setOpen={(value) =>
-                              dispatch(
-                                toggleCustomerPopup({
-                                  open: value
-                                })
-                              )
-                            }
-                            handlerAddress={(address) => setFieldValue('cashierInfo', address)}
-                          />
-                        </Box>
                       </Grid>
                     </Grid>
                   </MainCard>
