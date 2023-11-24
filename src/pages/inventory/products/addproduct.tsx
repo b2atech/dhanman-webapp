@@ -27,7 +27,6 @@ const getInitialValues = (product: FormikValues | null) => {
       quantityInStock: product.quntityInStock,
       description: product.description,
       unitPrice: product.unitPrice
-      // recorderLevel: product.recorderLevel
     };
     return newProduct;
   } else {
@@ -38,7 +37,6 @@ const getInitialValues = (product: FormikValues | null) => {
       quantityInStock: '',
       description: '',
       unitPrice: ''
-      // recorderLevel: ''
     };
     return newProduct;
   }
