@@ -127,7 +127,7 @@ const EditBill = () => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Invoice Updated successfully',
+          message: 'Bill Updated successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -136,7 +136,7 @@ const EditBill = () => {
           close: false
         })
       );
-      navigation('/sales/invoices/list');
+      navigation('/purchase/bills/list');
     });
   };
 
