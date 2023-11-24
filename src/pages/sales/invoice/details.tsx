@@ -86,7 +86,7 @@ const Invoicedetails = () => {
         <Box sx={{ p: 2.5, pb: 0 }}>
           <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
             <Stack direction="row" justifyContent="flex-end" spacing={1}>
-              <IconButton onClick={() => navigation(`/apps/invoice/edit/${id}`)}>
+              <IconButton onClick={() => navigation(`/sales/invoices/edit/${id}`)}>
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>
               <PDFDownloadLink
