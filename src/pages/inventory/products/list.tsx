@@ -114,7 +114,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -294,20 +294,6 @@ const ProductListPage = () => {
 
   const columns = useMemo(
     () => [
-      {
-        show: false,
-        accessor: 'firstName',
-        disableSortBy: true,
-        width: 20,
-        sticky: 'left'
-      },
-      {
-        show: false,
-        accessor: 'lastName',
-        disableSortBy: true,
-        width: 20,
-        sticky: 'left'
-      },
       {
         title: 'Row Selection',
         width: 10,
