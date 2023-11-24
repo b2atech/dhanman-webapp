@@ -218,7 +218,7 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
             </Stack>
           ))}
           <CSVExport data={data} filename={'Bill-list.csv'} />
-          <Tooltip title={isBillIdVisible ? 'Close ID' : 'Show ID'}>
+          <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
             <FormControlLabel
               value=""
               control={<Switch color="success" checked={isBillIdVisible} onChange={handleSwitchChange} />}
@@ -227,7 +227,7 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
               sx={{ margin: '0', padding: '0', marginRight: 0 }}
             />
           </Tooltip>
-          <Tooltip title={isAuditSwitchOn ? 'Close Audit Columns' : 'Show Audit Columns'}>
+          <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
             <FormControlLabel
               value=""
               control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}

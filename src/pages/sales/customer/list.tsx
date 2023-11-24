@@ -165,7 +165,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isCustomerIdVisible ? 'Close ID' : 'Show ID'}>
+            <Tooltip title={isCustomerIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="success" checked={isCustomerIdVisible} onChange={handleSwitchChange} />}
@@ -174,7 +174,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}

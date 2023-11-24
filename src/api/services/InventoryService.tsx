@@ -21,6 +21,15 @@ export const InvetoryAPI = {
     });
 
     return response.data.items;
+  },
+  deleteProductRequest = async function (clientId: string, cancel = false) {
+    const response = await apiInventory.request({
+      url: `/v1/products/${clientId}`,
+      method: 'DELETE',
+      signal: cancel ? cancelApiObject[deleteProductRequest.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
   };
 
 export async function createProductRequest(inventroydata: InventoryData) {

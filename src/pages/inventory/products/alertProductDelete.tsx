@@ -5,7 +5,7 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { deleteVendorRequest } from 'api/services/BillService';
+import { deleteProductRequest } from 'api/services/InventoryService';
 import { useDispatch } from 'store';
 
 // assets
@@ -19,17 +19,17 @@ interface Props {
   id: string;
 }
 
-// ==============================|| VENDOR - DELETE ||============================== //
+// ==============================|| Product - DELETE ||============================== //
 
 export default function AlertProductDelete({ title, open, handleClose, id }: Props) {
   const dispatch = useDispatch();
-  const deleteVendor = () => {
+  const deleteProduct = () => {
     handleClose(true);
-    deleteVendorRequest(id).then(() => {
+    deleteProductRequest(id).then(() => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Vendor deleted successfully',
+          message: 'Product deleted successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -59,15 +59,7 @@ export default function AlertProductDelete({ title, open, handleClose, id }: Pro
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete?
-            </Typography>
-            <Typography align="center">
-              By deleting
-              <Typography variant="subtitle1" component="span">
-                {' '}
-                "{title}"{' '}
-              </Typography>
-              user, all task assigned to that user will also be deleted.
+              Are you sure you want to delete "{title}" ?
             </Typography>
           </Stack>
 
@@ -75,7 +67,7 @@ export default function AlertProductDelete({ title, open, handleClose, id }: Pro
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={deleteVendor} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deleteProduct} autoFocus>
               Delete
             </Button>
           </Stack>
