@@ -35,8 +35,6 @@ import * as yup from 'yup';
 // project import
 import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
-import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
-
 import { reviewInvoicePopup, customerPopup, selectCountry } from 'store/reducers/invoice';
 import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
@@ -50,6 +48,7 @@ import { IBillType } from 'types/bill';
 import { getBillById, updateBillRequest } from 'api/services/BillService';
 import { BillEdit, BillLine } from 'types/billiingDetails';
 import AddressBillModal from 'sections/apps/bill/BillAddressModal';
+import BillItem from 'sections/apps/bill/billItem';
 
 const validationSchema = yup.object({
   date: yup.date().required('bill date is required'),
@@ -64,7 +63,7 @@ const validationSchema = yup.object({
     })
     .required('bill receiver information is required'),
   status: yup.string().required('Status selection is required'),
-  invoice_detail: yup
+  bill_detail: yup
     .array()
     .required('bill details is required')
     .of(
@@ -113,7 +112,7 @@ const EditBill = () => {
       note: values.notes
     };
 
-    updateBill.lines = values.invoice_detail.map((billItem: any) => {
+    updateBill.lines = values.bill_detail.map((billItem: any) => {
       let billLine = {} as BillLine;
       billLine.amount = parseInt(billItem.price) * billItem.quantity;
       billLine.name = billItem.name;
@@ -163,7 +162,7 @@ const EditBill = () => {
             lastName: list1?.vendor.lastName,
             city: list1?.vendor.city
           },
-          invoice_detail: list1?.lines || [],
+          bill_detail: list1?.lines || [],
           discount: list1?.discount || 0,
           tax: list1?.tax || 0,
           notes: list1?.note || '',
@@ -176,7 +175,7 @@ const EditBill = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal =
-            values?.invoice_detail?.reduce((prev, curr: any) => {
+            values?.bill_detail?.reduce((prev, curr: any) => {
               if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
               else return prev;
             }, 0) || 0;
@@ -332,7 +331,7 @@ const EditBill = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FieldArray
-                    name="invoice_detail"
+                    name="bill_detail"
                     render={({ remove, push }) => {
                       return (
                         <>
@@ -350,10 +349,10 @@ const EditBill = () => {
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {values?.invoice_detail?.map((item: any, index: number) => (
+                                {values?.bill_detail?.map((item: any, index: number) => (
                                   <TableRow key={item.id}>
-                                    <TableCell>{values?.invoice_detail.indexOf(item) + 1}</TableCell>
-                                    <InvoiceItem
+                                    <TableCell>{values?.bill_detail.indexOf(item) + 1}</TableCell>
+                                    <BillItem
                                       key={item.id}
                                       id={item.id}
                                       index={index}
@@ -373,9 +372,9 @@ const EditBill = () => {
                             </Table>
                           </TableContainer>
                           <Divider />
-                          {touched.invoice_detail && errors.invoice_detail && !Array.isArray(errors?.invoice_detail) && (
+                          {touched.bill_detail && errors.bill_detail && !Array.isArray(errors?.bill_detail) && (
                             <Stack direction="row" justifyContent="center" sx={{ p: 1.5 }}>
-                              <FormHelperText error={true}>{errors.invoice_detail as string}</FormHelperText>
+                              <FormHelperText error={true}>{errors.bill_detail as string}</FormHelperText>
                             </Stack>
                           )}
                           <Grid container justifyContent="space-between">
@@ -388,7 +387,7 @@ const EditBill = () => {
                                     push({
                                       name: '',
                                       description: '',
-                                      qty: 1,
+                                      quantity: 1,
                                       price: '1.00'
                                     })
                                   }
