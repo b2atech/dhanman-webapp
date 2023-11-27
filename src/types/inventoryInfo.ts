@@ -5,3 +5,16 @@ export interface InventoryData {
   description: string;
   unitPrice: string;
 }
+
+export interface IProductData {
+  productId: string;
+  clientId: string;
+  productName: string;
+  description: string;
+  quantityInStock: string;
+  vendorId: string;
+  recorderLevel: number;
+  unitPrice: string;
+  unitId: string;
+  categoryId: string;
+}
