@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, useRef } from 'react';
+import { useEffect, useMemo, useState, Fragment, MouseEvent } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import {
-  Box,
   Button,
   Dialog,
   FormControlLabel,
@@ -18,11 +17,11 @@ import {
   Typography,
   styled,
   useMediaQuery,
-  CircularProgress
+  CircularProgress,
+  Box
 } from '@mui/material';
 
 // third-party
-import { useSticky } from 'react-table-sticky';
 import {
   useFilters,
   useExpanded,
@@ -35,9 +34,10 @@ import {
   HeaderGroup,
   Row,
   Cell,
-  HeaderProps
+  HeaderProps,
+  CellProps
 } from 'react-table';
-
+import { useSticky } from 'react-table-sticky';
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
@@ -56,13 +56,11 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { getAllPaidPayments } from 'api/services/BillService';
+import { IPaidPayment } from 'types/bill';
+import AlertpaidPaymentDelete from './AlertpaidPaymentDelete';
 
-import { IInventory } from 'types/invoice';
-import ProductDetails from './productDetails';
-import AlertProductDelete from './alertProductDelete';
-import { InventoryData } from 'types/inventoryInfo';
-import { getAllProducts } from 'api/services/InventoryService';
-
+const moment = require('moment');
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
@@ -75,35 +73,33 @@ const TableWrapper = styled('div')(({ theme }) => ({
     zIndex: '5 !important'
   }
 }));
-
 interface Props {
   columns: Column[];
-  data: InventoryData[];
+  data: IPaidPayment[];
   handleAdd: () => void;
-  renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
     allColumns,
-    visibleColumns,
     rows,
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded },
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -113,7 +109,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] },
+      hiddenColumns: ['']
     },
     useGlobalFilter,
     useFilters,
@@ -124,15 +121,13 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useSticky
   );
 
-  const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-  const moment = require('moment');
   const now = new Date();
-  const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename = 'PaidPaymentsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [isProductIdVisible, setIsProductIdVisible] = useState(false);
+  const [isPaidPaymentIdVisible, setIsPiadPaymentIdVisible] = useState(false);
 
   const handleSwitchChange = () => {
-    setIsProductIdVisible((prevIsProductIdVisible) => !prevIsProductIdVisible);
+    setIsPiadPaymentIdVisible((prevIsPiadPaymentIdVisible) => !prevIsPiadPaymentIdVisible);
   };
 
   const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,22 +154,22 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Product
+              Add Paid Payment
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isProductIdVisible ? 'Close ID' : 'Show ID'}>
+            <Tooltip title={isPaidPaymentIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isProductIdVisible} onChange={handleSwitchChange} />}
+                control={<Switch color="success" checked={isPaidPaymentIdVisible} onChange={handleSwitchChange} />}
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -185,78 +180,71 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Tooltip>
           </Stack>
         </Stack>
-        <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflow: 'auto' }}>
-            <TableWrapper>
-              <Table {...getTableProps()} stickyHeader>
-                <TableHead>
-                  {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                      {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isProductIdVisible) {
-                          return null;
-                        }
-                        return (
-                          <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                            <HeaderSort column={column} />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHead>
-                <TableBody {...getTableBodyProps()}>
-                  {page.map((row: Row, i: number) => {
-                    prepareRow(row);
-                    const rowProps = row.getRowProps();
-
-                    return (
-                      <Fragment key={i}>
-                        <TableRow
-                          {...row.getRowProps()}
-                          onClick={() => {
-                            row.toggleRowSelected();
-                          }}
-                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                        >
-                          {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isProductIdVisible) {
-                              return null;
-                            }
-                            return (
-                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                            );
-                          })}
-                        </TableRow>
-                        {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
-                      </Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableWrapper>
-          </ScrollX>
-          <Box>
-            <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
-              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-            </Box>
-          </Box>
+        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (column.id === 'id' && !isPaidPaymentIdVisible) {
+                        return null;
+                      }
+                      return (
+                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          if (cell.column.id === 'id' && !isPaidPaymentIdVisible) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableWrapper>
+        </ScrollX>
+        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 2 }}>
+          <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
         </Box>
       </Stack>
     </>
   );
 }
 
-// ==============================|| PRODUCT - LIST ||============================== //
+// ==============================|| PaidPayments - LIST ||============================== //
 
-const ProductListPage = () => {
+const PaidPayments = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [product, setProduct] = useState<any>(null);
+  const [paidPayment, setPaidPayment] = useState<any>(null);
+  const [paidPaymentDeleteName, setPaidPaymentDeleteName] = useState<any>('');
+  const [setPaidPaymentDeleteId, setPaidPaymentsDeleteId] = useState<string>('');
   const [add, setAdd] = useState<boolean>(false);
-  const [products, setProducts] = useState<IInventory[]>([]);
-  const [productDeleteName, setProductDeleteName] = useState<any>('');
-  const [productDeleteId, setProductDeleteId] = useState<string>('');
+  const [paidPayments, setPaidPayments] = useState<IPaidPayment[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -265,10 +253,10 @@ const ProductListPage = () => {
   };
 
   useEffect(() => {
-    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((productList) => {
-        if (Array.isArray(productList)) {
-          setProducts(productList);
+    getAllPaidPayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((paidPaymentList) => {
+        if (Array.isArray(paidPaymentList)) {
+          setPaidPayments(paidPaymentList);
           setLoading(false);
         }
       })
@@ -278,15 +266,15 @@ const ProductListPage = () => {
       });
   }, []);
 
-  const memoizedProducts = useMemo(() => products, [products]);
+  const memoizedPaidPayment = useMemo(() => paidPayments, [paidPayments]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (product && !add) setProduct(null);
+    if (paidPayment && !add) setPaidPayment(null);
   };
 
-  const handleClose = (confirmed: boolean) => {
-    setOpen(false);
+  const handleClose = () => {
+    setOpen(!open);
   };
 
   const columns = useMemo(
@@ -303,104 +291,48 @@ const ProductListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'Product id',
+        Header: 'PaidPayment id',
         accessor: 'id',
         width: -200,
         sticky: 'left'
       },
       {
-        Header: 'Product Name',
-        accessor: 'productName',
-        width: 120,
+        Header: 'Create Date',
+        accessor: 'paidDate',
+        sticky: 'left',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableFilters: true
+      },
+      {
+        Header: 'Vendor Name',
+        accessor: 'vendorName',
+        width: 200,
         sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.productName}</Typography>
+              <Typography variant="subtitle1">{values.vendorName}</Typography>
             </Stack>
           );
         }
       },
       {
-        Header: 'Category',
-        accessor: 'categoryName',
-        width: 120,
-        sticky: 'left',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return (
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.categoryName}</Typography>
-            </Stack>
-          );
-        }
-      },
-      {
-        Header: 'HSN',
-        accessor: 'hsnCode',
-        width: 120,
-       // sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'SAC',
-        accessor: 'sac',
-        width: 80,
+        Header: 'Amount',
+        accessor: 'amount',
+        width: 200,
         sticky: 'left'
       },
       {
-        Header: 'cost',
-        accessor: 'purchasePrice',
-        width: 100,
-        sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'rate',
-        accessor: 'sellingPrice',
-        width: 100,
-        sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'cgst',
-        accessor: 'cgst',
-        width: 30,
-        sticky: 'center',
-        className: 'cell-center'
-      },
-      {
-        Header: 'sgst',
-        accessor: 'sgst',
-        width: 30,
-        sticky: 'left',
-        className: 'cell-center'
-      },
-      {
-        Header: 'igst',
-        accessor: 'igst',
-        width: 30,
-        sticky: 'left',
-        className: 'cell-center'
-      },
-      {
-        Header: 'open. Stock',
-        accessor: 'openingStock',
-        width: 100,
-        sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'unit',
-        accessor: 'unit',
-        width: 100,
+        Header: 'Description',
+        accessor: 'description',
+        width: 200,
         sticky: 'left'
       },
       {
         Header: 'Actions',
-        className: 'cell-right',
-        width: 100,
+        className: 'cell-left',
+        width: 200,
         sticky: 'left',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
@@ -427,7 +359,7 @@ const ProductListPage = () => {
                   color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setProduct(row.values);
+                    setPaidPayment(row.values);
                     handleAdd();
                   }}
                 >
@@ -439,9 +371,9 @@ const ProductListPage = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setProductDeleteName(row.values.productName);
-                    setProductDeleteId(row.values.id);
-                    setOpen(true);
+                    setPaidPaymentDeleteName(row.values.vendorName);
+                    setPaidPaymentsDeleteId(row.values.id);
+                    handleClose();
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -456,35 +388,28 @@ const ProductListPage = () => {
     [theme]
   );
 
-  const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <ProductDetails data={memoizedProducts[Number(row.id)]} />,
-
-    [memoizedProducts]
-  );
-
   return (
     <MainCard content={false}>
-      <ScrollX>
-        {loading ? (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
-            <CircularProgress size={60} thickness={4} />
-            <Typography variant="body1" style={{ marginTop: '32x' }}>
-              Loading, please wait...
-            </Typography>
-          </Box>
-        ) : (
+      {loading ? (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+          <CircularProgress size={60} thickness={4} />
+          <Typography variant="body1" style={{ marginTop: '16px' }}>
+            Loading, please wait...
+          </Typography>
+        </Box>
+      ) : (
+        <ScrollX>
           <ReactTable
             columns={columns}
-            data={memoizedProducts}
+            data={memoizedPaidPayment}
             handleAdd={handleAdd}
-            renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
           />
-        )}
-      </ScrollX>
-      <AlertProductDelete title={productDeleteName} open={open} handleClose={handleClose} id={productDeleteId} />
+        </ScrollX>
+      )}
+      <AlertpaidPaymentDelete title={paidPaymentDeleteName} open={open} handleClose={handleClose} id={setPaidPaymentDeleteId} />
 
       <Dialog
         maxWidth="sm"
@@ -494,11 +419,9 @@ const ProductListPage = () => {
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
-      >
-        {/* <AddProduct product={product} onCancel={handleAdd} /> */}
-      </Dialog>
+      ></Dialog>
     </MainCard>
   );
 };
 
-export default ProductListPage;
+export default PaidPayments;

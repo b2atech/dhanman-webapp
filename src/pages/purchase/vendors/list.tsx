@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, useRef } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
@@ -123,7 +123,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect,
     useSticky
   );
-
+  const componentRef: React.Ref<HTMLDivElement> = useRef(null);
   const now = new Date();
   const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
@@ -183,61 +183,61 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Tooltip>
           </Stack>
         </Stack>
-        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
-          <TableWrapper>
-            <Table {...getTableProps()} stickyHeader>
-              <TableHead>
-                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                    {headerGroup.headers.map((column: HeaderGroup) => {
-                      if (column.id === 'id' && !isVendorIdVisible) {
-                        return null;
-                      }
-                      return (
-                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                          <HeaderSort column={column} />
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHead>
-              <TableBody {...getTableBodyProps()}>
-                {page.map((row: Row, i: number) => {
-                  prepareRow(row);
-                  const rowProps = row.getRowProps();
+        <Box ref={componentRef}>
+          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+            <TableWrapper>
+              <Table {...getTableProps()} stickyHeader>
+                <TableHead>
+                  {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                      {headerGroup.headers.map((column: HeaderGroup) => {
+                        if (column.id === 'id' && !isVendorIdVisible) {
+                          return null;
+                        }
+                        return (
+                          <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                            <HeaderSort column={column} />
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHead>
+                <TableBody {...getTableBodyProps()}>
+                  {page.map((row: Row, i: number) => {
+                    prepareRow(row);
+                    const rowProps = row.getRowProps();
 
-                  return (
-                    <Fragment key={i}>
-                      <TableRow
-                        {...row.getRowProps()}
-                        onClick={() => {
-                          row.toggleRowSelected();
-                        }}
-                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                      >
-                        {row.cells.map((cell: Cell) => {
-                          if (cell.column.id === 'id' && !isVendorIdVisible) {
-                            return null;
-                          }
-                          return (
-                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                          );
-                        })}
-                      </TableRow>
-                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
-                    </Fragment>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableWrapper>
-        </ScrollX>
-        <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-          <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+                    return (
+                      <Fragment key={i}>
+                        <TableRow
+                          {...row.getRowProps()}
+                          onClick={() => {
+                            row.toggleRowSelected();
+                          }}
+                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                        >
+                          {row.cells.map((cell: Cell) => {
+                            if (cell.column.id === 'id' && !isVendorIdVisible) {
+                              return null;
+                            }
+                            return (
+                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                            );
+                          })}
+                        </TableRow>
+                        {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
+                      </Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableWrapper>
+          </ScrollX>
+          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
             <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-          </TableCell>
-        </TableRow>
+          </Box>
+        </Box>
       </Stack>
     </>
   );

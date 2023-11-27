@@ -81,23 +81,43 @@ export const BillAPI = {
     });
 
     return response.data;
-  };
+  },
+  createBillRequest = async function (billdata: BillHeader) {
+    const response = await apiPurchase.request({
+      url: `v1/bill/`,
+      method: 'POST',
+      data: billdata
+    });
+    return response.data;
+  },
+  createVendorRequest = async function (vendordata: VendorData) {
+    const response = await apiPurchase.request({
+      url: `v1/vendors`,
+      method: 'POST',
+      data: vendordata
+    });
+    return response.status;
+  },
+  getAllPaidPayments = async function (clientId: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/GetpaidPayment/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllPaidPayments.name].handleRequestCancellation().signal : undefined
+    });
 
-export async function createBillRequest(billdata: BillHeader) {
-  const response = await apiPurchase.request({
-    url: `v1/bill/`,
-    method: 'POST',
-    data: billdata
-  });
-  return response.data;
-}
-export async function createVendorRequest(vendordata: VendorData) {
-  const response = await apiPurchase.request({
-    url: `v1/vendors`,
-    method: 'POST',
-    data: vendordata
-  });
-  return response.status;
-}
+    return response.data.items;
+  },
+  deletepaidPaymentRequest = async function (id: string) {
+    try {
+      const response = await apiPurchase.request({
+        url: `/v1/paidPayment/${id}`,
+        method: 'DELETE'
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting paid payment:', error);
+      throw error;
+    }
+  };
 
 const cancelApiObject = defineCancelApiObject(BillAPI);

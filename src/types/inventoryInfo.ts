@@ -19,3 +19,16 @@ export interface InventoryData {
   vendorId: string;
   vendorName: string;
 }
+
+export interface IProductData {
+  productId: string;
+  clientId: string;
+  productName: string;
+  description: string;
+  quantityInStock: string;
+  vendorId: string;
+  recorderLevel: number;
+  unitPrice: string;
+  unitId: string;
+  categoryId: string;
+}
