@@ -117,6 +117,17 @@ export interface InvoiceDetail {
   price: number;
 }
 
+export interface IReceivedPayment {
+  id: string;
+  clientId: string;
+  vendorId: number;
+  vendoeName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: number;
+}
+
 export interface ICustomer {
   id: string;
   clientId: string;

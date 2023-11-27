@@ -58,7 +58,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import { getAllReceivePayments } from 'api/services/SalesService';
-import { ICustomer } from 'types/invoice';
+import { IReceivedPayment } from 'types/invoice';
 import AlertReceivedPaymentDelete from './AlertReceicedPaymentDelete';
 const moment = require('moment');
 // ==============================|| REACT TABLE ||============================== //
@@ -76,7 +76,7 @@ const TableWrapper = styled('div')(({ theme }) => ({
 
 interface Props {
   columns: Column[];
-  data: ICustomer[];
+  data: IReceivedPayment[];
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
@@ -121,14 +121,13 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
     useSticky
   );
 
-  const moment = require('moment');
-  const now = new Date();
-  const formatedFilename = 'CustomersList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+    const now = new Date();
+  const formatedFilename = 'ReceivedPaymentsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [isCustomerIdVisible, setIsCustomerIdVisible] = useState(false);
+  const [isReceivedPaymentIdVisible, setIsReceivedPaymentIdVisible] = useState(false);
 
   const handleSwitchChange = () => {
-    setIsCustomerIdVisible((prevIsCustomerIdVisible) => !prevIsCustomerIdVisible);
+    setIsReceivedPaymentIdVisible((prevIsReceivedPaymentIdVisible) => !prevIsReceivedPaymentIdVisible);
   };
 
   const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,10 +160,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isCustomerIdVisible ? 'Hide ID' : 'Show ID'}>
+            <Tooltip title={isReceivedPaymentIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isCustomerIdVisible} onChange={handleSwitchChange} />}
+                control={<Switch color="success" checked={isReceivedPaymentIdVisible} onChange={handleSwitchChange} />}
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
@@ -189,7 +188,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
                 {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                     {headerGroup.headers.map((column: HeaderGroup) => {
-                      if (column.id === 'id' && !isCustomerIdVisible) {
+                      if (column.id === 'id' && !isReceivedPaymentIdVisible) {
                         return null;
                       }
                       return (
@@ -215,7 +214,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
                         {row.cells.map((cell: Cell) => {
-                          if (cell.column.id === 'id' && !isCustomerIdVisible) {
+                          if (cell.column.id === 'id' && !isReceivedPaymentIdVisible) {
                             return null;
                           }
                           return (
@@ -238,16 +237,16 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
   );
 }
 
-// ==============================|| CUSTOMER - LIST ||============================== //
+// ==============================|| RECEIVED PAYMENT - LIST ||============================== //
 
 const List = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [receivedPayment, setReceivedPayment] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [customerDeleteName, setcustomerDeleteName] = useState<any>('');
-  const [customerDeleteId, setCustomerDeleteId] = useState<string>('');
+  const [receivedPayments, setReceivePayments] = useState<IReceivedPayment[]>([]);
+  const [receivedPaymentDeleteName, setReceivedPaymentDeleteName] = useState<any>('');
+  const [receivedPAymentDeleteId, setReceivedPaymentDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -257,9 +256,9 @@ const List = () => {
 
   useEffect(() => {
     getAllReceivePayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((customerList) => {
-        if (Array.isArray(customerList)) {
-          setCustomers(customerList);
+      .then((receivedPaymentList) => {
+        if (Array.isArray(receivedPaymentList)) {
+          setReceivePayments(receivedPaymentList);
           setLoading(false);
         }
       })
@@ -269,7 +268,7 @@ const List = () => {
       });
   }, []);
 
-  const memoizedCustomers = useMemo(() => customers, [customers]);
+  const memoizedReceivedPayments = useMemo(() => receivedPayments, [receivedPayments]);
 
   const handleAdd = () => {
     setAdd(!add);
@@ -374,8 +373,8 @@ const List = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setcustomerDeleteName(row.values.customerName);
-                    setCustomerDeleteId(row.values.id);
+                    setReceivedPaymentDeleteName(row.values.customerName);
+                    setReceivedPaymentDeleteId(row.values.id);
                     setOpen(true);
                   }}
                 >
@@ -404,7 +403,7 @@ const List = () => {
         <ScrollX>
           <ReactTable
             columns={columns}
-            data={memoizedCustomers}
+            data={memoizedReceivedPayments}
             handleAdd={handleAdd}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
@@ -413,7 +412,7 @@ const List = () => {
         </ScrollX>
       )}
 
-      <AlertReceivedPaymentDelete title={customerDeleteName} open={open} handleClose={handleClose} id={customerDeleteId} />
+      <AlertReceivedPaymentDelete title={receivedPaymentDeleteName} open={open} handleClose={handleClose} id={receivedPAymentDeleteId} />
 
       <Dialog
         maxWidth="sm"
