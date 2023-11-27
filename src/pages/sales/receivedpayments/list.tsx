@@ -121,7 +121,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
     useSticky
   );
 
-    const now = new Date();
+  const now = new Date();
   const formatedFilename = 'ReceivedPaymentsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const [isReceivedPaymentIdVisible, setIsReceivedPaymentIdVisible] = useState(false);
@@ -293,7 +293,7 @@ const List = () => {
         disableSortBy: true
       },
       {
-        Header: 'Payments Receive id',
+        Header: 'Payments Received id',
         accessor: 'id',
         width: -200,
         sticky: 'left'
