@@ -130,10 +130,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const now = new Date();
   const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [isCustomerIdVisible, setIsCustomerIdVisible] = useState(false);
+  const [isProductIdVisible, setIsProductIdVisible] = useState(false);
 
   const handleSwitchChange = () => {
-    setIsCustomerIdVisible((prevIsCustomerIdVisible) => !prevIsCustomerIdVisible);
+    setIsProductIdVisible((prevIsProductIdVisible) => !prevIsProductIdVisible);
   };
 
   const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,10 +166,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isCustomerIdVisible ? 'Close ID' : 'Show ID'}>
+            <Tooltip title={isProductIdVisible ? 'Close ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isCustomerIdVisible} onChange={handleSwitchChange} />}
+                control={<Switch color="success" checked={isProductIdVisible} onChange={handleSwitchChange} />}
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
@@ -194,7 +194,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                     <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                       {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isCustomerIdVisible) {
+                        if (column.id === 'id' && !isProductIdVisible) {
                           return null;
                         }
                         return (
@@ -221,7 +221,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                           sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                         >
                           {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isCustomerIdVisible) {
+                            if (cell.column.id === 'id' && !isProductIdVisible) {
                               return null;
                             }
                             return (
@@ -238,11 +238,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </TableWrapper>
           </ScrollX>
           <Box>
-            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
-                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-              </TableCell>
-            </TableRow>
+            <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
+              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+            </Box>
           </Box>
         </Box>
       </Stack>
@@ -257,9 +255,9 @@ const ProductListPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [product, setProduct] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
-  const [customers, setCustomers] = useState<IInventory[]>([]);
+  const [products, setProducts] = useState<IInventory[]>([]);
   const [productDeleteName, setProductDeleteName] = useState<any>('');
-  const [productDeleteId, setCustomerDeleteId] = useState<string>('');
+  const [productDeleteId, setProductDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -269,9 +267,9 @@ const ProductListPage = () => {
 
   useEffect(() => {
     getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((customerList) => {
-        if (Array.isArray(customerList)) {
-          setCustomers(customerList);
+      .then((productList) => {
+        if (Array.isArray(productList)) {
+          setProducts(productList);
           setLoading(false);
         }
       })
@@ -281,7 +279,7 @@ const ProductListPage = () => {
       });
   }, []);
 
-  const memoizedCustomers = useMemo(() => customers, [customers]);
+  const memoizedProducts = useMemo(() => products, [products]);
 
   const handleAdd = () => {
     setAdd(!add);
@@ -406,7 +404,7 @@ const ProductListPage = () => {
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     setProductDeleteName(row.values.productName);
-                    setCustomerDeleteId(row.values.id);
+                    setProductDeleteId(row.values.id);
                     setOpen(true);
                   }}
                 >
@@ -423,9 +421,9 @@ const ProductListPage = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <ProductDetails data={memoizedCustomers[Number(row.id)]} />,
+    ({ row }: { row: Row<{}> }) => <ProductDetails data={memoizedProducts[Number(row.id)]} />,
 
-    [memoizedCustomers]
+    [memoizedProducts]
   );
 
   return (
@@ -441,7 +439,7 @@ const ProductListPage = () => {
         ) : (
           <ReactTable
             columns={columns}
-            data={memoizedCustomers}
+            data={memoizedProducts}
             handleAdd={handleAdd}
             renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
