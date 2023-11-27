@@ -11,6 +11,7 @@ export interface CustomerData {
 }
 
 export interface VendorData {
+  vendorId: String;
   userId: string;
   clientId: string;
   firstName: string;
