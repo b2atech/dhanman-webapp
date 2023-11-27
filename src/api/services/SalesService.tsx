@@ -30,6 +30,14 @@ export const InvoiceAPI = {
     });
     return response.data.items;
   },
+  getAllReceivePayments = async function (clientId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/GetAllreceivedPayments/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllReceivePayments.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
   getInvoiceDetailsByHeaderId = async function (id: string, cancel = false) {
     const response = await apiSales.request({
       url: `v1/invoiceDetailByHeaderId/${id}`,
@@ -72,6 +80,18 @@ export const InvoiceAPI = {
       return response.data;
     } catch (error) {
       console.error('Error deleting customer:', error);
+      throw error;
+    }
+  },
+  deleteReceivedPaymentsRequest = async function (id: string) {
+    try {
+      const response = await apiSales.request({
+        url: `v1/receivedPayment/${id}`,
+        method: 'DELETE'
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting received payments:', error);
       throw error;
     }
   },
