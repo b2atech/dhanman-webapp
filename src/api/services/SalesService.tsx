@@ -63,6 +63,14 @@ export const InvoiceAPI = {
     });
     return response.status;
   },
+  updateCustomerRequest = async function (customerData: CustomerData) {
+    const response = await apiSales.request({
+      url: `v1/customers`,
+      method: 'PUT',
+      data: customerData
+    });
+    return response.status;
+  },
   deleteCustomerRequest = async function (id: string) {
     try {
       const response = await apiSales.request({

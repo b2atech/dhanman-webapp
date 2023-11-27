@@ -30,27 +30,58 @@ import { ICountry, ICity, IState } from 'types/address';
 import AlertCustomerDelete from './AlertCustomerDelete';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { createCustomerRequest } from 'api/services/SalesService';
+import { createCustomerRequest, updateCustomerRequest } from 'api/services/SalesService';
 
 // types
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  const newCustomer = {
-    userId: '0f6dd08e-cfe7-498b-9fed-167d759b1a3b',
-    clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-    cityName: '',
-    cityId: '',
-    country: '',
-    state: '',
-    addressLine: ''
-  };
+  // const newCustomer = {
+  //   userId: '0f6dd08e-cfe7-498b-9fed-167d759b1a3b',
+  //   clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+  //   firstName: '',
+  //   lastName: '',
+  //   phoneNumber: '',
+  //   email: '',
+  //   cityName: '',
+  //   cityId: '',
+  //   country: '',
+  //   state: '',
+  //   addressLine: ''
+  // };
 
-  return newCustomer;
+  // return newCustomer;
+  if (customer) {
+    const newCustomer = {
+      id: customer.id,
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      phoneNumber: customer.phoneNumber,
+      email: customer.email,
+      cityName: customer.cityName,
+      cityId: customer.cityId,
+      country: customer.countryId,
+      state: customer.stateId,
+      addressLine: customer.addressLine
+    };
+    return newCustomer;
+  } else {
+    const newCustomer = {
+      id: '',
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: '',
+      cityName: '',
+      cityId: '',
+      country: '',
+      state: '',
+      addressLine: ''
+    };
+    return newCustomer;
+  }
 };
 
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
@@ -137,11 +168,12 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
 
   const formik = useFormik({
     initialValues: getInitialValues(customer!),
+    enableReinitialize: true,
     validationSchema: CustomerSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const customerData = {
-          userId: values.userId,
+          userId: values.id,
           clientId: values.clientId,
           firstName: values.firstName,
           lastName: values.lastName,
@@ -152,18 +184,22 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           addressLine: values.addressLine
         };
         if (customer) {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'Customer updated successfully.',
-              anchorOrigin: { vertical: 'top', horizontal: 'right' },
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          const response = await updateCustomerRequest(customerData);
+          if (response === 204) {
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: 'Customer updated successfully.',
+                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                variant: 'alert',
+                alert: {
+                  color: 'success'
+                },
+                close: false
+              })
+            );
+            window.location.reload();
+          }
         } else {
           const response = await createCustomerRequest(customerData);
           if (response === 200) {
@@ -199,8 +235,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{customer ? 'Add Customer' : 'New Customer'}</DialogTitle>
-              <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
+              <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
+              <IconButton shape="rounded" type="reset" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
             </Stack>
