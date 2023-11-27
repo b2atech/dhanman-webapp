@@ -22,6 +22,16 @@ export interface InfoType {
   email: string;
 }
 
+export interface IPaidPayment {
+  clientId: string;
+  vendorId: number;
+  vendoeName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: number;
+}
+
 export interface Items {
   id: string | number;
   name: string;
