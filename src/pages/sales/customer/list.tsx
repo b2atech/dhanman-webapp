@@ -16,15 +16,14 @@ import {
   TableRow,
   Tooltip,
   Typography,
-  styled,
+  // styled,
   useMediaQuery,
   CircularProgress,
-  Theme
+  styled,
 } from '@mui/material';
 
 // third-party
 import { PatternFormat } from 'react-number-format';
-import { useSticky } from 'react-table-sticky';
 import {
   useFilters,
   useExpanded,
@@ -65,37 +64,28 @@ import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 import moment from 'moment';
+import { useSticky } from 'react-table-sticky';
+// import { auto } from '@popperjs/core';
+
+// import { map, map } from 'lodash';
 
 // ==============================|| REACT TABLE ||============================== //
-const TableWrapper = styled('div')(({ theme, isAuditSwitchOn }: { theme?: Theme; isAuditSwitchOn: boolean }) => ({
+const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
     position: 'sticky',
+    top: 0,
     zIndex: 1,
-    width: 'fit-content'
+    background: theme.palette.background.paper
   },
   '& th[data-sticky-td]': {
     position: 'sticky',
-    zIndex: theme ? theme.zIndex.drawer + 1 : 'auto',
-    backgroundColor: theme && theme.palette ? theme.palette.background.paper : 'transparent'
+    zIndex: '5 !important',
+    top: 0,
+    background: theme.palette.background.paper
   },
   overflowX: 'auto',
   whiteSpace: 'nowrap'
 }));
-
-// const DynamicTableCell = styled(TableCell, {
-//   shouldForwardProp: (prop) => prop !== 'isColumnVisible'
-// })(({ theme, isSmallScreen, isColumnVisible }: any) => ({
-//   position: 'relative',
-//   width: isColumnVisible ? 'auto' : 0,
-//   overflow: 'hidden',
-//   whiteSpace: 'nowrap',
-//   textOverflow: 'ellipsis',
-//   paddingLeft: '4px',
-//   paddingRight: '4px',
-//   [theme.breakpoints.down('sm')]: {
-//     width: isColumnVisible && isSmallScreen ? 100 : 0
-//   }
-// }));
 
 interface Props {
   columns: Column[];
@@ -121,8 +111,6 @@ function ReactTable({
 }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-  // const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
   const {
@@ -172,11 +160,6 @@ function ReactTable({
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
-  // const adjustedWidth =
-  //   isSmallScreen && (columns.find((column) => column.id === 'createdBy') || columns.find((column) => column.id === 'modifiedBy'))
-  //     ? 100
-  //     : 200;
-
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -223,9 +206,9 @@ function ReactTable({
             </Tooltip>
           </Stack>
         </Stack>
-        <Box ref={componentRef} sx={{ overflowX: 'auto' }}>
-          <ScrollX sx={{ maxHeight: 400 }}>
-            <TableWrapper isAuditSwitchOn={isAuditSwitchOn}>
+        <Box ref={componentRef}>
+          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+            <TableWrapper>
               <Table {...getTableProps()} stickyHeader>
                 <TableHead>
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
@@ -241,17 +224,11 @@ function ReactTable({
                           return null;
                         }
 
-                        // const isColumnVisible = !(
-                        //   (column.id === 'createdOnUtc' && !showCreatedOnColumn) ||
-                        //   (column.id === 'modifiedOnUtc' && !showCreatedOnColumn) ||
-                        //   (column.id === 'createdBy' && !showCreatedOnColumn) ||
-                        //   (column.id === 'modifiedBy' && !showCreatedOnColumn)
-                        // );
-
-                        // const adjustedWidth = isSmallScreen && (column.id === 'createdBy' || column.id === 'modifiedBy') ? 100 : 200;
-
                         return (
-                          <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <TableCell
+                            {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
+                            sx={{ position: 'sticky', top: 0, background: theme.palette.background.paper }}
+                          >
                             <HeaderSort column={column} />
                           </TableCell>
                         );
@@ -353,8 +330,12 @@ const CustomerListPage = () => {
     if (customer && !add) setCustomer(null);
   };
 
-  const handleClose = (confirmed: boolean) => {
-    setOpen(false);
+  // // const handleClose = (confirmed: boolean) => {
+  //   setOpen(false);
+  // };
+
+  const handleClose = () => {
+    setOpen(!open);
   };
 
   const columns = useMemo(
@@ -400,7 +381,9 @@ const CustomerListPage = () => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.customerName}</Typography>
+              <Stack spacing={0}>
+                <Typography variant="subtitle1">{values.customerName}</Typography>
+              </Stack>
             </Stack>
           );
         }
@@ -423,12 +406,14 @@ const CustomerListPage = () => {
       {
         Header: 'City',
         accessor: 'city',
-        minWidth: 50,
-        maxWidth: 100,
-        sticky: 'left',
-        Cell: ({ value }: { value: any }) => {
-          return <div>Jaysingpur</div>;
-        }
+        className: 'cell-right',
+        // minWidth: 50,
+        // maxWidth: 150,
+        width: 100,
+        sticky: 'left'
+        // Cell: ({ value }: { value: any }) => {
+        //   return <div>Jaysingpur</div>;
+        // }
       },
       {
         Header: 'Actions',
@@ -437,7 +422,7 @@ const CustomerListPage = () => {
         maxWidth: 200,
         sticky: 'left',
         disableSortBy: true,
-        style: { textAlign: 'center' },
+        // style: { textAlign: 'center' },
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
             <CloseOutlined style={{ color: theme.palette.error.main }} />
@@ -558,6 +543,7 @@ const CustomerListPage = () => {
         TransitionComponent={PopupTransition}
         keepMounted
         fullWidth
+        onClose={handleAdd}
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
