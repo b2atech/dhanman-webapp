@@ -58,11 +58,10 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
 import { IInventory } from 'types/invoice';
-import { getAllProducts } from 'api/services/InventoryService';
-import AddProduct from './addproduct';
 import ProductDetails from './productDetails';
 import AlertProductDelete from './alertProductDelete';
 import { InventoryData } from 'types/inventoryInfo';
+import { getAllProducts } from 'api/services/InventoryService';
 
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
@@ -295,20 +294,6 @@ const ProductListPage = () => {
   const columns = useMemo(
     () => [
       {
-        show: false,
-        accessor: 'firstName',
-        disableSortBy: true,
-        width: 20,
-        sticky: 'left'
-      },
-      {
-        show: false,
-        accessor: 'lastName',
-        disableSortBy: true,
-        width: 20,
-        sticky: 'left'
-      },
-      {
         title: 'Row Selection',
         width: 10,
         sticky: 'left',
@@ -328,7 +313,7 @@ const ProductListPage = () => {
       {
         Header: 'Product Name',
         accessor: 'productName',
-        width: 220,
+        width: 120,
         sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
@@ -340,33 +325,84 @@ const ProductListPage = () => {
         }
       },
       {
-        Header: 'Description',
-        accessor: 'description',
-        width: 200,
+        Header: 'Category',
+        accessor: 'categoryName',
+        width: 120,
+        sticky: 'left',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return (
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Typography variant="subtitle1">{values.categoryName}</Typography>
+            </Stack>
+          );
+        }
+      },
+      {
+        Header: 'HSN',
+        accessor: 'hsnCode',
+        width: 120,
+       // sticky: 'right',
+        className: 'cell-right'
+      },
+      {
+        Header: 'SAC',
+        accessor: 'sac',
+        width: 80,
         sticky: 'left'
       },
       {
-        Header: 'Quantity',
-        accessor: 'quntityInStock',
-        width: 200,
-        sticky: 'left'
+        Header: 'cost',
+        accessor: 'purchasePrice',
+        width: 100,
+        sticky: 'right',
+        className: 'cell-right'
       },
       {
-        Header: 'Price',
-        accessor: 'unitPrice',
-        width: 200,
-        sticky: 'left'
+        Header: 'rate',
+        accessor: 'sellingPrice',
+        width: 100,
+        sticky: 'right',
+        className: 'cell-right'
       },
       {
-        Header: 'Recorder Level',
-        accessor: 'recorderLevel',
-        width: 200,
+        Header: 'cgst',
+        accessor: 'cgst',
+        width: 30,
+        sticky: 'center',
+        className: 'cell-center'
+      },
+      {
+        Header: 'sgst',
+        accessor: 'sgst',
+        width: 30,
+        sticky: 'left',
+        className: 'cell-center'
+      },
+      {
+        Header: 'igst',
+        accessor: 'igst',
+        width: 30,
+        sticky: 'left',
+        className: 'cell-center'
+      },
+      {
+        Header: 'open. Stock',
+        accessor: 'openingStock',
+        width: 100,
+        sticky: 'right',
+        className: 'cell-right'
+      },
+      {
+        Header: 'unit',
+        accessor: 'unit',
+        width: 100,
         sticky: 'left'
       },
       {
         Header: 'Actions',
         className: 'cell-right',
-        width: 200,
+        width: 100,
         sticky: 'left',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
@@ -461,7 +497,7 @@ const ProductListPage = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddProduct product={product} onCancel={handleAdd} />
+        {/* <AddProduct product={product} onCancel={handleAdd} /> */}
       </Dialog>
     </MainCard>
   );
