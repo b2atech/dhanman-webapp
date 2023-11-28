@@ -100,6 +100,15 @@ function ReactTable({
   showCreatedOnColumn,
   handleAuditColumnSwitchChange
 }: Props) {
+  const defaultColumn = useMemo(
+    () => ({
+      minWidth: 80,
+      width: 200,
+      maxWidth: 400,
+      margin: 20
+    }),
+    []
+  );
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const filterTypes = useMemo(() => renderFilterTypes, []);
@@ -124,6 +133,7 @@ function ReactTable({
     {
       columns,
       data,
+      defaultColumn,
       filterTypes,
       initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar', 'addressLine'], sortBy: [sortBy] }
     },
@@ -262,12 +272,8 @@ function ReactTable({
               </Table>
             </TableWrapper>
           </ScrollX>
-          <Box>
-            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={columns.length}>
-                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-              </TableCell>
-            </TableRow>
+          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
+            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
           </Box>
         </Box>
       </Stack>
@@ -326,8 +332,6 @@ const CustomerListPage = () => {
     () => [
       {
         title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -338,29 +342,21 @@ const CustomerListPage = () => {
       {
         show: false,
         accessor: 'firstName',
-        disableSortBy: true,
-        // width: 20,
-        sticky: 'left'
+        disableSortBy: true
       },
       {
         show: false,
         accessor: 'lastName',
-        disableSortBy: true,
-        // width: 20,
-        sticky: 'left'
+        disableSortBy: true
       },
       {
         Header: 'Customer id',
-        accessor: 'id',
-        width: -200,
-        sticky: 'left'
+        accessor: 'id'
       },
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        // minWidth: 100,
-        // maxWidth: 200,
-        sticky: 'left',
+
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
@@ -375,38 +371,30 @@ const CustomerListPage = () => {
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
-        // minWidth: 100,
-        // maxWidth: 200,
-        sticky: 'left',
-        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
+        Width: 400,
+        Cell: ({ value }: { value: number }) => (
+          <PatternFormat
+            displayType="text"
+            format="+91 ##### #####"
+            mask="_"
+            defaultValue={value}
+            style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
+          />
+        )
       },
       {
         Header: 'Email',
-        accessor: 'email',
-        // minWidth: 100,
-        // maxWidth: 150,
-        sticky: 'left'
+        accessor: 'email'
       },
       {
         Header: 'City',
         accessor: 'city',
-        className: 'cell-right',
-        // minWidth: 50,
-        // maxWidth: 150,
-        width: 100,
-        sticky: 'left'
-        // Cell: ({ value }: { value: any }) => {
-        //   return <div>Jaysingpur</div>;
-        // }
+        className: 'cell-right'
       },
       {
         Header: 'Actions',
         className: 'cell-right',
-        // minWidth: 100,
-        // maxWidth: 200,
-        sticky: 'left',
         disableSortBy: true,
-        // style: { textAlign: 'center' },
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
             <CloseOutlined style={{ color: theme.palette.error.main }} />
@@ -458,32 +446,20 @@ const CustomerListPage = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        // minWidth: showCreatedOnColumn ? 120 : 100,
-        // maxWidth: showCreatedOnColumn ? 150 : 120,
-        sticky: 'left',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
-        // minWidth: showCreatedOnColumn ? 150 : 100,
-        // maxWidth: showCreatedOnColumn ? 200 : 150,
-        sticky: 'left',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Created By',
-        accessor: 'createdBy',
-        // minWidth: showCreatedOnColumn ? 200 : 150,
-        // maxWidth: showCreatedOnColumn ? 250 : 200,
-        sticky: 'left'
+        accessor: 'createdBy'
       },
       {
         Header: 'Modified By',
-        accessor: 'modifiedBy',
-        // minWidth: showCreatedOnColumn ? 150 : 100,
-        // maxWidth: showCreatedOnColumn ? 200 : 150,
-        sticky: 'left'
+        accessor: 'modifiedBy'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
