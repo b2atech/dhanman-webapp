@@ -5,31 +5,29 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { deleteInvoiceRequest } from 'api/services/SalesService';
+import { deleteReceivedPaymentsRequest } from 'api/services/SalesService';
 import { useDispatch } from 'store';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
 
 // types
-interface Props {
+interface AlertReceivedPaymentsDeleteProps {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
   id: string;
 }
 
-// ==============================|| KANBAN BOARD - COLUMN DELETE ||============================== //
-
-export default function AlertInvoiceDelete({ title, open, handleClose, id }: Props) {
+export default function AlertReceivedPaymentDelete({ title, open, handleClose, id }: AlertReceivedPaymentsDeleteProps) {
   const dispatch = useDispatch();
-  const deleteInvoice = () => {
+  const deleteReceivedPayment = () => {
     handleClose(true);
-    deleteInvoiceRequest(id).then(() => {
+    deleteReceivedPaymentsRequest(id).then(() => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Invoice deleted successfully',
+          message: 'Received Payments Deleted Successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -58,7 +56,7 @@ export default function AlertInvoiceDelete({ title, open, handleClose, id }: Pro
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete the invoice of "{title}"?
+              Are you sure you want to delete "{title}"?
             </Typography>
           </Stack>
 
@@ -66,7 +64,7 @@ export default function AlertInvoiceDelete({ title, open, handleClose, id }: Pro
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={deleteInvoice} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deleteReceivedPayment} autoFocus>
               Delete
             </Button>
           </Stack>

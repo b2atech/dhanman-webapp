@@ -196,7 +196,7 @@ function ReactTable({
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -392,6 +392,13 @@ const CustomerListPage = () => {
         Header: 'City',
         accessor: 'city',
         className: 'cell-right'
+      },
+      {
+        show: false,
+        Header: 'Address',
+        accessor: 'addressLine',
+        width: 200,
+        sticky: 'left'
       },
       {
         Header: 'Actions',

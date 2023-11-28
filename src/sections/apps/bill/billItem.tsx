@@ -63,7 +63,7 @@ const BillItem = ({ id, name, description, qty, price, onDeleteItem, onEditItem,
       id: id,
       value: description
     },
-    { placeholder: '', label: 'Qty', type: 'number', name: `bill_detail.${index}.qty`, id: id, value: qty },
+    { placeholder: '', label: 'Qty', type: 'number', name: `bill_detail.${index}.quantity`, id: id, value: qty },
     { placeholder: '', label: 'price', type: 'number', name: `bill_detail.${index}.price`, id: id, value: price }
   ];
 

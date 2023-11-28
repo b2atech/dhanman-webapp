@@ -120,10 +120,10 @@ const CreateBill = () => {
 
     bill.lines = values.bill_detail.map((billItem: any) => {
       let billLine = {} as BillLine;
-      billLine.amount = parseInt(billItem.price) * billItem.qty;
+      billLine.amount = parseInt(billItem.price) * billItem.quantity;
       billLine.name = billItem.name;
       billLine.description = billItem.description;
-      billLine.quantity = billItem.qty;
+      billLine.quantity = billItem.quantity;
       billLine.price = billItem.price;
       return billLine;
     });
@@ -179,7 +179,7 @@ const CreateBill = () => {
             {
               name: '',
               description: '',
-              qty: 0,
+              quantity: 0,
               price: 0,
               amount: 0
             }
@@ -196,7 +196,7 @@ const CreateBill = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
@@ -391,7 +391,7 @@ const CreateBill = () => {
                                       index={index}
                                       name={item.name}
                                       description={item.description}
-                                      qty={item.qty}
+                                      qty={item.quantity}
                                       price={item.price}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
@@ -421,7 +421,7 @@ const CreateBill = () => {
                                       id: UIDV4(),
                                       name: '',
                                       description: '',
-                                      qty: 1,
+                                      quantity: 1,
                                       price: '1.00'
                                     })
                                   }

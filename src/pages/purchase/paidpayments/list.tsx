@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, useRef } from 'react';
+import { useEffect, useMemo, useState, Fragment, MouseEvent } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
@@ -34,7 +34,8 @@ import {
   HeaderGroup,
   Row,
   Cell,
-  HeaderProps
+  HeaderProps,
+  CellProps
 } from 'react-table';
 import { useSticky } from 'react-table-sticky';
 // project import
@@ -55,13 +56,11 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import VendorDetails from '../createbills/Vendor/VendorDetails';
-import { getAllVendors } from 'api/services/BillService';
-import { IVendor } from 'types/bill';
-import moment from 'moment';
-import AddVendor from '../createbills/Vendor/AddVendor';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
-import { PatternFormat } from 'react-number-format';
+import { getAllPaidPayments } from 'api/services/BillService';
+import { IPaidPayment } from 'types/bill';
+import AlertpaidPaymentDelete from './AlertpaidPaymentDelete';
+
+const moment = require('moment');
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
@@ -76,15 +75,14 @@ const TableWrapper = styled('div')(({ theme }) => ({
 }));
 interface Props {
   columns: Column[];
-  data: IVendor[];
+  data: IPaidPayment[];
   handleAdd: () => void;
-  renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -97,12 +95,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     headerGroups,
     prepareRow,
     allColumns,
-    visibleColumns,
     rows,
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded },
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -112,7 +109,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy], hiddenColumns: ['firstName', 'lastName', 'cityId', 'addressLine'] }
+      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] },
+      hiddenColumns: ['']
     },
     useGlobalFilter,
     useFilters,
@@ -122,14 +120,14 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect,
     useSticky
   );
-  const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+
   const now = new Date();
-  const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename = 'PaidPaymentsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [isVendorIdVisible, setIsVendorIdVisible] = useState(false);
+  const [isPaidPaymentIdVisible, setIsPiadPaymentIdVisible] = useState(false);
 
   const handleSwitchChange = () => {
-    setIsVendorIdVisible((prevIsVendorIdVisible) => !prevIsVendorIdVisible);
+    setIsPiadPaymentIdVisible((prevIsPiadPaymentIdVisible) => !prevIsPiadPaymentIdVisible);
   };
 
   const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,16 +154,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Vendor
+              Add Paid Payment
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isVendorIdVisible ? 'Hide ID' : 'Show ID'}>
+            <Tooltip title={isPaidPaymentIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isVendorIdVisible} onChange={handleSwitchChange} />}
+                control={<Switch color="success" checked={isPaidPaymentIdVisible} onChange={handleSwitchChange} />}
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
@@ -182,76 +180,71 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Tooltip>
           </Stack>
         </Stack>
-        <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
-            <TableWrapper>
-              <Table {...getTableProps()} stickyHeader>
-                <TableHead>
-                  {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                      {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isVendorIdVisible) {
-                          return null;
-                        }
-                        return (
-                          <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                            <HeaderSort column={column} />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHead>
-                <TableBody {...getTableBodyProps()}>
-                  {page.map((row: Row, i: number) => {
-                    prepareRow(row);
-                    const rowProps = row.getRowProps();
-
-                    return (
-                      <Fragment key={i}>
-                        <TableRow
-                          {...row.getRowProps()}
-                          onClick={() => {
-                            row.toggleRowSelected();
-                          }}
-                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                        >
-                          {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isVendorIdVisible) {
-                              return null;
-                            }
-                            return (
-                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                            );
-                          })}
-                        </TableRow>
-                        {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
-                      </Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableWrapper>
-          </ScrollX>
-          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
-            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-          </Box>
+        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (column.id === 'id' && !isPaidPaymentIdVisible) {
+                        return null;
+                      }
+                      return (
+                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          if (cell.column.id === 'id' && !isPaidPaymentIdVisible) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableWrapper>
+        </ScrollX>
+        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 2 }}>
+          <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
         </Box>
       </Stack>
     </>
   );
 }
 
-// ==============================|| VENDOR - LIST ||============================== //
+// ==============================|| PaidPayments - LIST ||============================== //
 
-const Vendors = () => {
+const PaidPayments = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [vendor, setVendor] = useState<any>(null);
-  const [vendorDeleteName, setVendorDeleteName] = useState<any>('');
-  const [vendorDeleteId, setVendorDeleteId] = useState<string>('');
+  const [paidPayment, setPaidPayment] = useState<any>(null);
+  const [paidPaymentDeleteName, setPaidPaymentDeleteName] = useState<any>('');
+  const [setPaidPaymentDeleteId, setPaidPaymentsDeleteId] = useState<string>('');
   const [add, setAdd] = useState<boolean>(false);
-  const [vendors, setVendors] = useState<IVendor[]>([]);
+  const [paidPayments, setPaidPayments] = useState<IPaidPayment[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -260,10 +253,10 @@ const Vendors = () => {
   };
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          setVendors(vendorList);
+    getAllPaidPayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((paidPaymentList) => {
+        if (Array.isArray(paidPaymentList)) {
+          setPaidPayments(paidPaymentList);
           setLoading(false);
         }
       })
@@ -273,13 +266,11 @@ const Vendors = () => {
       });
   }, []);
 
-  const memoizedVendors = useMemo(() => vendors, [vendors]);
+  const memoizedPaidPayment = useMemo(() => paidPayments, [paidPayments]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (vendor && !add) {
-      setVendor(null);
-    }
+    if (paidPayment && !add) setPaidPayment(null);
   };
 
   const handleClose = () => {
@@ -300,26 +291,17 @@ const Vendors = () => {
         disableSortBy: true
       },
       {
-        Header: 'Vendor id',
+        Header: 'PaidPayment id',
         accessor: 'id',
         width: -200,
         sticky: 'left'
       },
       {
-        show: false,
-        accessor: 'addressLine'
-      },
-      {
-        show: false,
-        accessor: 'firstName'
-      },
-      {
-        show: false,
-        accessor: 'lastName'
-      },
-      {
-        show: false,
-        accessor: 'cityId'
+        Header: 'Create Date',
+        accessor: 'paidDate',
+        sticky: 'left',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableFilters: true
       },
       {
         Header: 'Vendor Name',
@@ -336,21 +318,14 @@ const Vendors = () => {
         }
       },
       {
-        Header: 'Contact',
-        accessor: 'phoneNumber',
-        width: 200,
-        sticky: 'left',
-        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
-      },
-      {
-        Header: 'Email',
-        accessor: 'email',
+        Header: 'Amount',
+        accessor: 'amount',
         width: 200,
         sticky: 'left'
       },
       {
-        Header: 'City',
-        accessor: 'cityName',
+        Header: 'Description',
+        accessor: 'description',
         width: 200,
         sticky: 'left'
       },
@@ -384,7 +359,7 @@ const Vendors = () => {
                   color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setVendor(row.values);
+                    setPaidPayment(row.values);
                     handleAdd();
                   }}
                 >
@@ -396,8 +371,8 @@ const Vendors = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setVendorDeleteName(row.values.vendorName);
-                    setVendorDeleteId(row.values.id);
+                    setPaidPaymentDeleteName(row.values.vendorName);
+                    setPaidPaymentsDeleteId(row.values.id);
                     handleClose();
                   }}
                 >
@@ -413,11 +388,6 @@ const Vendors = () => {
     [theme]
   );
 
-  const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
-    [memoizedVendors]
-  );
-
   return (
     <MainCard content={false}>
       {loading ? (
@@ -431,16 +401,15 @@ const Vendors = () => {
         <ScrollX>
           <ReactTable
             columns={columns}
-            data={memoizedVendors}
+            data={memoizedPaidPayment}
             handleAdd={handleAdd}
-            renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
           />
         </ScrollX>
       )}
-      <AlertVendorDelete title={vendorDeleteName} open={open} handleClose={handleClose} id={vendorDeleteId} />
+      <AlertpaidPaymentDelete title={paidPaymentDeleteName} open={open} handleClose={handleClose} id={setPaidPaymentDeleteId} />
 
       <Dialog
         maxWidth="sm"
@@ -450,11 +419,9 @@ const Vendors = () => {
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
-      >
-        <AddVendor vendor={vendor} onCancel={handleAdd} />
-      </Dialog>
+      ></Dialog>
     </MainCard>
   );
 };
 
-export default Vendors;
+export default PaidPayments;

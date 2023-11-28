@@ -137,6 +137,8 @@ function ReactTable({ columns, data }: Props) {
                       ? counts.purchase
                       : state === 'webapp'
                       ? counts.webapp
+                      : state === 'inventory'
+                      ? counts.inventory
                       : counts.common
                   }
                   color={
@@ -148,6 +150,8 @@ function ReactTable({ columns, data }: Props) {
                       ? 'secondary'
                       : state === 'webapp'
                       ? 'warning'
+                      : state === 'inventory'
+                      ? 'primary'
                       : 'error'
                   }
                   variant="light"
@@ -235,9 +239,10 @@ const List = () => {
       getAllPRs('dhanman-sales'),
       getAllPRs('dhanman-purchase'),
       getAllPRs('dhanman-webapp'),
-      getAllPRs('dhanman-common')
+      getAllPRs('dhanman-common'),
+      getAllPRs('dhanman-inventory')
     ]).then((results) => {
-      setList(results[0].concat(results[1]).concat(results[2]).concat(results[3]));
+      setList(results[0].concat(results[1]).concat(results[2]).concat(results[3]).concat(results[4]));
     });
   };
 

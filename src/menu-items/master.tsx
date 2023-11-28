@@ -118,17 +118,10 @@ const master: NavItemType = {
           icon: icons.PlusSquareOutlined
         },
         {
-          id: 'invoicedetails',
-          title: <FormattedMessage id="details" />,
-          type: 'item',
-          url: '/sales/invoices/details/:id',
-          icon: icons.PlusSquareOutlined
-        },
-        {
           id: 'paymentreceived',
           title: <FormattedMessage id="paymentreceived" />,
           type: 'item',
-          url: '/sales/payments',
+          url: '/sales/payments/list',
           icon: icons.PlusSquareOutlined
         }
       ]
@@ -152,13 +145,6 @@ const master: NavItemType = {
           type: 'item',
           url: '/purchase/bills/list',
           icon: icons.UnorderedListOutlined
-        },
-        {
-          id: 'billdetails',
-          title: <FormattedMessage id="details" />,
-          type: 'item',
-          url: '/purchase/bills/details/:id',
-          icon: icons.PlusSquareOutlined
         },
         {
           id: 'createbills',

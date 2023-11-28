@@ -28,10 +28,9 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 // third-party
-import { v4 as UIDV4 } from 'uuid';
 import { format } from 'date-fns';
 import { FieldArray, Form, Formik } from 'formik';
-import * as yup from 'yup';
+// import * as yup from 'yup';
 
 // project import
 import Loader from 'components/Loader';
@@ -40,46 +39,41 @@ import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
 import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
 import AddressModal from 'sections/apps/invoice/AddressModal';
 
-import {
-  reviewInvoicePopup,
-  customerPopup,
-  toggleCustomerPopup,
-  selectCountry,
-  getInvoiceSingleList,
-  getInvoiceUpdate
-} from 'store/reducers/invoice';
+import { reviewInvoicePopup, customerPopup, toggleCustomerPopup, selectCountry } from 'store/reducers/invoice';
 import { useDispatch, useSelector } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
 // types
-import { CountryType, IInvoice } from 'types/invoice';
+import { CountryType, IInvoice, IInvoiceType } from 'types/invoice';
 
 //asset
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
+import { getInvoice, updateInvoiceRequest } from 'api/services/SalesService';
+import { InvoiceEdit, InvoiceLine } from 'types/invoiceDetails';
 
-const validationSchema = yup.object({
-  date: yup.date().required('Invoice date is required'),
-  due_date: yup
-    .date()
-    .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
-    .nullable()
-    .required('Due date is required'),
-  customerInfo: yup
-    .object({
-      name: yup.string().required('Invoice receiver information is required')
-    })
-    .required('Invoice receiver information is required'),
-  status: yup.string().required('Status selection is required'),
-  invoice_detail: yup
-    .array()
-    .required('Invoice details is required')
-    .of(
-      yup.object().shape({
-        name: yup.string().required('Product name is required')
-      })
-    )
-    .min(1, 'Invoice must have at least 1 items')
-});
+// const validationSchema = yup.object({
+//   date: yup.date().required('Invoice date is required'),
+//   due_date: yup
+//     .date()
+//     .when('date', (date, schema) => date && schema.min(date, "Due date can't be before invoice date"))
+//     .nullable()
+//     .required('Due date is required'),
+//   customerInfo: yup
+//     .object({
+//       name: yup.string().required('Invoice receiver information is required')
+//     })
+//     .required('Invoice receiver information is required'),
+//   status: yup.string().required('Status selection is required'),
+//   invoice_detail: yup
+//     .array()
+//     .required('Invoice details is required')
+//     .of(
+//       yup.object().shape({
+//         name: yup.string().required('Product name is required')
+//       })
+//     )
+//     .min(1, 'Invoice must have at least 1 items')
+// });
 
 // ==============================|| INVOICE - EDIT ||============================== //
 
@@ -88,13 +82,18 @@ const Invoiceedit = () => {
   const { id } = useParams();
   const navigation = useNavigate();
   const dispatch = useDispatch();
+  const [list1, setList] = useState<IInvoiceType>();
 
   const [loading, setLoading] = useState<boolean>(true);
   const { open, isCustomerOpen, countries, country, isOpen, list } = useSelector((state) => state.invoice);
 
   useEffect(() => {
-    dispatch(getInvoiceSingleList(Number(id))).then(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (id) {
+      getInvoice(id).then((InvoiceHeader) => {
+        setList(InvoiceHeader);
+        setLoading(false);
+      });
+    }
   }, [id]);
 
   const invoiceSingleList: IInvoice['cashierInfo'] = {
@@ -107,30 +106,31 @@ const Invoiceedit = () => {
   const notesLimit: number = 500;
 
   const handlerEdit = (values: any) => {
-    const NewList: IInvoice = {
-      id: Number(list?.id),
-      invoice_id: Number(values.invoice_id),
-      customer_name: values.cashierInfo?.name,
-      email: values.cashierInfo?.email,
-      avatar: Number(list?.avatar),
+    const NewList: InvoiceEdit = {
+      invoiceHeaederId: values.id,
+      invoiceNumber: values.invoiceNumber,
       discount: Number(values.discount),
       tax: Number(values.tax),
-      date: format(new Date(values.date), 'MM/dd/yyyy'),
-      due_date: format(new Date(values.due_date), 'MM/dd/yyyy'),
-      quantity: Number(
-        values.invoice_detail?.reduce((sum: any, i: any) => {
-          return sum + i.qty;
-        }, 0)
-      ),
-      status: values.status,
-      cashierInfo: values.cashierInfo,
-      customerInfo: values.customerInfo,
-      invoice_detail: values.invoice_detail,
-      notes: values.notes,
-      totalAmount: 0
+      invoiceDate: format(values.date, 'yyyy-MM-dd'),
+      dueDate: format(values.due_date, 'yyyy-MM-dd'),
+      totalAmount: Number(values.totalAmount),
+      currency: 'INR',
+      customerId: values.customerInfo.id,
+      note: values.notes
     };
 
-    dispatch(getInvoiceUpdate(NewList)).then(() => {
+    NewList.lines = values.invoice_detail.map((invoiceItem: any) => {
+      let invoiceLine = {} as InvoiceLine;
+      invoiceLine.amount = parseInt(invoiceItem.price) * invoiceItem.quantity;
+      invoiceLine.name = invoiceItem.name;
+      invoiceLine.description = invoiceItem.description;
+      invoiceLine.quantity = invoiceItem.quantity;
+      invoiceLine.price = invoiceItem.price;
+      invoiceLine.id = invoiceItem.id;
+      return invoiceLine;
+    });
+
+    updateInvoiceRequest(NewList).then(() => {
       dispatch(
         openSnackbar({
           open: true,
@@ -140,10 +140,10 @@ const Invoiceedit = () => {
           alert: {
             color: 'success'
           },
-          close: true
+          close: false
         })
       );
-      navigation('/apps/invoice/list');
+      navigation('/sales/invoices/list');
     });
   };
 
@@ -162,48 +162,60 @@ const Invoiceedit = () => {
       <Formik
         enableReinitialize={true}
         initialValues={{
-          id: list?.id || '',
-          invoice_id: list?.invoice_id || '',
-          status: list?.status || '',
-          date: new Date(list?.date!) || null,
-          due_date: new Date(list?.due_date!) || null,
+          id: list1?.id || '',
+          invoiceNumber: list1?.invoiceNumber,
+          invoice_id: list1?.invoiceNumber || '',
+          status: list1?.invoiceStatus || '',
+          date: new Date(list1?.invoiceDate!) || null,
+          due_date: new Date(list1?.dueDate!) || null,
           cashierInfo: list?.cashierInfo || invoiceSingleList,
-          customerInfo: list?.customerInfo || invoiceSingleList,
-          invoice_detail: list?.invoice_detail || [],
-          discount: list?.discount || 0,
-          tax: list?.tax || 0,
-          notes: list?.notes || ''
+          customerInfo: {
+            id: list1?.customer.id,
+            phoneNumber: list1?.customer.phoneNumber,
+            email: list1?.customer.email,
+            firstName: list1?.customer.firstName,
+            lastName: list1?.customer.lastName,
+            city: list1?.customer.city
+          },
+          invoice_detail: list1?.lines || [],
+          discount: list1?.discount || 0,
+          tax: list1?.tax || 0,
+          notes: list1?.note || '',
+          currency: list1?.currency,
+          totalAmount: list1?.totalAmount
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={(values) => {
+          console.log('Submitting form:', values);
           handlerEdit(values);
         }}
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal =
             values?.invoice_detail?.reduce((prev, curr: any) => {
-              if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.qty));
+              if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
               else return prev;
             }, 0) || 0;
           const taxRate = (values?.tax * subtotal) / 100;
           const discountRate = (values.discount * subtotal) / 100;
           const total = subtotal - discountRate + taxRate;
-
+          values.totalAmount = total;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
-                    <InputLabel>Invoice Id</InputLabel>
+                    <InputLabel>Invoice No.</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
                       <TextField
-                        required
                         disabled
-                        type="number"
-                        name="invoice_id"
-                        id="invoice_id"
-                        value={values.invoice_id}
+                        name="invoiceNumber"
+                        id="invoiceNumber"
+                        value={values.invoiceNumber}
                         onChange={handleChange}
+                        inputProps={{
+                          maxLength: 16
+                        }}
                       />
                     </FormControl>
                   </Stack>
@@ -269,31 +281,16 @@ const Invoiceedit = () => {
                       <Grid item xs={12} sm={8}>
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
-                          <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
-                          </Stack>
+                          <FormControl sx={{ width: '100%' }}>
+                            <Typography color="secondary">Belle J. Richter</Typography>
+                            <Typography color="secondary">1300 Cooks Mine, NM 87829</Typography>
+                            <Typography color="secondary">305-829-7809</Typography>
+                            <Typography color="secondary">belljrc23@gmail.com</Typography>
+                          </FormControl>
                         </Stack>
                       </Grid>
                       <Grid item xs={12} sm={4}>
                         <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
-                          <Button
-                            variant="outlined"
-                            startIcon={<EditOutlined />}
-                            color="secondary"
-                            onClick={() =>
-                              dispatch(
-                                toggleCustomerPopup({
-                                  open: true
-                                })
-                              )
-                            }
-                            size="small"
-                          >
-                            Change
-                          </Button>
                           <AddressModal
                             open={open}
                             setOpen={(value) =>
@@ -317,9 +314,9 @@ const Invoiceedit = () => {
                         <Stack spacing={2}>
                           <Typography variant="h5">To:</Typography>
                           <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.customerInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.phone}</Typography>
+                            <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.city}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                           </Stack>
                         </Stack>
@@ -357,7 +354,7 @@ const Invoiceedit = () => {
                     </Grid>
                   </MainCard>
                   {touched.customerInfo && errors.customerInfo && (
-                    <FormHelperText error={true}>{errors?.customerInfo?.name as string}</FormHelperText>
+                    <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
                   )}
                 </Grid>
 
@@ -393,7 +390,7 @@ const Invoiceedit = () => {
                                       index={index}
                                       name={item.name}
                                       description={item.description}
-                                      qty={item.qty}
+                                      qty={item.quantity}
                                       price={item.price}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
@@ -420,10 +417,9 @@ const Invoiceedit = () => {
                                   startIcon={<PlusOutlined />}
                                   onClick={() =>
                                     push({
-                                      id: UIDV4(),
                                       name: '',
                                       description: '',
-                                      qty: 1,
+                                      quantity: 1,
                                       price: '1.00'
                                     })
                                   }

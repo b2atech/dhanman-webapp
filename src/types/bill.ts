@@ -22,6 +22,16 @@ export interface InfoType {
   email: string;
 }
 
+export interface IPaidPayment {
+  clientId: string;
+  vendorId: number;
+  vendoeName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: number;
+}
+
 export interface Items {
   id: string | number;
   name: string;
@@ -57,10 +67,12 @@ export interface IBillType {
   paymentTerm: number;
   billStatus: string;
   vendor: {
+    id: string | number;
     firstName: string;
     lastName: string;
     email: string;
     addressLine: string;
+    city: string;
     phoneNumber: number;
   };
   currency: string;

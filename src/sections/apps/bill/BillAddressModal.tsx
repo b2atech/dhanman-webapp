@@ -66,7 +66,7 @@ const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) =
           />
         </FormControl>
         <Stack spacing={2}>
-          <Address handlerAddress={handlerAddress} />
+          <Address handlerAddress={(value) => handlerAddress(value)} />
         </Stack>
       </DialogContent>
       <Divider />

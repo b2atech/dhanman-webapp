@@ -5,11 +5,11 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { deleteInvoiceRequest } from 'api/services/SalesService';
 import { useDispatch } from 'store';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
+import { deletepaidPaymentRequest } from 'api/services/BillService';
 
 // types
 interface Props {
@@ -19,17 +19,17 @@ interface Props {
   id: string;
 }
 
-// ==============================|| KANBAN BOARD - COLUMN DELETE ||============================== //
+// ==============================|| PaidPayment - DELETE ||============================== //
 
-export default function AlertInvoiceDelete({ title, open, handleClose, id }: Props) {
+export default function AlertpaidPaymentDelete({ title, open, handleClose, id }: Props) {
   const dispatch = useDispatch();
-  const deleteInvoice = () => {
+  const deletepaidPayment = () => {
     handleClose(true);
-    deleteInvoiceRequest(id).then(() => {
+    deletepaidPaymentRequest(id).then(() => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Invoice deleted successfully',
+          message: 'Paid Payment deleted successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -41,6 +41,7 @@ export default function AlertInvoiceDelete({ title, open, handleClose, id }: Pro
       window.location.reload();
     });
   };
+
   return (
     <Dialog
       open={open}
@@ -58,7 +59,7 @@ export default function AlertInvoiceDelete({ title, open, handleClose, id }: Pro
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete the invoice of "{title}"?
+              Are you sure you want to delete "{title}"?
             </Typography>
           </Stack>
 
@@ -66,7 +67,7 @@ export default function AlertInvoiceDelete({ title, open, handleClose, id }: Pro
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={deleteInvoice} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deletepaidPayment} autoFocus>
               Delete
             </Button>
           </Stack>

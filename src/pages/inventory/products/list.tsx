@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, us
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import {
+  Box,
   Button,
   Dialog,
   FormControlLabel,
@@ -17,11 +18,11 @@ import {
   Typography,
   styled,
   useMediaQuery,
-  CircularProgress,
-  Box
+  CircularProgress
 } from '@mui/material';
 
 // third-party
+import { useSticky } from 'react-table-sticky';
 import {
   useFilters,
   useExpanded,
@@ -36,7 +37,7 @@ import {
   Cell,
   HeaderProps
 } from 'react-table';
-import { useSticky } from 'react-table-sticky';
+
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
@@ -55,13 +56,14 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import VendorDetails from '../createbills/Vendor/VendorDetails';
-import { getAllVendors } from 'api/services/BillService';
-import { IVendor } from 'types/bill';
-import moment from 'moment';
-import AddVendor from '../createbills/Vendor/AddVendor';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
-import { PatternFormat } from 'react-number-format';
+
+import { IInventory } from 'types/invoice';
+import { getAllProducts } from 'api/services/InventoryService';
+import AddProduct from './addproduct';
+import ProductDetails from './productDetails';
+import AlertProductDelete from './alertProductDelete';
+import { InventoryData } from 'types/inventoryInfo';
+
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
@@ -74,9 +76,10 @@ const TableWrapper = styled('div')(({ theme }) => ({
     zIndex: '5 !important'
   }
 }));
+
 interface Props {
   columns: Column[];
-  data: IVendor[];
+  data: InventoryData[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
@@ -90,7 +93,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -112,7 +114,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy], hiddenColumns: ['firstName', 'lastName', 'cityId', 'addressLine'] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -122,14 +124,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     useRowSelect,
     useSticky
   );
+
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+  const moment = require('moment');
   const now = new Date();
-  const formatedFilename = 'VendorsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [isVendorIdVisible, setIsVendorIdVisible] = useState(false);
+  const [isProductIdVisible, setIsProductIdVisible] = useState(false);
 
   const handleSwitchChange = () => {
-    setIsVendorIdVisible((prevIsVendorIdVisible) => !prevIsVendorIdVisible);
+    setIsProductIdVisible((prevIsProductIdVisible) => !prevIsProductIdVisible);
   };
 
   const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,22 +160,22 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Vendor
+              Add Product
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isVendorIdVisible ? 'Hide ID' : 'Show ID'}>
+            <Tooltip title={isProductIdVisible ? 'Close ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isVendorIdVisible} onChange={handleSwitchChange} />}
+                control={<Switch color="success" checked={isProductIdVisible} onChange={handleSwitchChange} />}
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -183,14 +187,14 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           </Stack>
         </Stack>
         <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+          <ScrollX sx={{ maxHeight: 400, overflow: 'auto' }}>
             <TableWrapper>
               <Table {...getTableProps()} stickyHeader>
                 <TableHead>
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                     <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                       {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isVendorIdVisible) {
+                        if (column.id === 'id' && !isProductIdVisible) {
                           return null;
                         }
                         return (
@@ -217,7 +221,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                           sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                         >
                           {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isVendorIdVisible) {
+                            if (cell.column.id === 'id' && !isProductIdVisible) {
                               return null;
                             }
                             return (
@@ -233,8 +237,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               </Table>
             </TableWrapper>
           </ScrollX>
-          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
-            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+          <Box>
+            <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
+              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+            </Box>
           </Box>
         </Box>
       </Stack>
@@ -242,16 +248,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-// ==============================|| VENDOR - LIST ||============================== //
+// ==============================|| PRODUCT - LIST ||============================== //
 
-const Vendors = () => {
+const ProductListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [vendor, setVendor] = useState<any>(null);
-  const [vendorDeleteName, setVendorDeleteName] = useState<any>('');
-  const [vendorDeleteId, setVendorDeleteId] = useState<string>('');
+  const [product, setProduct] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
-  const [vendors, setVendors] = useState<IVendor[]>([]);
+  const [products, setProducts] = useState<IInventory[]>([]);
+  const [productDeleteName, setProductDeleteName] = useState<any>('');
+  const [productDeleteId, setProductDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -260,10 +266,10 @@ const Vendors = () => {
   };
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          setVendors(vendorList);
+    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((productList) => {
+        if (Array.isArray(productList)) {
+          setProducts(productList);
           setLoading(false);
         }
       })
@@ -273,17 +279,15 @@ const Vendors = () => {
       });
   }, []);
 
-  const memoizedVendors = useMemo(() => vendors, [vendors]);
+  const memoizedProducts = useMemo(() => products, [products]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (vendor && !add) {
-      setVendor(null);
-    }
+    if (product && !add) setProduct(null);
   };
 
-  const handleClose = () => {
-    setOpen(!open);
+  const handleClose = (confirmed: boolean) => {
+    setOpen(false);
   };
 
   const columns = useMemo(
@@ -300,63 +304,52 @@ const Vendors = () => {
         disableSortBy: true
       },
       {
-        Header: 'Vendor id',
+        Header: 'Product id',
         accessor: 'id',
         width: -200,
         sticky: 'left'
       },
       {
-        show: false,
-        accessor: 'addressLine'
-      },
-      {
-        show: false,
-        accessor: 'firstName'
-      },
-      {
-        show: false,
-        accessor: 'lastName'
-      },
-      {
-        show: false,
-        accessor: 'cityId'
-      },
-      {
-        Header: 'Vendor Name',
-        accessor: 'vendorName',
-        width: 200,
+        Header: 'Product Name',
+        accessor: 'productName',
+        width: 220,
         sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.vendorName}</Typography>
+              <Typography variant="subtitle1">{values.productName}</Typography>
             </Stack>
           );
         }
       },
       {
-        Header: 'Contact',
-        accessor: 'phoneNumber',
-        width: 200,
-        sticky: 'left',
-        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
-      },
-      {
-        Header: 'Email',
-        accessor: 'email',
+        Header: 'Description',
+        accessor: 'description',
         width: 200,
         sticky: 'left'
       },
       {
-        Header: 'City',
-        accessor: 'cityName',
+        Header: 'Quantity',
+        accessor: 'quntityInStock',
+        width: 200,
+        sticky: 'left'
+      },
+      {
+        Header: 'Price',
+        accessor: 'unitPrice',
+        width: 200,
+        sticky: 'left'
+      },
+      {
+        Header: 'Recorder Level',
+        accessor: 'recorderLevel',
         width: 200,
         sticky: 'left'
       },
       {
         Header: 'Actions',
-        className: 'cell-left',
+        className: 'cell-right',
         width: 200,
         sticky: 'left',
         disableSortBy: true,
@@ -384,7 +377,7 @@ const Vendors = () => {
                   color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setVendor(row.values);
+                    setProduct(row.values);
                     handleAdd();
                   }}
                 >
@@ -396,9 +389,9 @@ const Vendors = () => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    setVendorDeleteName(row.values.vendorName);
-                    setVendorDeleteId(row.values.id);
-                    handleClose();
+                    setProductDeleteName(row.values.productName);
+                    setProductDeleteId(row.values.id);
+                    setOpen(true);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -414,33 +407,34 @@ const Vendors = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <VendorDetails data={memoizedVendors[Number(row.id)]} />,
-    [memoizedVendors]
+    ({ row }: { row: Row<{}> }) => <ProductDetails data={memoizedProducts[Number(row.id)]} />,
+
+    [memoizedProducts]
   );
 
   return (
     <MainCard content={false}>
-      {loading ? (
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
-          <CircularProgress size={60} thickness={4} />
-          <Typography variant="body1" style={{ marginTop: '16px' }}>
-            Loading, please wait...
-          </Typography>
-        </Box>
-      ) : (
-        <ScrollX>
+      <ScrollX>
+        {loading ? (
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+            <CircularProgress size={60} thickness={4} />
+            <Typography variant="body1" style={{ marginTop: '32x' }}>
+              Loading, please wait...
+            </Typography>
+          </Box>
+        ) : (
           <ReactTable
             columns={columns}
-            data={memoizedVendors}
+            data={memoizedProducts}
             handleAdd={handleAdd}
             renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
           />
-        </ScrollX>
-      )}
-      <AlertVendorDelete title={vendorDeleteName} open={open} handleClose={handleClose} id={vendorDeleteId} />
+        )}
+      </ScrollX>
+      <AlertProductDelete title={productDeleteName} open={open} handleClose={handleClose} id={productDeleteId} />
 
       <Dialog
         maxWidth="sm"
@@ -451,10 +445,10 @@ const Vendors = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddVendor vendor={vendor} onCancel={handleAdd} />
+        <AddProduct product={product} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default Vendors;
+export default ProductListPage;

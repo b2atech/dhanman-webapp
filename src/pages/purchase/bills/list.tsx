@@ -218,7 +218,7 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
             </Stack>
           ))}
           <CSVExport data={data} filename={'Bill-list.csv'} />
-          <Tooltip title={isBillIdVisible ? 'Close ID' : 'Show ID'}>
+          <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
             <FormControlLabel
               value=""
               control={<Switch color="success" checked={isBillIdVisible} onChange={handleSwitchChange} />}
@@ -227,7 +227,7 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
               sx={{ margin: '0', padding: '0', marginRight: 0 }}
             />
           </Tooltip>
-          <Tooltip title={isAuditSwitchOn ? 'Close Audit Columns' : 'Show Audit Columns'}>
+          <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
             <FormControlLabel
               value=""
               control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -287,11 +287,9 @@ function ReactTable({ columns, data, showIdColumn, getHeaderProps }: Props) {
           </TableWrapper>
         </ScrollX>
         <Box>
-          <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-            <TableCell sx={{ p: 2, py: 3 }} colSpan={10}>
-              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-            </TableCell>
-          </TableRow>
+          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
+            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+          </Box>
         </Box>
       </Box>
     </>
@@ -449,7 +447,13 @@ const Bills = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Edit">
-                  <IconButton color="primary">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      navigation(`/purchase/bills/edit/${row.values.id}`);
+                    }}
+                  >
                     <EditTwoTone twoToneColor={theme.palette.primary.main} />
                   </IconButton>
                 </Tooltip>

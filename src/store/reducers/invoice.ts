@@ -19,7 +19,7 @@ const initialState: InvoiceProps = {
   isOpen: false,
   isCustomerOpen: false,
   open: false,
-  country: countries[0],
+  country: countries[2],
   countries: countries,
   lists: [],
   list: null,

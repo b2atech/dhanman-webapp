@@ -78,6 +78,7 @@ import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import { PaletteColor } from '@mui/material';
 
+const moment = require('moment');
 export interface InvoiceWidgets {
   title: string;
   count: string;
@@ -291,7 +292,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
-  // ================ Tab ================
+  // =============================================== Tab ================================================================
 
   const groups = ['All', ...new Set(data.map((item: IInvoiceList) => item.invoiceStatus))];
   const countGroup = data.map((item: IInvoiceList) => item.invoiceStatus);
@@ -382,7 +383,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
             </Stack>
           ))}
           <CSVExport data={data} filename={'invoice-list.csv'} />
-          <Tooltip title={isInvoiceIdVisible ? 'Close ID' : 'Show ID'}>
+          <Tooltip title={isInvoiceIdVisible ? 'Hide ID' : 'Show ID'}>
             <FormControlLabel
               value=""
               control={<Switch color="success" checked={isInvoiceIdVisible} onChange={handleSwitchChange} />}
@@ -391,7 +392,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
               sx={{ margin: '0', padding: '0', marginRight: 0 }}
             />
           </Tooltip>
-          <Tooltip title={isAuditSwitchOn ? 'Close Audit Columns' : 'Show Audit Columns'}>
+          <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
             <FormControlLabel
               value=""
               control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -453,11 +454,9 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
           </TableWrapper>
         </ScrollX>
         <Box>
-          <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-            <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
-              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-            </TableCell>
-          </TableRow>
+          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
+            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+          </Box>
         </Box>
       </Box>
     </>
@@ -554,12 +553,14 @@ const List = () => {
       {
         Header: 'Create Date',
         accessor: 'invoiceDate',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
         sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Due Date',
         accessor: 'dueDate',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
         sticky: 'left',
         disableFilters: true
       },
@@ -615,7 +616,7 @@ const List = () => {
                   color="primary"
                   onClick={(e: any) => {
                     e.stopPropagation();
-                    navigation(`/apps/invoice/edit/${row.values.id}`);
+                    navigation(`/sales/invoices/edit/${row.values.id}`);
                   }}
                 >
                   <EditTwoTone twoToneColor={theme.palette.primary.main} />

@@ -33,7 +33,7 @@ export interface IInvoiceList {
 }
 
 export interface IInvoiceType {
-  id: number;
+  id: string;
   invoice_id: number;
   customer_name: string;
   invoiceNumber: string;
@@ -43,6 +43,7 @@ export interface IInvoiceType {
   dueDate: Date | string | number;
   quantity: number;
   customer: {
+    id: string | number;
     firstName: string;
     lastName: string;
     phoneNumber: number;
@@ -58,6 +59,7 @@ export interface IInvoiceType {
   tax: number | null;
   customerInfo: InfoType;
   note: string;
+  currency: string;
 }
 
 export interface Items {
@@ -115,6 +117,17 @@ export interface InvoiceDetail {
   price: number;
 }
 
+export interface IReceivedPayment {
+  id: string;
+  clientId: string;
+  vendorId: number;
+  vendoeName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: number;
+}
+
 export interface ICustomer {
   id: string;
   clientId: string;
@@ -123,6 +136,14 @@ export interface ICustomer {
   email: string;
   phoneNumber: string;
   city: string;
+}
+
+export interface IInventory {
+  clientId: string;
+  productName: string;
+  quantityInStock: string;
+  description: string;
+  unitPrice: string;
 }
 export interface ICoa {
   clientId: string;
