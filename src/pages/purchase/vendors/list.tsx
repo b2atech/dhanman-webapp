@@ -112,8 +112,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] },
-      hiddenColumns: ['']
+      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy], hiddenColumns: ['firstName', 'lastName', 'cityId', 'addressLine'] }
     },
     useGlobalFilter,
     useFilters,
@@ -278,7 +277,9 @@ const Vendors = () => {
 
   const handleAdd = () => {
     setAdd(!add);
-    if (vendor && !add) setVendor(null);
+    if (vendor && !add) {
+      setVendor(null);
+    }
   };
 
   const handleClose = () => {
@@ -303,6 +304,22 @@ const Vendors = () => {
         accessor: 'id',
         width: -200,
         sticky: 'left'
+      },
+      {
+        show: false,
+        accessor: 'addressLine'
+      },
+      {
+        show: false,
+        accessor: 'firstName'
+      },
+      {
+        show: false,
+        accessor: 'lastName'
+      },
+      {
+        show: false,
+        accessor: 'cityId'
       },
       {
         Header: 'Vendor Name',

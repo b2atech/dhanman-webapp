@@ -53,6 +53,19 @@ export const BillAPI = {
       throw error;
     }
   },
+  updateVendorRequest = async function (vendorData: VendorData) {
+    try {
+      const response = await apiPurchase.request({
+        url: `v1/vendor`,
+        method: 'PUT',
+        data: vendorData
+      });
+      return response.status;
+    } catch (error) {
+      console.error('Error deleting vendor:', error);
+      throw error;
+    }
+  },
   deleteBillRequest = async function (id: string) {
     try {
       const response = await apiPurchase.request({
