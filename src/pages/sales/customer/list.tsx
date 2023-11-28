@@ -113,7 +113,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar', 'addressLine'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -350,6 +350,13 @@ const CustomerListPage = () => {
       {
         Header: 'City',
         accessor: 'city',
+        width: 200,
+        sticky: 'left'
+      },
+      {
+        show: false,
+        Header: 'Address',
+        accessor: 'addressLine',
         width: 200,
         sticky: 'left'
       },

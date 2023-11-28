@@ -32,25 +32,8 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { createCustomerRequest, updateCustomerRequest } from 'api/services/SalesService';
 
-// types
-
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  // const newCustomer = {
-  //   userId: '0f6dd08e-cfe7-498b-9fed-167d759b1a3b',
-  //   clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-  //   firstName: '',
-  //   lastName: '',
-  //   phoneNumber: '',
-  //   email: '',
-  //   cityName: '',
-  //   cityId: '',
-  //   country: '',
-  //   state: '',
-  //   addressLine: ''
-  // };
-
-  // return newCustomer;
   if (customer) {
     const newCustomer = {
       id: customer.id,
