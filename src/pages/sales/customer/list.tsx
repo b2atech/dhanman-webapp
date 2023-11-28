@@ -351,7 +351,8 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Customer id',
-        accessor: 'id'
+        accessor: 'id',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Customer Name',
@@ -361,9 +362,10 @@ const CustomerListPage = () => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Stack spacing={0}>
-                <Typography variant="subtitle1">{values.customerName}</Typography>
-              </Stack>
+              <Typography variant="subtitle1">
+                {' '}
+                <span style={{ whiteSpace: 'nowrap' }}>{values.customerName}</span>
+              </Typography>
             </Stack>
           );
         }
@@ -455,7 +457,8 @@ const CustomerListPage = () => {
       },
       {
         Header: 'Created By',
-        accessor: 'createdBy'
+        accessor: 'createdBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Modified By',
