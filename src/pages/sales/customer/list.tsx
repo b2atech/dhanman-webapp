@@ -16,10 +16,9 @@ import {
   TableRow,
   Tooltip,
   Typography,
-  // styled,
   useMediaQuery,
   CircularProgress,
-  styled,
+  styled
 } from '@mui/material';
 
 // third-party
@@ -65,26 +64,18 @@ import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 import moment from 'moment';
 import { useSticky } from 'react-table-sticky';
-// import { auto } from '@popperjs/core';
-
-// import { map, map } from 'lodash';
 
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
     position: 'sticky',
-    top: 0,
     zIndex: 1,
-    background: theme.palette.background.paper
+    width: 'fit-content'
   },
   '& th[data-sticky-td]': {
     position: 'sticky',
-    zIndex: '5 !important',
-    top: 0,
-    background: theme.palette.background.paper
-  },
-  overflowX: 'auto',
-  whiteSpace: 'nowrap'
+    zIndex: '5 !important'
+  }
 }));
 
 interface Props {
@@ -134,7 +125,7 @@ function ReactTable({
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar', 'addressLine'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -225,10 +216,7 @@ function ReactTable({
                         }
 
                         return (
-                          <TableCell
-                            {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
-                            sx={{ position: 'sticky', top: 0, background: theme.palette.background.paper }}
-                          >
+                          <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
                             <HeaderSort column={column} />
                           </TableCell>
                         );
@@ -330,10 +318,6 @@ const CustomerListPage = () => {
     if (customer && !add) setCustomer(null);
   };
 
-  // // const handleClose = (confirmed: boolean) => {
-  //   setOpen(false);
-  // };
-
   const handleClose = () => {
     setOpen(!open);
   };
@@ -355,14 +339,14 @@ const CustomerListPage = () => {
         show: false,
         accessor: 'firstName',
         disableSortBy: true,
-        width: 20,
+        // width: 20,
         sticky: 'left'
       },
       {
         show: false,
         accessor: 'lastName',
         disableSortBy: true,
-        width: 20,
+        // width: 20,
         sticky: 'left'
       },
       {
@@ -374,8 +358,8 @@ const CustomerListPage = () => {
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        minWidth: 100,
-        maxWidth: 200,
+        // minWidth: 100,
+        // maxWidth: 200,
         sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
@@ -391,16 +375,16 @@ const CustomerListPage = () => {
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
-        minWidth: 100,
-        maxWidth: 200,
+        // minWidth: 100,
+        // maxWidth: 200,
         sticky: 'left',
         Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
       },
       {
         Header: 'Email',
         accessor: 'email',
-        minWidth: 100,
-        maxWidth: 150,
+        // minWidth: 100,
+        // maxWidth: 150,
         sticky: 'left'
       },
       {
@@ -418,8 +402,8 @@ const CustomerListPage = () => {
       {
         Header: 'Actions',
         className: 'cell-right',
-        minWidth: 100,
-        maxWidth: 200,
+        // minWidth: 100,
+        // maxWidth: 200,
         sticky: 'left',
         disableSortBy: true,
         // style: { textAlign: 'center' },
@@ -474,31 +458,31 @@ const CustomerListPage = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        minWidth: showCreatedOnColumn ? 120 : 100,
-        maxWidth: showCreatedOnColumn ? 150 : 120,
+        // minWidth: showCreatedOnColumn ? 120 : 100,
+        // maxWidth: showCreatedOnColumn ? 150 : 120,
         sticky: 'left',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
-        minWidth: showCreatedOnColumn ? 150 : 100,
-        maxWidth: showCreatedOnColumn ? 200 : 150,
+        // minWidth: showCreatedOnColumn ? 150 : 100,
+        // maxWidth: showCreatedOnColumn ? 200 : 150,
         sticky: 'left',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
-        minWidth: showCreatedOnColumn ? 200 : 150,
-        maxWidth: showCreatedOnColumn ? 250 : 200,
+        // minWidth: showCreatedOnColumn ? 200 : 150,
+        // maxWidth: showCreatedOnColumn ? 250 : 200,
         sticky: 'left'
       },
       {
         Header: 'Modified By',
         accessor: 'modifiedBy',
-        minWidth: showCreatedOnColumn ? 150 : 100,
-        maxWidth: showCreatedOnColumn ? 200 : 150,
+        // minWidth: showCreatedOnColumn ? 150 : 100,
+        // maxWidth: showCreatedOnColumn ? 200 : 150,
         sticky: 'left'
       }
     ],
