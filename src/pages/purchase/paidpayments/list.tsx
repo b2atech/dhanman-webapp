@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState, Fragment, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   FormControlLabel,
   Stack,
@@ -16,9 +18,7 @@ import {
   Tooltip,
   Typography,
   styled,
-  useMediaQuery,
-  CircularProgress,
-  Box
+  useMediaQuery
 } from '@mui/material';
 
 // third-party
@@ -37,7 +37,7 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { useSticky } from 'react-table-sticky';
+
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
@@ -56,12 +56,14 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { getAllPaidPayments } from 'api/services/BillService';
+import AddPaidPayment from './add';
 import { IPaidPayment } from 'types/bill';
-import AlertpaidPaymentDelete from './AlertpaidPaymentDelete';
+import AlertpaidPaymentDelete from './deleteAlert';
+import { getAllPaidPayments } from 'api/services/BillService';
+import PaidPaymentView from './details';
 
-const moment = require('moment');
 // ==============================|| REACT TABLE ||============================== //
+
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
     position: 'sticky',
@@ -73,33 +75,38 @@ const TableWrapper = styled('div')(({ theme }) => ({
     zIndex: '5 !important'
   }
 }));
+
+const moment = require('moment');
 interface Props {
   columns: Column[];
   data: IPaidPayment[];
   handleAdd: () => void;
-  getHeaderProps: (column: HeaderGroup) => {};
+  renderRowSubComponent: FC<any>;
   showIdColumn: boolean;
   handleSwitchChange: () => void;
+  getHeaderProps: (column: HeaderGroup) => {};
 }
 
-function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'vendorName', desc: false };
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    setHiddenColumns,
     allColumns,
+    visibleColumns,
     rows,
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, selectedRowIds, pageIndex, pageSize },
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -109,29 +116,34 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] },
-      hiddenColumns: ['']
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'email'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect,
-    useSticky
+    useRowSelect
   );
 
-  const now = new Date();
-  const formatedFilename = 'PaidPaymentsList ' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const [isPaidPaymentIdVisible, setIsPaidPaymentIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [isPaidPaymentIdVisible, setIsPiadPaymentIdVisible] = useState(false);
+
+  useEffect(() => {
+    if (matchDownSM) {
+      setHiddenColumns(['age', 'contact', 'visits', 'email', 'status', 'avatar']);
+    } else {
+      setHiddenColumns(['avatar', 'email']);
+    }
+    // eslint-disable-next-line
+  }, [matchDownSM]);
 
   const handleSwitchChange = () => {
-    setIsPiadPaymentIdVisible((prevIsPiadPaymentIdVisible) => !prevIsPiadPaymentIdVisible);
+    setIsPaidPaymentIdVisible((prevIsPaidPaymetIdVisible) => !prevIsPaidPaymetIdVisible);
   };
 
-  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAuditSwitchOn(event.target.checked);
+  const handleAuditSwitchChange = () => {
+    setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
   return (
@@ -154,11 +166,11 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Paid Payment
+              Comming soon
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formatedFilename}
+              filename={'paidPayment-list.csv'}
             />
             <Tooltip title={isPaidPaymentIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
@@ -169,7 +181,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -180,18 +192,27 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
             </Tooltip>
           </Stack>
         </Stack>
-        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+        <ScrollX sx={{ height: 500, overflowX: 'auto', overflowY: 'auto' }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
                 {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                     {headerGroup.headers.map((column: HeaderGroup) => {
-                      if (column.id === 'id' && !isPaidPaymentIdVisible) {
+                      if (
+                        (column.id === 'id' && !isPaidPaymentIdVisible) ||
+                        (column.id === '12' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                      ) {
                         return null;
                       }
                       return (
-                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                        <TableCell
+                          sx={{ position: 'sticky !important' }}
+                          {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
+                        >
                           <HeaderSort column={column} />
                         </TableCell>
                       );
@@ -202,6 +223,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
               <TableBody {...getTableBodyProps()}>
                 {page.map((row: Row, i: number) => {
                   prepareRow(row);
+                  const rowProps = row.getRowProps();
+
                   return (
                     <Fragment key={i}>
                       <TableRow
@@ -212,14 +235,22 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
                         {row.cells.map((cell: Cell) => {
-                          if (cell.column.id === 'id' && !isPaidPaymentIdVisible) {
+                          if (
+                            (cell.column.id === 'id' && !isPaidPaymentIdVisible) ||
+                            (cell.column.id === '12' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                          ) {
                             return null;
                           }
+
                           return (
                             <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                           );
                         })}
                       </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
                     </Fragment>
                   );
                 })}
@@ -227,7 +258,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
             </Table>
           </TableWrapper>
         </ScrollX>
-        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 2 }}>
+        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
           <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
         </Box>
       </Stack>
@@ -235,22 +266,18 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
   );
 }
 
-// ==============================|| PaidPayments - LIST ||============================== //
+// ==============================|| Paid Payment - LIST ||============================== //
 
-const PaidPayments = () => {
+const PaidPaymentListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [paidPayment, setPaidPayment] = useState<any>(null);
   const [paidPaymentDeleteName, setPaidPaymentDeleteName] = useState<any>('');
   const [setPaidPaymentDeleteId, setPaidPaymentsDeleteId] = useState<string>('');
-  const [add, setAdd] = useState<boolean>(false);
   const [paidPayments, setPaidPayments] = useState<IPaidPayment[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const handleSwitchChange = () => {
-    setShowIdColumn(!showIdColumn);
-  };
+  const [add, setAdd] = useState<boolean>(false);
 
   useEffect(() => {
     getAllPaidPayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -276,13 +303,14 @@ const PaidPayments = () => {
   const handleClose = () => {
     setOpen(!open);
   };
+  const handleSwitchChange = () => {
+    setShowIdColumn(!showIdColumn);
+  };
 
   const columns = useMemo(
     () => [
       {
         title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -292,22 +320,17 @@ const PaidPayments = () => {
       },
       {
         Header: 'PaidPayment id',
-        accessor: 'id',
-        width: -200,
-        sticky: 'left'
+        accessor: 'id'
       },
       {
         Header: 'Create Date',
-        accessor: 'paidDate',
-        sticky: 'left',
+        accessor: 'createdOnUtc',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
         disableFilters: true
       },
       {
         Header: 'Vendor Name',
         accessor: 'vendorName',
-        width: 200,
-        sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
@@ -319,21 +342,15 @@ const PaidPayments = () => {
       },
       {
         Header: 'Amount',
-        accessor: 'amount',
-        width: 200,
-        sticky: 'left'
+        accessor: 'amount'
       },
       {
         Header: 'Description',
-        accessor: 'description',
-        width: 200,
-        sticky: 'left'
+        accessor: 'description'
       },
       {
         Header: 'Actions',
-        className: 'cell-left',
-        width: 200,
-        sticky: 'left',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -342,50 +359,76 @@ const PaidPayments = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    row.toggleRowExpanded();
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setPaidPayment(row.values);
-                    handleAdd();
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setPaidPaymentDeleteName(row.values.vendorName);
-                    setPaidPaymentsDeleteId(row.values.id);
-                    handleClose();
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0}>
+              <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={0}>
+                <Tooltip title="View">
+                  <IconButton
+                    color="secondary"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      row.toggleRowExpanded();
+                    }}
+                  >
+                    {collapseIcon}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      setPaidPayment(row.values);
+                      handleAdd();
+                    }}
+                  >
+                    <EditTwoTone twoToneColor={theme.palette.primary.main} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    color="error"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      handleClose();
+                      setPaidPaymentDeleteName(row.values.vendorName);
+                      setPaidPaymentsDeleteId(row.values.id);
+                    }}
+                  >
+                    <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
             </Stack>
           );
         }
+      },
+      //shreyas: need to change as per accessor name
+      {
+        Header: 'Created On',
+        accessor: '12',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Created By',
+        accessor: 'createdBy'
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
+  );
+
+  const renderRowSubComponent = useCallback(
+    ({ row }: { row: Row<{}> }) => <PaidPaymentView data={memoizedPaidPayment[Number(row.id)]} />,
+    [memoizedPaidPayment]
   );
 
   return (
@@ -393,7 +436,7 @@ const PaidPayments = () => {
       {loading ? (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
           <CircularProgress size={60} thickness={4} />
-          <Typography variant="body1" style={{ marginTop: '16px' }}>
+          <Typography variant="body1" style={{ marginTop: '32x' }}>
             Loading, please wait...
           </Typography>
         </Box>
@@ -403,14 +446,16 @@ const PaidPayments = () => {
             columns={columns}
             data={memoizedPaidPayment}
             handleAdd={handleAdd}
+            renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
           />
         </ScrollX>
       )}
-      <AlertpaidPaymentDelete title={paidPaymentDeleteName} open={open} handleClose={handleClose} id={setPaidPaymentDeleteId} />
 
+      <AlertpaidPaymentDelete title={paidPaymentDeleteName} open={open} handleClose={handleClose} id={setPaidPaymentDeleteId} />
+      {/* add paidPayment dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -419,9 +464,11 @@ const PaidPayments = () => {
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
-      ></Dialog>
+      >
+        <AddPaidPayment paidpayment={paidPayments} onCancel={handleAdd} />
+      </Dialog>
     </MainCard>
   );
 };
 
-export default PaidPayments;
+export default PaidPaymentListPage;

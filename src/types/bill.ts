@@ -24,12 +24,22 @@ export interface InfoType {
 
 export interface IPaidPayment {
   clientId: string;
-  vendorId: number;
-  vendoeName: string;
+  vendorId: string;
+  vendorName: string;
   transactionId: string;
   coaId: string;
   description: string;
-  amount: number;
+  amount: string | number;
+}
+
+export interface PaidPaymentData {
+  clientId: string;
+  vendorId: string;
+  vendorName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: string | number;
 }
 
 export interface Items {
