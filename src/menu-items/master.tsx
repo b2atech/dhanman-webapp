@@ -174,6 +174,13 @@ const master: NavItemType = {
           type: 'item',
           url: '/inventory/products/list',
           icon: icons.TagOutlined
+        },
+        {
+          id: 'addproducts',
+          title: <FormattedMessage id="addproducts" />,
+          type: 'item',
+          url: '/inventory/products/create',
+          icon: icons.PlusSquareOutlined
         }
       ]
     },
