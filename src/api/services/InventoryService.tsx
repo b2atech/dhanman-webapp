@@ -1,4 +1,4 @@
-import { IProductData, InventoryData } from 'types/inventoryInfo';
+import { InventoryData } from 'types/inventoryInfo';
 import { apiInventory } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 
@@ -40,7 +40,7 @@ export async function createProductRequest(inventroydata: InventoryData) {
   });
   return response.status;
 }
-export async function updateProductRequest(inventroydata: IProductData) {
+export async function updateProductRequest(inventroydata: InventoryData) {
   const response = await apiInventory.request({
     url: `v1/product`,
     method: 'PUT',
