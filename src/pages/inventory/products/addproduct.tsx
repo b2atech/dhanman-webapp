@@ -15,22 +15,55 @@ import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
 // types
-import { createProductRequest } from 'api/services/InventoryService';
+import { createProductRequest, updateProductRequest } from 'api/services/InventoryService';
+//import { Inventory } from '@mui/icons-material';
 
 // constant
 const getInitialValues = (product: FormikValues | null) => {
-  const newProduct = {
-    clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    productName: '',
-    quantityInStock: '',
-    description: '',
-    unitPrice: ''
-  };
-
-  return newProduct;
+  if (product) {
+    const newProduct = {
+      id: product.id,
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      productName: product.productName,
+      description: product.description,
+      unit: product.unit,
+      categoryName: product.categoryName,
+      hsnCode: product.hsnCode,
+      sac: product.sac,
+      purchasePrice: product.purchasePrice,
+      sellingPrice: product.sellingPrice,
+      cgst: product.cgst,
+      sgst: product.sgst,
+      igst: product.igst,
+      openingStock: product.openingStock,
+      minimumStock: product.minimumStock,
+      vendorName: product.vendorName
+    };
+    return newProduct;
+  } else {
+    const newProduct = {
+      id: '',
+      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      productName: '',
+      description: '',
+      unit: '',
+      categoryName: '',
+      hsnCode: '',
+      sac: '',
+      purchasePrice: '',
+      sellingPrice: '',
+      cgst: '',
+      sgst: '',
+      igst: '',
+      openingStock: '',
+      minimumStock: '',
+      vendorName: ''
+    };
+    return newProduct;
+  }
 };
 
-// ==============================|| Product ADD / EDIT ||============================== //
+// ==============================|| PRODUCT ADD / EDIT ||============================== //
 
 export interface Props {
   product?: any;
@@ -40,37 +73,54 @@ export interface Props {
 const AddProduct = ({ product, onCancel }: Props) => {
   const ProductSchema = Yup.object().shape({
     productName: Yup.string().max(255).required('Please Enter Product Name'),
-    quantityInStock: Yup.number().positive('Please Enter a positive quantity').required('Please Enter Quantity'),
-    unitPrice: Yup.number().positive('Please Enter a positive unit price').required('Please Enter Price'),
     description: Yup.string().max(255).required('Please Enter Description')
   });
 
   const formik = useFormik({
     initialValues: getInitialValues(product!),
+    enableReinitialize: true,
     validationSchema: ProductSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const InventoryData = {
+          productId: values.id,
           clientId: values.clientId,
           productName: values.productName,
-          quantityInStock: values.quantityInStock,
           description: values.description,
-          unitPrice: values.unitPrice
+          vendorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          unitId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          categoryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          unit: values.unit,
+          categoryName: values.categoryName,
+          hsnCode: values.hsnCode,
+          sac: values.sac,
+          purchasePrice: values.purchasePrice,
+          sellingPrice: values.sellingPrice,
+          cgst: values.cgst,
+          sgst: values.sgst,
+          igst: values.igst,
+          openingStock: values.openingStock,
+          minimumStock: values.minimumStock,
+          vendorName: values.vendorName
         };
 
         if (product) {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'Product updated successfully.',
-              anchorOrigin: { vertical: 'top', horizontal: 'right' },
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          const response = await updateProductRequest(InventoryData);
+          if (response === 204) {
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: 'Product updated successfully.',
+                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                variant: 'alert',
+                alert: {
+                  color: 'success'
+                },
+                close: false
+              })
+            );
+            window.location.reload();
+          }
         } else {
           const response = await createProductRequest(InventoryData);
           if (response === 200) {
@@ -132,55 +182,15 @@ const AddProduct = ({ product, onCancel }: Props) => {
                   </Grid>
                   <Grid item xs={6}>
                     <Stack spacing={1.25}>
-                      <InputLabel htmlFor="quntity-In-Stock">Quntity</InputLabel>
-                      <TextField
-                        autoFocus
-                        fullWidth
-                        id="quantityInStock"
-                        type="text"
-                        placeholder="Enter Quntity"
-                        {...getFieldProps('quantityInStock')}
-                        error={Boolean(touched.quantityInStock && errors.quantityInStock)}
-                        helperText={touched.quantityInStock && errors.quantityInStock ? 'Please Enter Quntity' : ''}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={1.25}>
-                      <InputLabel htmlFor="price">Price</InputLabel>
-                      <TextField
-                        fullWidth
-                        id="unitPrice"
-                        placeholder="Enter Price"
-                        {...getFieldProps('unitPrice')}
-                        error={Boolean(touched.unitPrice && errors.unitPrice)}
-                        helperText={touched.unitPrice && errors.unitPrice ? (errors.unitPrice as React.ReactNode) : ''}
-                        inputProps={{
-                          inputMode: 'numeric',
-                          pattern: '[0-9]*',
-                          maxLength: 10,
-                          onInput: (e) => {
-                            e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
-                            if (e.currentTarget.value.length > 10) {
-                              e.currentTarget.value = e.currentTarget.value.slice(0, 10);
-                            }
-                          }
-                        }}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={1.25}>
                       <InputLabel htmlFor="description">Description</InputLabel>
                       <TextField
-                        autoFocus
                         fullWidth
                         id="description"
                         type="text"
-                        placeholder="Enter Description"
+                        placeholder="Enter description"
                         {...getFieldProps('description')}
                         error={Boolean(touched.description && errors.description)}
-                        helperText={touched.description && errors.description ? 'Please Enter Description' : ''}
+                        helperText={touched.description && errors.description ? 'Please enter description' : ''}
                       />
                     </Stack>
                   </Grid>

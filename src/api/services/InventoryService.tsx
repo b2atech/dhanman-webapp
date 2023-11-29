@@ -40,5 +40,13 @@ export async function createProductRequest(inventroydata: InventoryData) {
   });
   return response.status;
 }
+export async function updateProductRequest(inventroydata: InventoryData) {
+  const response = await apiInventory.request({
+    url: `v1/product`,
+    method: 'PUT',
+    data: inventroydata
+  });
+  return response.status;
+}
 
 const cancelApiObject = defineCancelApiObject(InvetoryAPI);

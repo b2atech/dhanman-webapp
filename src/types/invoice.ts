@@ -117,6 +117,17 @@ export interface InvoiceDetail {
   price: number;
 }
 
+export interface IReceivedPayment {
+  id: string;
+  clientId: string;
+  vendorId: number;
+  vendoeName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: number;
+}
+
 export interface ICustomer {
   id: string;
   clientId: string;
@@ -130,9 +141,22 @@ export interface ICustomer {
 export interface IInventory {
   clientId: string;
   productName: string;
-  quantityInStock: string;
+  unitId: string;
+  unit: string;
+  categoryId: string;
+  categoryName: string;
   description: string;
-  unitPrice: string;
+  hsnCode: string;
+  sac: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  cgst: number;
+  sgst: number;
+  igst: number;
+  openingStock: number;
+  minimumStock: number;
+  vendorId: string;
+  vendorName: string;
 }
 export interface ICoa {
   clientId: string;

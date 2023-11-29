@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
 
 // material-ui
@@ -6,6 +5,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   FormControlLabel,
   Stack,
@@ -18,8 +18,7 @@ import {
   Tooltip,
   Typography,
   styled,
-  useMediaQuery,
-  CircularProgress
+  useMediaQuery
 } from '@mui/material';
 
 // third-party
@@ -57,13 +56,14 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-
-import ProductDetails from './productDetails';
-import AlertProductDelete from './alertProductDelete';
-import { InventoryData } from 'types/inventoryInfo';
-import { getAllProducts } from 'api/services/InventoryService';
+import AddPaidPayment from './add';
+import { IPaidPayment } from 'types/bill';
+import AlertpaidPaymentDelete from './deleteAlert';
+import { getAllPaidPayments } from 'api/services/BillService';
+import PaidPaymentView from './details';
 
 // ==============================|| REACT TABLE ||============================== //
+
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
     position: 'sticky',
@@ -79,12 +79,12 @@ const TableWrapper = styled('div')(({ theme }) => ({
 const moment = require('moment');
 interface Props {
   columns: Column[];
-  data: InventoryData[];
+  data: IPaidPayment[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
-  getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
+  getHeaderProps: (column: HeaderGroup) => {};
 }
 
 function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
@@ -92,7 +92,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'productName', desc: false };
+  const sortBy = { id: 'vendorName', desc: false };
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -124,10 +125,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     usePagination,
     useRowSelect
   );
-  
-  const moment = require('moment');
-  const now = new Date();const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
-  const [isProductIdVisible, setIsProductIdVisible] = useState(false);
+
+  const [isPaidPaymentIdVisible, setIsPaidPaymentIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
 
   useEffect(() => {
@@ -140,7 +139,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   }, [matchDownSM]);
 
   const handleSwitchChange = () => {
-    setIsProductIdVisible((prevIsProductIdVisible) => !prevIsProductIdVisible);
+    setIsPaidPaymentIdVisible((prevIsPaidPaymetIdVisible) => !prevIsPaidPaymetIdVisible);
   };
 
   const handleAuditSwitchChange = () => {
@@ -167,16 +166,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Paid Payment
+              Comming soon
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formatedFilename}
+              filename={'paidPayment-list.csv'}
             />
-            <Tooltip title={isProductIdVisible ? 'Hide ID' : 'Show ID'}>
+            <Tooltip title={isPaidPaymentIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isProductIdVisible} onChange={handleSwitchChange} />}
+                control={<Switch color="success" checked={isPaidPaymentIdVisible} onChange={handleSwitchChange} />}
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
@@ -201,7 +200,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                     {headerGroup.headers.map((column: HeaderGroup) => {
                       if (
-                        (column.id === 'id' && !isProductIdVisible) ||
+                        (column.id === 'id' && !isPaidPaymentIdVisible) ||
                         (column.id === '12' && !isAuditSwitchOn) ||
                         (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
                         (column.id === 'createdBy' && !isAuditSwitchOn) ||
@@ -237,7 +236,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                       >
                         {row.cells.map((cell: Cell) => {
                           if (
-                            (cell.column.id === 'id' && !isProductIdVisible) ||
+                            (cell.column.id === 'id' && !isPaidPaymentIdVisible) ||
                             (cell.column.id === '12' && !isAuditSwitchOn) ||
                             (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
                             (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
@@ -245,6 +244,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                           ) {
                             return null;
                           }
+
                           return (
                             <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                           );
@@ -266,24 +266,24 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-// ==============================|| PRODUCT - LIST ||============================== //
+// ==============================|| Paid Payment - LIST ||============================== //
 
-const ProductListPage = () => {
+const PaidPaymentListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
-  const [product, setProduct] = useState<any>(null);
-  const [add, setAdd] = useState<boolean>(false);
-  const [products, setProducts] = useState<InventoryData[]>([]);
-  const [productDeleteName, setProductDeleteName] = useState<any>('');
-  const [productDeleteId, setProductDeleteId] = useState<string>('');
+  const [paidPayment, setPaidPayment] = useState<any>(null);
+  const [paidPaymentDeleteName, setPaidPaymentDeleteName] = useState<any>('');
+  const [setPaidPaymentDeleteId, setPaidPaymentsDeleteId] = useState<string>('');
+  const [paidPayments, setPaidPayments] = useState<IPaidPayment[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [add, setAdd] = useState<boolean>(false);
 
   useEffect(() => {
-    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((productList) => {
-        if (Array.isArray(productList)) {
-          setProducts(productList);
+    getAllPaidPayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((paidPaymentList) => {
+        if (Array.isArray(paidPaymentList)) {
+          setPaidPayments(paidPaymentList);
           setLoading(false);
         }
       })
@@ -293,11 +293,11 @@ const ProductListPage = () => {
       });
   }, []);
 
-  const memoizedProducts = useMemo(() => products, [products]);
+  const memoizedPaidPayment = useMemo(() => paidPayments, [paidPayments]);
 
   const handleAdd = () => {
     setAdd(!add);
-    if (product && !add) setProduct(null);
+    if (paidPayment && !add) setPaidPayment(null);
   };
 
   const handleClose = () => {
@@ -319,84 +319,37 @@ const ProductListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'PRODUCT ID',
-        accessor: 'id',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 300 }}>{value}</Box>
+        Header: 'PaidPayment id',
+        accessor: 'id'
       },
       {
-        Header: 'PRODUCT NAME',
-        accessor: 'productName',
+        Header: 'Create Date',
+        accessor: 'createdOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableFilters: true
+      },
+      {
+        Header: 'Vendor Name',
+        accessor: 'vendorName',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1" minWidth={150}>{values.productName}</Typography>
+              <Typography variant="subtitle1">{values.vendorName}</Typography>
             </Stack>
           );
         }
       },
       {
-        Header: 'CATEGORY',
-        accessor: 'categoryName',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 100 }}>{value}</Box>,
-        width: 200
+        Header: 'Amount',
+        accessor: 'amount'
       },
       {
-        Header: 'HSN',
-        accessor: 'hsnCode',
-        className: 'cell-center',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+        Header: 'Description',
+        accessor: 'description'
       },
       {
-        Header: 'SAC',
-        accessor: 'sac',
-        className: 'cell-center',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'COST',
-        accessor: 'purchasePrice',
-        className: 'cell-right',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'RATE',
-        accessor: 'sellingPrice',
-        className: 'cell-right',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-
-      },
-      {
-        Header: 'CGST',
-        accessor: 'cgst',
-        className: 'cell-center',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'SGST',
-        accessor: 'sgst',
-        className: 'cell-center',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'IGST',
-        accessor: 'igst',
-        className: 'cell-center',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'OPN.STOCK',
-        accessor: 'openingStock',
-        className: 'cell-right',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'UNIT',
-        accessor: 'unit',
-        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-      },
-      {
-        Header: 'ACTIONS',
+        Header: 'Actions',
         className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
@@ -424,7 +377,7 @@ const ProductListPage = () => {
                     color="primary"
                     onClick={(e: MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
-                      setProduct(row.values);
+                      setPaidPayment(row.values);
                       handleAdd();
                     }}
                   >
@@ -437,8 +390,8 @@ const ProductListPage = () => {
                     onClick={(e: MouseEvent<HTMLButtonElement>) => {
                       e.stopPropagation();
                       handleClose();
-                      setProductDeleteName(row.values.productName);
-                      setProductDeleteId(row.values.id);
+                      setPaidPaymentDeleteName(row.values.vendorName);
+                      setPaidPaymentsDeleteId(row.values.id);
                     }}
                   >
                     <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -449,23 +402,23 @@ const ProductListPage = () => {
           );
         }
       },
-      //pranit: need to change as per accessor name
+      //shreyas: need to change as per accessor name
       {
-        Header: 'CREATED ON',
+        Header: 'Created On',
         accessor: '12',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
-        Header: 'MODIFIED ON',
+        Header: 'Modified On',
         accessor: 'modifiedOnUtc',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
-        Header: 'CREATED BY',
+        Header: 'Created By',
         accessor: 'createdBy'
       },
       {
-        Header: 'MODIFIED BY',
+        Header: 'Modified By',
         accessor: 'modifiedBy'
       }
     ],
@@ -474,9 +427,8 @@ const ProductListPage = () => {
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <ProductDetails data={memoizedProducts[Number(row.id)]} />,
-
-    [memoizedProducts]
+    ({ row }: { row: Row<{}> }) => <PaidPaymentView data={memoizedPaidPayment[Number(row.id)]} />,
+    [memoizedPaidPayment]
   );
 
   return (
@@ -492,7 +444,7 @@ const ProductListPage = () => {
         <ScrollX>
           <ReactTable
             columns={columns}
-            data={memoizedProducts}
+            data={memoizedPaidPayment}
             handleAdd={handleAdd}
             renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
@@ -502,21 +454,21 @@ const ProductListPage = () => {
         </ScrollX>
       )}
 
-      <AlertProductDelete title={productDeleteName} open={open} handleClose={handleClose} id={productDeleteId} />
-
+      <AlertpaidPaymentDelete title={paidPaymentDeleteName} open={open} handleClose={handleClose} id={setPaidPaymentDeleteId} />
+      {/* add paidPayment dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
         keepMounted
         fullWidth
-        onClose={handleAdd}
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
+        <AddPaidPayment paidpayment={paidPayments} onCancel={handleAdd} />
       </Dialog>
     </MainCard>
   );
 };
 
-export default ProductListPage;
+export default PaidPaymentListPage;

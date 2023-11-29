@@ -33,28 +33,45 @@ import { openSnackbar } from 'store/reducers/snackbar';
 
 // types
 import AlertVendorDelete from './AlertVendorDelete';
-import { createVendorRequest } from 'api/services/BillService';
+import { createVendorRequest, updateVendorRequest } from 'api/services/BillService';
 
 // constant
-const getInitialValues = (vendor: FormikValues | null) => {
-  const newVendor = {
-    userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    clientId: '59ac0567-d0ac-4a75-91d5-b5246cfa8ff3',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-    country: '',
-    state: '',
-    cityName: '',
-    cityId: '',
-    addressLine: ''
-  };
 
-  return newVendor;
+const getInitialValues = (vendor: FormikValues | null) => {
+  if (vendor) {
+    return {
+      userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      clientId: '59ac0567-d0ac-4a75-91d5-b5246cfa8ff3',
+      firstName: vendor.firstName,
+      lastName: vendor.lastName,
+      phoneNumber: vendor.phoneNumber,
+      email: vendor.email,
+      country: vendor.country,
+      state: vendor.state,
+      cityName: vendor.cityName,
+      cityId: vendor.cityId,
+      addressLine: vendor.addressLine,
+      id: vendor.id
+    };
+  } else {
+    return {
+      userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      clientId: '59ac0567-d0ac-4a75-91d5-b5246cfa8ff3',
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: '',
+      country: '',
+      state: '',
+      cityName: '',
+      cityId: '',
+      addressLine: '',
+      id: ''
+    };
+  }
 };
 
-// ==============================|| CUSTOMER ADD / EDIT ||============================== //
+// ==============================|| VENDOR ADD / EDIT ||============================== //
 
 export interface Props {
   vendor?: any;
@@ -138,10 +155,12 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
 
   const formik = useFormik({
     initialValues: getInitialValues(vendor!),
+    enableReinitialize: true,
     validationSchema: VendorSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const vendorData = {
+          vendorId: values.id,
           userId: values.userId,
           clientId: values.clientId,
           firstName: values.firstName,
@@ -154,18 +173,22 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
         };
 
         if (vendor) {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'Vendor updated successfully.',
-              anchorOrigin: { vertical: 'top', horizontal: 'right' },
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          const response = await updateVendorRequest(vendorData);
+          if (response === 204) {
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: 'Vendor updated successfully. nad kra pn amacha kuthe',
+                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                variant: 'alert',
+                alert: {
+                  color: 'success'
+                },
+                close: false
+              })
+            );
+            window.location.reload();
+          }
         } else {
           const response = await createVendorRequest(vendorData);
           if (response === 200) {
@@ -201,7 +224,7 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{vendor ? 'Add Vendor' : 'New Vendor'}</DialogTitle>
+              <DialogTitle>{vendor ? 'Edit Vendor' : 'New Vendor'}</DialogTitle>
               <IconButton shape="rounded" type="reset" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
@@ -241,10 +264,10 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
                   </Grid>
                   <Grid item xs={6}>
                     <Stack spacing={1.25}>
-                      <InputLabel htmlFor="customer-phoneNumber">Phone Number</InputLabel>
+                      <InputLabel htmlFor="vendor-phoneNumber">Phone Number</InputLabel>
                       <TextField
                         fullWidth
-                        id="customer-phoneNumber"
+                        id="vendor-phoneNumber"
                         placeholder="Enter Phone Number"
                         {...getFieldProps('phoneNumber')}
                         error={Boolean(touched.phoneNumber && errors.phoneNumber)}
@@ -394,7 +417,7 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
                 <Grid item>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
                     <Button type="submit" color="primary" variant="contained" disabled={isSubmitting}>
-                      Add
+                      {vendor ? 'Edit' : 'Add'}
                     </Button>
                     <Button variant="contained" type="reset" color="error" onClick={onCancel}>
                       Cancel
