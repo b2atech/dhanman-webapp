@@ -16,14 +16,13 @@ import {
   TableRow,
   Tooltip,
   Typography,
-  styled,
   useMediaQuery,
-  CircularProgress
+  CircularProgress,
+  styled
 } from '@mui/material';
 
 // third-party
 import { PatternFormat } from 'react-number-format';
-import { useSticky } from 'react-table-sticky';
 import {
   useFilters,
   useExpanded,
@@ -36,7 +35,8 @@ import {
   HeaderGroup,
   Row,
   Cell,
-  HeaderProps
+  HeaderProps,
+  CellProps
 } from 'react-table';
 
 // project import
@@ -62,6 +62,8 @@ import AddCustomer from '../createinvoice/Customer/AddCustomer';
 import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
+import moment from 'moment';
+import { useSticky } from 'react-table-sticky';
 
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
@@ -84,12 +86,31 @@ interface Props {
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
+  showCreatedOnColumn: boolean;
+  handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({
+  columns,
+  data,
+  renderRowSubComponent,
+  handleAdd,
+  getHeaderProps,
+  showIdColumn,
+  showCreatedOnColumn,
+  handleAuditColumnSwitchChange
+}: Props) {
+  const defaultColumn = useMemo(
+    () => ({
+      minWidth: 80,
+      width: 200,
+      maxWidth: 400,
+      margin: 20
+    }),
+    []
+  );
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
   const {
@@ -112,6 +133,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     {
       columns,
       data,
+      defaultColumn,
       filterTypes,
       initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar', 'addressLine'], sortBy: [sortBy] }
     },
@@ -135,8 +157,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     setIsCustomerIdVisible((prevIsCustomerIdVisible) => !prevIsCustomerIdVisible);
   };
 
-  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAuditSwitchOn(event.target.checked);
+  const handleAuditSwitchChange = () => {
+    setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
   return (
@@ -186,18 +208,25 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           </Stack>
         </Stack>
         <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflow: 'auto' }}>
+          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
             <TableWrapper>
               <Table {...getTableProps()} stickyHeader>
                 <TableHead>
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                     <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                       {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isCustomerIdVisible) {
+                        if (
+                          (column.id === 'id' && !isCustomerIdVisible) ||
+                          (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                          (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                          (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                          (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                        ) {
                           return null;
                         }
+
                         return (
-                          <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                          <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
                             <HeaderSort column={column} />
                           </TableCell>
                         );
@@ -211,7 +240,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                     const rowProps = row.getRowProps();
 
                     return (
-                      <Fragment key={i}>
+                      <Fragment key={row.id}>
                         <TableRow
                           {...row.getRowProps()}
                           onClick={() => {
@@ -220,9 +249,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                           sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                         >
                           {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isCustomerIdVisible) {
+                            if (
+                              (cell.column.id === 'id' && !isCustomerIdVisible) ||
+                              (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                              (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                              (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                              (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                            ) {
                               return null;
                             }
+
                             return (
                               <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                             );
@@ -256,10 +292,15 @@ const CustomerListPage = () => {
   const [customerDeleteName, setcustomerDeleteName] = useState<any>('');
   const [customerDeleteId, setCustomerDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
+  const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
+  };
+
+  const handleAuditColumnSwitchChange = () => {
+    setshowCreatedOnColumn(!showCreatedOnColumn);
   };
 
   useEffect(() => {
@@ -283,30 +324,14 @@ const CustomerListPage = () => {
     if (customer && !add) setCustomer(null);
   };
 
-  const handleClose = (confirmed: boolean) => {
-    setOpen(false);
+  const handleClose = () => {
+    setOpen(!open);
   };
 
   const columns = useMemo(
     () => [
       {
-        show: false,
-        accessor: 'firstName',
-        disableSortBy: true,
-        width: 20,
-        sticky: 'left'
-      },
-      {
-        show: false,
-        accessor: 'lastName',
-        disableSortBy: true,
-        width: 20,
-        sticky: 'left'
-      },
-      {
         title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -315,21 +340,32 @@ const CustomerListPage = () => {
         disableSortBy: true
       },
       {
+        show: false,
+        accessor: 'firstName',
+        disableSortBy: true
+      },
+      {
+        show: false,
+        accessor: 'lastName',
+        disableSortBy: true
+      },
+      {
         Header: 'Customer id',
         accessor: 'id',
-        width: -200,
-        sticky: 'left'
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        width: 220,
-        sticky: 'left',
+
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.customerName}</Typography>
+              <Typography variant="subtitle1">
+                {' '}
+                <span style={{ whiteSpace: 'nowrap' }}>{values.customerName}</span>
+              </Typography>
             </Stack>
           );
         }
@@ -337,21 +373,25 @@ const CustomerListPage = () => {
       {
         Header: 'Contact',
         accessor: 'phoneNumber',
-        width: 200,
-        sticky: 'left',
-        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+91 ##### #####" mask="_" defaultValue={value} />
+        Width: 400,
+        Cell: ({ value }: { value: number }) => (
+          <PatternFormat
+            displayType="text"
+            format="+91 ##### #####"
+            mask="_"
+            defaultValue={value}
+            style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
+          />
+        )
       },
       {
         Header: 'Email',
-        accessor: 'email',
-        width: 200,
-        sticky: 'left'
+        accessor: 'email'
       },
       {
         Header: 'City',
         accessor: 'city',
-        width: 200,
-        sticky: 'left'
+        className: 'cell-right'
       },
       {
         show: false,
@@ -363,8 +403,6 @@ const CustomerListPage = () => {
       {
         Header: 'Actions',
         className: 'cell-right',
-        width: 200,
-        sticky: 'left',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -413,6 +451,25 @@ const CustomerListPage = () => {
             </Stack>
           );
         }
+      },
+      {
+        Header: 'Created On',
+        accessor: 'createdOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Created By',
+        accessor: 'createdBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -444,6 +501,8 @@ const CustomerListPage = () => {
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
+            handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
+            showCreatedOnColumn={showCreatedOnColumn}
           />
         )}
       </ScrollX>
@@ -454,6 +513,7 @@ const CustomerListPage = () => {
         TransitionComponent={PopupTransition}
         keepMounted
         fullWidth
+        onClose={handleAdd}
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
