@@ -245,7 +245,15 @@ interface Props {
 function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdColumn, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const defaultColumn = useMemo(() => ({ Filter: DateColumnFilter }), []);
+  const defaultColumn = useMemo(
+    () => ({
+      Filter: DateColumnFilter,
+      minWidth: 80,
+      width: 100,
+      maxWidth: 400
+    }),
+    []
+  );
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'customerName', desc: false };
   const initialState = useMemo(
@@ -404,7 +412,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
         </Stack>
       </Stack>
       <Box ref={componentRef}>
-        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+        <ScrollX sx={{ maxHeight: 500 }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
@@ -415,7 +423,10 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
                         return null;
                       }
                       return (
-                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                        <TableCell
+                          sx={{ position: 'sticky !important' }}
+                          {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
+                        >
                           <HeaderSort column={column} sort />
                         </TableCell>
                       );
@@ -504,8 +515,6 @@ const List = () => {
       {
         Header: () => null,
         id: 'expander',
-        width: -200,
-        sticky: 'left',
         className: 'cell-center',
         Cell: ({ row }: CellProps<any>) => {
           const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
@@ -529,8 +538,6 @@ const List = () => {
       },
       {
         title: 'Row Selection',
-        width: 70,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -541,35 +548,28 @@ const List = () => {
       },
       {
         Header: 'Invoice ID',
-        accessor: 'id',
-        sticky: 'left',
-        width: -200
+        accessor: 'id'
       },
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        width: 150,
-        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Create Date',
         accessor: 'invoiceDate',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
-        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Due Date',
         accessor: 'dueDate',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
-        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Amount',
         accessor: 'totalAmount',
-        sticky: 'left',
         Cell: ({ value }: { value: number }) => (
           <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         ),
@@ -578,8 +578,6 @@ const List = () => {
       {
         Header: 'Status',
         accessor: 'invoiceStatus',
-        width: 100,
-        sticky: 'left',
         disableFilters: true,
         filter: 'includes',
         Cell: ({ value }: { value: string }) => {

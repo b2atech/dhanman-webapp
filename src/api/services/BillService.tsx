@@ -65,14 +65,6 @@ export const BillAPI = {
       throw error;
     }
   },
-  updateBillRequest = async function (billdata: BillEdit) {
-    const response = await apiPurchase.request({
-      url: `v1/bill`,
-      method: 'PUT',
-      data: billdata
-    });
-    return response.status;
-  },
   getBillById = async function (id: string, cancel = false) {
     const response = await apiPurchase.request({
       url: `v1/GetBill/${id}`,
@@ -88,6 +80,14 @@ export async function createBillRequest(billdata: BillHeader) {
     url: `v1/bill/`,
     method: 'POST',
     data: billdata
+  });
+  return response.data;
+}
+export async function updateBillRequest(billEdit: BillEdit) {
+  const response = await apiPurchase.request({
+    url: `v1/bill/`,
+    method: 'PUT',
+    data: billEdit
   });
   return response.data;
 }
