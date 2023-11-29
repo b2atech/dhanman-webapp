@@ -25,9 +25,19 @@ const getInitialValues = (product: FormikValues | null) => {
       id: product.id,
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       productName: product.productName,
-      quantityInStock: product.quntityInStock,
       description: product.description,
-      unitPrice: product.unitPrice
+      unit: product.unit,
+      categoryName: product.categoryName,
+      hsnCode: product.hsnCode,
+      sac: product.sac,
+      purchasePrice: product.purchasePrice,
+      sellingPrice: product.sellingPrice,
+      cgst: product.cgst,
+      sgst: product.sgst,
+      igst: product.igst,
+      openingStock: product.openingStock,
+      minimumStock: product.minimumStock,
+      vendorName: product.vendorName
     };
     return newProduct;
   } else {
@@ -35,9 +45,19 @@ const getInitialValues = (product: FormikValues | null) => {
       id: '',
       clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       productName: '',
-      quantityInStock: '',
       description: '',
-      unitPrice: ''
+      unit: '',
+      categoryName: '',
+      hsnCode: '',
+      sac: '',
+      purchasePrice: '',
+      sellingPrice: '',
+      cgst: '',
+      sgst: '',
+      igst: '',
+      openingStock: '',
+      minimumStock: '',
+      vendorName: ''
     };
     return newProduct;
   }
@@ -53,8 +73,6 @@ export interface Props {
 const AddProduct = ({ product, onCancel }: Props) => {
   const ProductSchema = Yup.object().shape({
     productName: Yup.string().max(255).required('Please Enter Product Name'),
-    quantityInStock: Yup.number().positive('Please Enter a positive quantity').required('Please Enter Quantity'),
-    unitPrice: Yup.number().positive('Please Enter a positive unit price').required('Please Enter Price'),
     description: Yup.string().max(255).required('Please Enter Description')
   });
 
@@ -69,12 +87,21 @@ const AddProduct = ({ product, onCancel }: Props) => {
           clientId: values.clientId,
           productName: values.productName,
           description: values.description,
-          quantityInStock: values.quantityInStock,
           vendorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          recorderLevel: 10,
-          unitPrice: values.unitPrice,
           unitId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          categoryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+          categoryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          unit: values.unit,
+          categoryName: values.categoryName,
+          hsnCode: values.hsnCode,
+          sac: values.sac,
+          purchasePrice: values.purchasePrice,
+          sellingPrice: values.sellingPrice,
+          cgst: values.cgst,
+          sgst: values.sgst,
+          igst: values.igst,
+          openingStock: values.openingStock,
+          minimumStock: values.minimumStock,
+          vendorName: values.vendorName
         };
 
         if (product) {
@@ -150,41 +177,6 @@ const AddProduct = ({ product, onCancel }: Props) => {
                         {...getFieldProps('productName')}
                         error={Boolean(touched.productName && errors.productName)}
                         helperText={touched.productName && errors.productName ? 'Please Enter Product Name' : ''}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={1.25}>
-                      <InputLabel htmlFor="quntity-In-Stock">Quantity</InputLabel>
-                      <TextField
-                        fullWidth
-                        id="quantityInStock"
-                        type="text"
-                        placeholder="Enter Quantity"
-                        {...getFieldProps('quantityInStock')}
-                        error={Boolean(touched.quantityInStock && errors.quantityInStock)}
-                        helperText={touched.quantityInStock && errors.quantityInStock ? 'Please Enter Quntity' : ''}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Stack spacing={1.25}>
-                      <InputLabel htmlFor="price">Price</InputLabel>
-                      <TextField
-                        fullWidth
-                        id="unitPrice"
-                        placeholder="Enter Price"
-                        {...getFieldProps('unitPrice')}
-                        error={Boolean(touched.unitPrice && errors.unitPrice)}
-                        helperText={touched.unitPrice && errors.unitPrice ? (errors.unitPrice as React.ReactNode) : ''}
-                        inputProps={{
-                          inputMode: 'numeric',
-                          type: 'number',
-                          maxLength: 10,
-                          onInput: (e) => {
-                            e.currentTarget.value = e.currentTarget.value.replace(/[^0-9.]/g, '');
-                          }
-                        }}
                       />
                     </Stack>
                   </Grid>

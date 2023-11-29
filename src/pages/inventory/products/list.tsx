@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, useRef } from 'react';
+/* eslint-disable prettier/prettier */
+import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
@@ -22,7 +23,6 @@ import {
 } from '@mui/material';
 
 // third-party
-import { useSticky } from 'react-table-sticky';
 import {
   useFilters,
   useExpanded,
@@ -35,7 +35,8 @@ import {
   HeaderGroup,
   Row,
   Cell,
-  HeaderProps
+  HeaderProps,
+  CellProps
 } from 'react-table';
 
 // project import
@@ -57,7 +58,6 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
-import { IInventory } from 'types/invoice';
 import ProductDetails from './productDetails';
 import AlertProductDelete from './alertProductDelete';
 import { InventoryData } from 'types/inventoryInfo';
@@ -76,6 +76,7 @@ const TableWrapper = styled('div')(({ theme }) => ({
   }
 }));
 
+const moment = require('moment');
 interface Props {
   columns: Column[];
   data: InventoryData[];
@@ -86,17 +87,18 @@ interface Props {
   handleSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'productName', desc: false };
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    setHiddenColumns,
     allColumns,
     visibleColumns,
     rows,
@@ -113,30 +115,36 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'email'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect,
-    useSticky
+    useRowSelect
   );
-
-  const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+  
   const moment = require('moment');
-  const now = new Date();
-  const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
-  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+  const now = new Date();const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isProductIdVisible, setIsProductIdVisible] = useState(false);
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+
+  useEffect(() => {
+    if (matchDownSM) {
+      setHiddenColumns(['age', 'contact', 'visits', 'email', 'status', 'avatar']);
+    } else {
+      setHiddenColumns(['avatar', 'email']);
+    }
+    // eslint-disable-next-line
+  }, [matchDownSM]);
 
   const handleSwitchChange = () => {
     setIsProductIdVisible((prevIsProductIdVisible) => !prevIsProductIdVisible);
   };
 
-  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAuditSwitchOn(event.target.checked);
+  const handleAuditSwitchChange = () => {
+    setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
   return (
@@ -159,13 +167,13 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Product
+              Add Paid Payment
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
-            <Tooltip title={isProductIdVisible ? 'Close ID' : 'Show ID'}>
+            <Tooltip title={isProductIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="success" checked={isProductIdVisible} onChange={handleSwitchChange} />}
@@ -174,7 +182,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Close Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -185,62 +193,73 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             </Tooltip>
           </Stack>
         </Stack>
-        <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflow: 'auto' }}>
-            <TableWrapper>
-              <Table {...getTableProps()} stickyHeader>
-                <TableHead>
-                  {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                      {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (column.id === 'id' && !isProductIdVisible) {
-                          return null;
-                        }
-                        return (
-                          <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                            <HeaderSort column={column} />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHead>
-                <TableBody {...getTableBodyProps()}>
-                  {page.map((row: Row, i: number) => {
-                    prepareRow(row);
-                    const rowProps = row.getRowProps();
-
-                    return (
-                      <Fragment key={i}>
-                        <TableRow
-                          {...row.getRowProps()}
-                          onClick={() => {
-                            row.toggleRowSelected();
-                          }}
-                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+        <ScrollX sx={{ height: 500, overflowX: 'auto', overflowY: 'auto' }}>
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (
+                        (column.id === 'id' && !isProductIdVisible) ||
+                        (column.id === '12' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                      ) {
+                        return null;
+                      }
+                      return (
+                        <TableCell
+                          sx={{ position: 'sticky !important' }}
+                          {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
                         >
-                          {row.cells.map((cell: Cell) => {
-                            if (cell.column.id === 'id' && !isProductIdVisible) {
-                              return null;
-                            }
-                            return (
-                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                            );
-                          })}
-                        </TableRow>
-                        {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
-                      </Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableWrapper>
-          </ScrollX>
-          <Box>
-            <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
-              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-            </Box>
-          </Box>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
+                  const rowProps = row.getRowProps();
+
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          if (
+                            (cell.column.id === 'id' && !isProductIdVisible) ||
+                            (cell.column.id === '12' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                          ) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
+                      </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableWrapper>
+        </ScrollX>
+        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
+          <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
         </Box>
       </Stack>
     </>
@@ -254,15 +273,11 @@ const ProductListPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [product, setProduct] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
-  const [products, setProducts] = useState<IInventory[]>([]);
+  const [products, setProducts] = useState<InventoryData[]>([]);
   const [productDeleteName, setProductDeleteName] = useState<any>('');
   const [productDeleteId, setProductDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const handleSwitchChange = () => {
-    setShowIdColumn(!showIdColumn);
-  };
 
   useEffect(() => {
     getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -285,16 +300,17 @@ const ProductListPage = () => {
     if (product && !add) setProduct(null);
   };
 
-  const handleClose = (confirmed: boolean) => {
-    setOpen(false);
+  const handleClose = () => {
+    setOpen(!open);
+  };
+  const handleSwitchChange = () => {
+    setShowIdColumn(!showIdColumn);
   };
 
   const columns = useMemo(
     () => [
       {
         title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -303,105 +319,85 @@ const ProductListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'Product id',
+        Header: 'PRODUCT ID',
         accessor: 'id',
-        width: -200,
-        sticky: 'left'
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 300 }}>{value}</Box>
       },
       {
-        Header: 'Product Name',
+        Header: 'PRODUCT NAME',
         accessor: 'productName',
-        width: 120,
-        sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.productName}</Typography>
+              <Typography variant="subtitle1" minWidth={150}>{values.productName}</Typography>
             </Stack>
           );
         }
       },
       {
-        Header: 'Category',
+        Header: 'CATEGORY',
         accessor: 'categoryName',
-        width: 120,
-        sticky: 'left',
-        Cell: ({ row }: { row: Row }) => {
-          const { values } = row;
-          return (
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1">{values.categoryName}</Typography>
-            </Stack>
-          );
-        }
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 100 }}>{value}</Box>,
+        width: 200
       },
       {
         Header: 'HSN',
         accessor: 'hsnCode',
-        width: 120,
-       // sticky: 'right',
-        className: 'cell-right'
+        className: 'cell-center',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
       },
       {
         Header: 'SAC',
         accessor: 'sac',
-        width: 80,
-        sticky: 'left'
+        className: 'cell-center',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
       },
       {
-        Header: 'cost',
+        Header: 'COST',
         accessor: 'purchasePrice',
-        width: 100,
-        sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'rate',
-        accessor: 'sellingPrice',
-        width: 100,
-        sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'cgst',
-        accessor: 'cgst',
-        width: 30,
-        sticky: 'center',
-        className: 'cell-center'
-      },
-      {
-        Header: 'sgst',
-        accessor: 'sgst',
-        width: 30,
-        sticky: 'left',
-        className: 'cell-center'
-      },
-      {
-        Header: 'igst',
-        accessor: 'igst',
-        width: 30,
-        sticky: 'left',
-        className: 'cell-center'
-      },
-      {
-        Header: 'open. Stock',
-        accessor: 'openingStock',
-        width: 100,
-        sticky: 'right',
-        className: 'cell-right'
-      },
-      {
-        Header: 'unit',
-        accessor: 'unit',
-        width: 100,
-        sticky: 'left'
-      },
-      {
-        Header: 'Actions',
         className: 'cell-right',
-        width: 100,
-        sticky: 'left',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+      },
+      {
+        Header: 'RATE',
+        accessor: 'sellingPrice',
+        className: 'cell-right',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+
+      },
+      {
+        Header: 'CGST',
+        accessor: 'cgst',
+        className: 'cell-center',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+      },
+      {
+        Header: 'SGST',
+        accessor: 'sgst',
+        className: 'cell-center',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+      },
+      {
+        Header: 'IGST',
+        accessor: 'igst',
+        className: 'cell-center',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+      },
+      {
+        Header: 'OPN.STOCK',
+        accessor: 'openingStock',
+        className: 'cell-right',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+      },
+      {
+        Header: 'UNIT',
+        accessor: 'unit',
+        Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
+      },
+      {
+        Header: 'ACTIONS',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -410,46 +406,67 @@ const ProductListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    row.toggleRowExpanded();
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setProduct(row.values);
-                    handleAdd();
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setProductDeleteName(row.values.productName);
-                    setProductDeleteId(row.values.id);
-                    setOpen(true);
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0}>
+              <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={0}>
+                <Tooltip title="View">
+                  <IconButton
+                    color="secondary"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      row.toggleRowExpanded();
+                    }}
+                  >
+                    {collapseIcon}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      setProduct(row.values);
+                      handleAdd();
+                    }}
+                  >
+                    <EditTwoTone twoToneColor={theme.palette.primary.main} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    color="error"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      handleClose();
+                      setProductDeleteName(row.values.productName);
+                      setProductDeleteId(row.values.id);
+                    }}
+                  >
+                    <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
             </Stack>
           );
         }
+      },
+      //pranit: need to change as per accessor name
+      {
+        Header: 'CREATED ON',
+        accessor: '12',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'MODIFIED ON',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'CREATED BY',
+        accessor: 'createdBy'
+      },
+      {
+        Header: 'MODIFIED BY',
+        accessor: 'modifiedBy'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -464,15 +481,15 @@ const ProductListPage = () => {
 
   return (
     <MainCard content={false}>
-      <ScrollX>
-        {loading ? (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
-            <CircularProgress size={60} thickness={4} />
-            <Typography variant="body1" style={{ marginTop: '32x' }}>
-              Loading, please wait...
-            </Typography>
-          </Box>
-        ) : (
+      {loading ? (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+          <CircularProgress size={60} thickness={4} />
+          <Typography variant="body1" style={{ marginTop: '32x' }}>
+            Loading, please wait...
+          </Typography>
+        </Box>
+      ) : (
+        <ScrollX>
           <ReactTable
             columns={columns}
             data={memoizedProducts}
@@ -482,8 +499,9 @@ const ProductListPage = () => {
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
           />
-        )}
-      </ScrollX>
+        </ScrollX>
+      )}
+
       <AlertProductDelete title={productDeleteName} open={open} handleClose={handleClose} id={productDeleteId} />
 
       <Dialog
@@ -491,11 +509,11 @@ const ProductListPage = () => {
         TransitionComponent={PopupTransition}
         keepMounted
         fullWidth
+        onClose={handleAdd}
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {/* <AddProduct product={product} onCancel={handleAdd} /> */}
       </Dialog>
     </MainCard>
   );
