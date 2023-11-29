@@ -29,6 +29,7 @@ const AppPullRequests = Loadable(lazy(() => import('pages/dev/pr')));
 const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details')));
 const AppProducts = Loadable(lazy(() => import('pages/inventory/products/list')));
 const AppPaidPayments = Loadable(lazy(() => import('pages/purchase/paidpayments/list')));
+const AppAccountGroups = Loadable(lazy(() => import('pages/company/accountGroup/list')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -67,6 +68,16 @@ const MainRoutes = {
             {
               path: 'coaContainer',
               element: <AppCoaContainer />
+            }
+          ]
+        },
+        {
+          path: 'accountgroup',
+          element: <CommonLayout />,
+          children: [
+            {
+              path: 'list',
+              element: <AppAccountGroups />
             }
           ]
         }
