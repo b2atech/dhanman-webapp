@@ -34,7 +34,7 @@ const getInitialValues = (paidPayment: FormikValues | null) => {
   return newPaidPayment;
 };
 
-// ==============================|| CUSTOMER ADD / EDIT ||============================== //
+// ==============================|| Paid Payment ADD / EDIT ||============================== //
 
 export interface Props {
   paidpayment?: any;

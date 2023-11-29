@@ -12,7 +12,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { deletepaidPaymentRequest } from 'api/services/BillService';
 
 // types
-interface AlertCustomerDeleteProps {
+interface AlertPaidPaymentDeleteProps {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
@@ -21,7 +21,7 @@ interface AlertCustomerDeleteProps {
 
 // ==============================|| PaidPayment - DELETE ||============================== //
 
-export default function AlertpaidPaymentDelete({ title, open, handleClose, id }: AlertCustomerDeleteProps) {
+export default function AlertpaidPaymentDelete({ title, open, handleClose, id }: AlertPaidPaymentDeleteProps) {
   const dispatch = useDispatch();
   const deletepaidPayment = () => {
     handleClose(true);
