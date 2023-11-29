@@ -49,7 +49,7 @@ export default function Goods() {
         <Grid item xs={12} sm={6}>
           <Stack spacing={0.5}>
             <InputLabel>HSN No.</InputLabel>
-            <TextField required id="sac" name="HSN Code" placeholder="Enter HSN" fullWidth autoComplete="given-name" />
+            <TextField required id="hsnCode" name="HSN Code" placeholder="Enter HSN" fullWidth autoComplete="given-name" />
           </Stack>
         </Grid>
 
@@ -90,7 +90,7 @@ export default function Goods() {
         <Grid item xs={12} sm={6}>
           <Stack spacing={0.5}>
             <InputLabel>Buy Price</InputLabel>
-            <TextField id="buyprice" name="nuypricename" placeholder="Enter Buy Price" fullWidth />
+            <TextField id="buyprice" name="buypricename" placeholder="Enter Buy Price" fullWidth />
           </Stack>
         </Grid>
 

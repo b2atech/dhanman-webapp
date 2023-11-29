@@ -90,7 +90,7 @@ export default function Service() {
         <Grid item xs={12} sm={6}>
           <Stack spacing={0.5}>
             <InputLabel>Buy Price</InputLabel>
-            <TextField id="buyprice" name="nuypricename" placeholder="Enter Buy Price" fullWidth />
+            <TextField id="buyprice" name="buypricename" placeholder="Enter Buy Price" fullWidth />
           </Stack>
         </Grid>
 
