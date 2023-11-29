@@ -117,7 +117,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <DialogTitle>{paidpayment ? 'Add Customer' : 'New Customer'}</DialogTitle>
+              <DialogTitle>{paidpayment ? 'Add Paid Payment' : 'New Paid Payment'}</DialogTitle>
               <IconButton shape="rounded" color="error" onClick={onCancel} style={{ marginRight: '5px' }}>
                 <CloseOutlined />
               </IconButton>
