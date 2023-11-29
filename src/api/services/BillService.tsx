@@ -134,4 +134,13 @@ export const BillAPI = {
     return response.status;
   };
 
+export async function updateBillRequest(billEdit: BillEdit) {
+  const response = await apiPurchase.request({
+    url: `v1/bill/`,
+    method: 'PUT',
+    data: billEdit
+  });
+  return response.data;
+}
+
 const cancelApiObject = defineCancelApiObject(BillAPI);
