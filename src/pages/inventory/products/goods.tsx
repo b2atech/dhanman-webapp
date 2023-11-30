@@ -46,7 +46,7 @@ export default function Goods() {
             <TextField required id="UnitName" name="Unit Name" placeholder="Enter Unit" fullWidth autoComplete="given-name" />
           </Stack>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={6} sx={{ paddingBottom: 2.5 }}>
           <Stack spacing={0.5}>
             <InputLabel>HSN No.</InputLabel>
             <TextField required id="hsnCode" name="HSN Code" placeholder="Enter HSN" fullWidth autoComplete="given-name" />
@@ -96,7 +96,7 @@ export default function Goods() {
 
         <Grid item xs={12} sm={12}>
           <Chip color="info" label="Track Stock" />
-          <Grid item xs={12} sm={2}>
+          <Grid item xs={12} sm={2} sx={{ paddingBottom: 2.5 }}>
             <Stack spacing={0.5}>
               <InputLabel>Initial Stock Level</InputLabel>
               <TextField
