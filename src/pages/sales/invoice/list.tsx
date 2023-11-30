@@ -237,15 +237,32 @@ interface Props {
   columns: Column[];
   data: IInvoiceList[];
   renderRowSubComponent: FC<any>;
+  getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
-  getHeaderProps: (column: HeaderGroup) => {};
+  handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdColumn, getHeaderProps }: Props) {
+function ReactTable({
+  columns: userColumns,
+  data,
+  renderRowSubComponent,
+  getHeaderProps,
+  showIdColumn,
+  handleAuditColumnSwitchChange
+}: Props) {
+  const defaultColumn = useMemo(
+    () => ({
+      minWidth: 80,
+      width: 200,
+      maxWidth: 400,
+      margin: 20,
+      Filter: DateColumnFilter
+    }),
+    []
+  );
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const defaultColumn = useMemo(() => ({ Filter: DateColumnFilter }), []);
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'customerName', desc: false };
   const initialState = useMemo(
@@ -304,16 +321,16 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
     {}
   );
 
-  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const [isInvoiceIdVisible, setIsInvoiceIdVisible] = useState(false);
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const [activeTab, setActiveTab] = useState(groups[0]);
 
   const handleSwitchChange = () => {
     setIsInvoiceIdVisible((prevIsInvoiceIdVisible) => !prevIsInvoiceIdVisible);
   };
 
-  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAuditSwitchOn(event.target.checked);
+  const handleAuditSwitchChange = () => {
+    setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
   useEffect(() => {
@@ -392,7 +409,7 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
               sx={{ margin: '0', padding: '0', marginRight: 0 }}
             />
           </Tooltip>
-          <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
+          <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
             <FormControlLabel
               value=""
               control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -411,7 +428,13 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
                 {headerGroups.map((headerGroup) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                     {headerGroup.headers.map((column: HeaderGroup<{}>) => {
-                      if (column.id === 'id' && !isInvoiceIdVisible) {
+                      if (
+                        (column.id === 'id' && !isInvoiceIdVisible) ||
+                        (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                      ) {
                         return null;
                       }
                       return (
@@ -437,7 +460,13 @@ function ReactTable({ columns: userColumns, data, renderRowSubComponent, showIdC
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
                         {row.cells.map((cell: Cell) => {
-                          if (cell.column.id === 'id' && !isInvoiceIdVisible) {
+                          if (
+                            (cell.column.id === 'id' && !isInvoiceIdVisible) ||
+                            (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                          ) {
                             return null;
                           }
                           return (
@@ -472,9 +501,14 @@ const List = () => {
   const [getInvoiceName, setGetInvoiceName] = useState<any>('');
   const [expandedRows, setExpandedRows] = useState({});
   const [showIdColumn, setShowIdColumn] = useState(false);
+  const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
+  };
+
+  const handleAuditColumnSwitchChange = () => {
+    setshowCreatedOnColumn(!showCreatedOnColumn);
   };
 
   useEffect(() => {
@@ -502,8 +536,6 @@ const List = () => {
       {
         Header: () => null,
         id: 'expander',
-        width: -200,
-        sticky: 'left',
         className: 'cell-center',
         Cell: ({ row }: CellProps<any>) => {
           const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
@@ -527,8 +559,6 @@ const List = () => {
       },
       {
         title: 'Row Selection',
-        width: 70,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -540,34 +570,39 @@ const List = () => {
       {
         Header: 'Invoice ID',
         accessor: 'id',
-        sticky: 'left',
-        width: -200
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        width: 150,
-        sticky: 'left',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return (
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Typography variant="subtitle1">
+                {' '}
+                <span style={{ whiteSpace: 'nowrap' }}>{values.customerName}</span>
+              </Typography>
+            </Stack>
+          );
+        },
         disableFilters: true
       },
       {
         Header: 'Create Date',
         accessor: 'invoiceDate',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
-        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Due Date',
         accessor: 'dueDate',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
-        sticky: 'left',
         disableFilters: true
       },
       {
         Header: 'Amount',
         accessor: 'totalAmount',
-        sticky: 'left',
         Cell: ({ value }: { value: number }) => (
           <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         ),
@@ -576,8 +611,6 @@ const List = () => {
       {
         Header: 'Status',
         accessor: 'invoiceStatus',
-        width: 100,
-        sticky: 'left',
         disableFilters: true,
         filter: 'includes',
         Cell: ({ value }: { value: string }) => {
@@ -638,6 +671,25 @@ const List = () => {
             </Stack>
           );
         }
+      },
+      {
+        Header: 'Created On',
+        accessor: 'createdOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Created By',
+        accessor: 'createdBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -767,9 +819,10 @@ const List = () => {
             columns={columns}
             data={invoice}
             renderRowSubComponent={renderRowSubComponent}
+            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
           />
         </ScrollX>
       </MainCard>
