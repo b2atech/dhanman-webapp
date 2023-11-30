@@ -162,5 +162,6 @@
   "tasks": "Tasks",
   "createTask": "Create Task",
   "pullRequests": "Pull Requests",
-  "dev": "Dev"
+  "dev": "Dev",
+  "accountgroups": "Accounts Group"
 }

@@ -74,5 +74,14 @@ export const CommonAPI = {
     });
 
     return response.data;
+  },
+  getAllAccountGroups = async function (clientId: string, cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/getAllAccountGroups/${clientId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllAccountGroups.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
   };
 const cancelApiObject = defineCancelApiObject(CommonAPI);
