@@ -75,6 +75,13 @@ const master: NavItemType = {
           icon: icons.TableOutlined
         },
         {
+          id: 'accountgroups',
+          title: <FormattedMessage id="accountgroups" />,
+          type: 'item',
+          url: '/company/accountgroup/list',
+          icon: icons.TableOutlined
+        },
+        {
           id: 'customers',
           title: <FormattedMessage id="customers" />,
           type: 'item',

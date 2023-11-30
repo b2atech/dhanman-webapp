@@ -263,6 +263,15 @@ function ReactTable({
   );
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const defaultColumn = useMemo(
+    () => ({
+      Filter: DateColumnFilter,
+      minWidth: 80,
+      width: 100,
+      maxWidth: 400
+    }),
+    []
+  );
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'customerName', desc: false };
   const initialState = useMemo(
@@ -421,7 +430,7 @@ function ReactTable({
         </Stack>
       </Stack>
       <Box ref={componentRef}>
-        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+        <ScrollX sx={{ maxHeight: 500 }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
@@ -438,7 +447,10 @@ function ReactTable({
                         return null;
                       }
                       return (
-                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                        <TableCell
+                          sx={{ position: 'sticky !important' }}
+                          {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
+                        >
                           <HeaderSort column={column} sort />
                         </TableCell>
                       );
