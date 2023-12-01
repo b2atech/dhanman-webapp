@@ -83,5 +83,14 @@ export const CommonAPI = {
     });
 
     return response.data.items;
+  },
+  getAllCompanies = async function (cancel = false) {
+    const response = await apiCommon.request({
+      url: `v1/companies`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllCompanies.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
   };
 const cancelApiObject = defineCancelApiObject(CommonAPI);
