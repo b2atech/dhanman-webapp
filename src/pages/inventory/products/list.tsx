@@ -58,7 +58,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
-import ProductDetails from './productDetails';
+import ProductDetails from './details';
 import AlertProductDelete from './alertProductDelete';
 import { InventoryData } from 'types/inventoryInfo';
 import { getAllProducts } from 'api/services/InventoryService';
