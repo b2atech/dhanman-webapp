@@ -263,15 +263,6 @@ function ReactTable({
   );
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const defaultColumn = useMemo(
-    () => ({
-      Filter: DateColumnFilter,
-      minWidth: 80,
-      width: 100,
-      maxWidth: 400
-    }),
-    []
-  );
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'customerName', desc: false };
   const initialState = useMemo(
