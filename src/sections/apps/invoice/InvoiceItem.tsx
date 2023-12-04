@@ -17,9 +17,30 @@ import AlertProductDelete from './AlertProductDelete';
 
 // ==============================|| INVOICE - ITEMS ||============================== //
 
-const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditItem, index, Blur, errors, touched }: any) => {
+const InvoiceItem = ({
+  id,
+  name,
+  description,
+  qty,
+  price,
+  onDeleteItem,
+  onEditItem,
+  index,
+  Blur,
+  errors,
+  touched,
+  setFieldValue,
+  products
+}: any) => {
   const { country } = useSelector((state) => state.invoice);
-
+  const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const selectedProduct = products.find((product: any) => product.productName === event.target.value);
+    if (selectedProduct) {
+      setFieldValue(`invoice_detail[${index}].name`, selectedProduct.productName);
+      setFieldValue(`invoice_detail[${index}].description`, selectedProduct.description);
+      setFieldValue(`invoice_detail[${index}].price`, selectedProduct.sellingPrice);
+    }
+  };
   const [open, setOpen] = useState(false);
   const handleModalClose = (status: boolean) => {
     setOpen(false);
@@ -53,7 +74,13 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
       id: id,
       value: name,
       errors: errorName,
-      touched: touchedName
+      touched: touchedName,
+      select: true,
+      selectOptions: products.map((product: any) => ({
+        label: product.productName,
+        value: product.productName
+      })),
+      selectOnChange: handleNameChange
     },
     {
       placeholder: 'Description',
@@ -81,7 +108,10 @@ const InvoiceItem = ({ id, name, description, qty, price, onDeleteItem, onEditIt
               id: item.id,
               value: item.value,
               errors: item.errors,
-              touched: item.touched
+              touched: item.touched,
+              select: item.select,
+              selectOptions: item.selectOptions,
+              selectOnChange: item.selectOnChange
             }}
             key={item.label}
           />
