@@ -94,6 +94,7 @@ export default function AddProductForm() {
     validationSchema: CustomerSchema,
     onSubmit: async (values, { setSubmitting }) => {
       // try {
+      //
       //   const customerData = {
       //     userId: values.id,
       //     clientId: values.clientId,
