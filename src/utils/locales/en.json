@@ -163,5 +163,9 @@
   "createTask": "Create Task",
   "pullRequests": "Pull Requests",
   "dev": "Dev",
-  "accountgroups": "Accounts Group"
+  "accountgroups": "Accounts Group",
+  "reports": "Reports",
+  "inventoryreports": "Inventory Reports",
+  "closingstock": "Closing Stock"
+
 }

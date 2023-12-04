@@ -30,6 +30,7 @@ const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details'
 const AppProducts = Loadable(lazy(() => import('pages/inventory/products/list')));
 const AppPaidPayments = Loadable(lazy(() => import('pages/purchase/paidpayments/list')));
 const AppAccountGroups = Loadable(lazy(() => import('pages/company/accountGroup/list')));
+const AppReports = Loadable(lazy(() => import('pages/reports/inventoryreports/closingStock')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -305,6 +306,20 @@ const MainRoutes = {
         {
           path: 'pr',
           element: <AppPullRequests />
+        }
+      ]
+    },
+    {
+      path: '/reports/inventoryreports',
+      element: (
+        <AuthGuard>
+          <MainLayout />
+        </AuthGuard>
+      ),
+      children: [
+        {
+          path: 'closingstock',
+          element: <AppReports />
         }
       ]
     }
