@@ -3,15 +3,10 @@ import { Grid, InputLabel, Stack, TextField, Button, DialogActions, Typography, 
 import React from 'react';
 import { useFormik, FormikProvider, Form, FormikValues } from 'formik';
 import * as Yup from 'yup';
-// import { openSnackbar } from 'store/reducers/snackbar';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import MainCard from 'components/MainCard';
-
 // ==============================|| ADD PRODUCTS  ||============================== //
-
-const category = ['Electronics', 'Clothing and Apparel', 'Home and Kitchen', 'Health and Beauty', 'Books and Stationery', 'Toys and Games'];
-const unitname = ['kilo', 'gram', 'liter', 'ml'];
 
 const getInitialValues = (customer?: FormikValues | null) => {
   if (customer) {
@@ -52,8 +47,7 @@ const CustomerSchema = Yup.object().shape({
   productCategory: Yup.string().max(255).required('Please Category Name'),
   description: Yup.string().max(255).required('Please Enter Description'),
   hsnsaccdoeno: Yup.string()
-    .matches(/^[0-9]+$/, 'Only numbers are allowed')
-    .max(255)
+    .matches(/^\d{8}$/, 'HSN/SAC No. must be an 8-digit number')
     .required('Please Enter HSN/SAC No.'),
   bypingprice: Yup.string()
     .matches(/^\d+(\.\d{0,2})?$/, 'Invalid price format. Use only two decimal places')
@@ -71,82 +65,41 @@ const CustomerSchema = Yup.object().shape({
     .matches(/^\d+(\.\d{0,2})?$/, 'Invalid tax format. Use only two decimal places')
     .required('Please Enter I GST Rate Tax'),
   initialstock: Yup.string()
-    .matches(/^[0-9]+$/, 'Only numbers are allowed')
-    .max(255)
-    .required('Please Enter Initial Stock'),
+    .matches(/^\d+(\.\d{0,2})?$/, 'Invalid Initial stock format. Use only two decimal places')
+    .required('Please Enter Minimum Stock'),
   minimumstock: Yup.string()
-    .matches(/^[0-9]+$/, 'Only numbers are allowed')
-    .max(255)
-    .required('Please Enter Initial Stock'),
+    .matches(/^\d+(\.\d{0,2})?$/, 'Invalid Minimum stock format. Use only two decimal places')
+    .required('Please Enter Minimum Stock'),
   unit: Yup.string().max(255).required('Please Enter Unit')
 });
+
+const category = ['Electronics', 'Clothing and Apparel', 'Home and Kitchen', 'Health and Beauty', 'Books and Stationery', 'Toys and Games'];
+const unitname = ['kilo', 'gram', 'liter', 'ml'];
+const sgsttaxrate = [0, 5, 12, 18, 28];
+const cgsttaxrate = [0, 5, 12, 18, 28];
+const igsttaxrate = [0, 5, 12, 18, 28];
 
 export default function AddProductForm() {
   const [value, setValue] = React.useState<string | null>(category[0]);
   const [inputValue, setInputValue] = React.useState('');
 
-  const [valuex, setUnitValue] = React.useState<string | null>(unitname[0]);
+  const [unitValue, setUnitValue] = React.useState<string | null>(unitname[0]);
   const [inputUnitValue, setinputUnitValue] = React.useState('');
+
+  const [sgstTaxRender, setSgstTaxRender] = React.useState<number | null>(sgsttaxrate[0]);
+  const [sgstTaxValue, setSgstTaxValue] = React.useState('');
+
+  const [cgstTaxRender, setCgstTaxRender] = React.useState<number | null>(cgsttaxrate[0]);
+  const [cgstTaxValue, setCgstTaxValue] = React.useState('');
+
+  const [igstTaxRender, setIgstTaxRender] = React.useState<number | null>(igsttaxrate[0]);
+  const [igstTaxValue, setIgstTaxValue] = React.useState('');
 
   const formik = useFormik({
     initialValues: getInitialValues(),
     enableReinitialize: true,
     validationSchema: CustomerSchema,
-    onSubmit: async (values, { setSubmitting }) => {
-      // try {
-      //
-      //   const customerData = {
-      //     userId: values.id,
-      //     clientId: values.clientId,
-      //     firstName: values.firstName,
-      //     lastName: values.lastName,
-      //     email: values.email,
-      //     cityId: values.cityId,
-      //     phoneNumber: values.phoneNumber,
-      //     city: values.cityName,
-      //     addressLine: values.addressLine
-      //   };
-      //   if (customer) {
-      //     const response = await updateCustomerRequest(customerData);
-      //     if (response === 204) {
-      //       dispatch(
-      //         openSnackbar({
-      //           open: true,
-      //           message: 'Customer updated successfully.',
-      //           anchorOrigin: { vertical: 'top', horizontal: 'right' },
-      //           variant: 'alert',
-      //           alert: {
-      //             color: 'success'
-      //           },
-      //           close: false
-      //         })
-      //       );
-      //       window.location.reload();
-      //     }
-      //   } else {
-      //     const response = await createCustomerRequest(customerData);
-      //     if (response === 200) {
-      //       dispatch(
-      //         openSnackbar({
-      //           open: true,
-      //           message: 'Customer added successfully.',
-      //           anchorOrigin: { vertical: 'top', horizontal: 'right' },
-      //           variant: 'alert',
-      //           alert: {
-      //             color: 'success'
-      //           },
-      //           close: false
-      //         })
-      //       );
-      //       window.location.reload();
-      //     }
-      //   }
-      //   setSubmitting(false);
-      //   // onCancel();
-      // } catch (error) {
-      //   console.error(error);
-      // }
-    }
+    onSubmit: async (values, { setSubmitting }) => {}
   });
 
   const { errors, touched, handleSubmit } = formik;
@@ -172,16 +125,19 @@ export default function AddProductForm() {
                           </Stack>
                         </InputLabel>
                         <TextField
-                          autoFocus
                           required
-                          type="text"
                           id="productName"
                           name="productName"
-                          placeholder="Enter Product/Service Name"
+                          placeholder="Enter product name"
                           fullWidth
                           error={Boolean(touched.productName && errors.productName)}
-                          helperText={touched.productName && errors.productName ? (errors.productName as string) : ''}
+                          helperText={touched.productName && typeof errors.productName === 'string' ? errors.productName : ''}
                           onBlur={formik.handleBlur}
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                            formik.setFieldTouched('productName', true);
+                            formik.setFieldError('productName', '');
+                          }}
                         />
                       </Stack>
                     </Grid>
@@ -190,13 +146,15 @@ export default function AddProductForm() {
                       <Stack spacing={0.5} alignItems="left" justifyContent="start" sx={{ display: 'flex', flexDirection: 'column' }}>
                         <InputLabel>Unit</InputLabel>
                         <Autocomplete
-                          value={valuex}
+                          value={unitValue}
                           onChange={(event: any, newValue: string | null) => {
                             setUnitValue(newValue);
+                            formik.setFieldValue('unit', newValue);
                           }}
                           inputValue={inputUnitValue}
-                          onInputChange={(event, newInputValuex) => {
-                            setinputUnitValue(newInputValuex);
+                          onInputChange={(event, newInputValue) => {
+                            setinputUnitValue(newInputValue);
+                            formik.setFieldValue('unit', newInputValue);
                           }}
                           id="controllable-states-demo"
                           options={unitname}
@@ -227,12 +185,12 @@ export default function AddProductForm() {
                       value={value}
                       onChange={(event: any, newValue: string | null) => {
                         setValue(newValue);
-                        formik.setFieldTouched('productCategory', true, false);
-                        formik.setFieldError('productCategory', '');
+                        formik.setFieldValue('productCategory', newValue);
                       }}
                       inputValue={inputValue}
                       onInputChange={(event, newInputValue) => {
                         setInputValue(newInputValue);
+                        formik.setFieldValue('productCategory', newInputValue);
                       }}
                       id="controllable-states-demo"
                       options={category}
@@ -292,6 +250,10 @@ export default function AddProductForm() {
                           id="hsnsaccdoeno"
                           name="hsnsaccdoeno"
                           placeholder="Enter HSN/SAC No."
+                          inputProps={{
+                            style: { textAlign: 'right' },
+                            maxLength: 8
+                          }}
                           error={Boolean(touched.hsnsaccdoeno && errors.hsnsaccdoeno)}
                           helperText={touched.hsnsaccdoeno && typeof errors.hsnsaccdoeno === 'string' ? errors.hsnsaccdoeno : ''}
                           onBlur={(e) => {
@@ -324,6 +286,7 @@ export default function AddProductForm() {
                           name="bypingprice"
                           placeholder="Enter Buying Price"
                           fullWidth
+                          inputProps={{ style: { textAlign: 'right' } }}
                           error={Boolean(touched.bypingprice && errors.bypingprice)}
                           helperText={touched.bypingprice && typeof errors.bypingprice === 'string' ? errors.bypingprice : ''}
                           onBlur={formik.handleBlur}
@@ -353,6 +316,7 @@ export default function AddProductForm() {
                           required
                           type="text"
                           placeholder="Enter Selling Price"
+                          inputProps={{ style: { textAlign: 'right' } }}
                           error={Boolean(touched.sellingprice && errors.sellingprice)}
                           helperText={touched.sellingprice && typeof errors.sellingprice === 'string' ? errors.sellingprice : ''}
                           onBlur={formik.handleBlur}
@@ -371,20 +335,27 @@ export default function AddProductForm() {
                     <Grid item xs={12} sm={4}>
                       <Stack spacing={0.5} alignItems="left" justifyContent="start" sx={{ display: 'flex', flexDirection: 'column' }}>
                         <InputLabel>S GST Rate %</InputLabel>
-                        <TextField
-                          required
-                          id="sgsttax"
-                          name="sgsttax"
-                          placeholder="Enter SGST"
-                          fullWidth
-                          error={Boolean(touched.sgsttax && errors.sgsttax)}
-                          helperText={touched.sgsttax && typeof errors.sgsttax === 'string' ? errors.sgsttax : ''}
-                          onBlur={formik.handleBlur}
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                            formik.setFieldTouched('sgsttax', true);
-                            formik.setFieldError('sgsttax', '');
+                        <Autocomplete
+                          value={sgstTaxRender}
+                          onChange={(event: any, newValue: number | null) => {
+                            setSgstTaxRender(newValue);
+                            formik.setFieldValue('sgsttax', newValue);
                           }}
+                          inputValue={sgstTaxValue}
+                          onInputChange={(event, newInput_Sgst_Value) => {
+                            setSgstTaxValue(newInput_Sgst_Value);
+                            formik.setFieldValue('sgsttax', newInput_Sgst_Value);
+                          }}
+                          id="controllable-states-demo"
+                          options={sgsttaxrate}
+                          sx={{ width: '100%' }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={Boolean(touched.sgsttax && errors.sgsttax)}
+                              helperText={touched.sgsttax && errors.sgsttax ? 'Please Enter S SGST Tax Rate' : ''}
+                            />
+                          )}
                         />
                       </Stack>
                     </Grid>
@@ -392,20 +363,27 @@ export default function AddProductForm() {
                     <Grid item xs={12} sm={4}>
                       <Stack spacing={0.5} alignItems="left" justifyContent="start" sx={{ display: 'flex', flexDirection: 'column' }}>
                         <InputLabel>C GST Rate %</InputLabel>
-                        <TextField
-                          required
-                          id="cgsttax"
-                          name="cgsttax"
-                          placeholder="Enter CGST"
-                          fullWidth
-                          error={Boolean(touched.cgsttax && errors.cgsttax)}
-                          helperText={touched.cgsttax && typeof errors.cgsttax === 'string' ? errors.cgsttax : ''}
-                          onBlur={formik.handleBlur}
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                            formik.setFieldTouched('cgsttax', true);
-                            formik.setFieldError('cgsttax', '');
+                        <Autocomplete
+                          value={cgstTaxRender}
+                          onChange={(event: any, newValue: number | null) => {
+                            setCgstTaxRender(newValue);
+                            formik.setFieldValue('cgsttax', newValue);
                           }}
+                          inputValue={cgstTaxValue}
+                          onInputChange={(event, newInput_Cgst_Value) => {
+                            setCgstTaxValue(newInput_Cgst_Value);
+                            formik.setFieldValue('cgsttax', newInput_Cgst_Value);
+                          }}
+                          id="controllable-states-demo"
+                          options={cgsttaxrate}
+                          sx={{ width: '100%' }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={Boolean(touched.cgsttax && errors.cgsttax)}
+                              helperText={touched.cgsttax && errors.cgsttax ? 'Please Enter C SGST Tax Rate' : ''}
+                            />
+                          )}
                         />
                       </Stack>
                     </Grid>
@@ -413,20 +391,27 @@ export default function AddProductForm() {
                     <Grid item xs={12} sm={4}>
                       <Stack spacing={0.5} alignItems="left" justifyContent="start" sx={{ display: 'flex', flexDirection: 'column' }}>
                         <InputLabel>I GST Rate %</InputLabel>
-                        <TextField
-                          required
-                          id="igsttax"
-                          name="igsttax"
-                          placeholder="Enter CGST"
-                          fullWidth
-                          error={Boolean(touched.igsttax && errors.igsttax)}
-                          helperText={touched.igsttax && typeof errors.igsttax === 'string' ? errors.igsttax : ''}
-                          onBlur={formik.handleBlur}
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                            formik.setFieldTouched('igsttax', true);
-                            formik.setFieldError('igsttax', '');
+                        <Autocomplete
+                          value={igstTaxRender}
+                          onChange={(event: any, newValue: number | null) => {
+                            setIgstTaxRender(newValue);
+                            formik.setFieldValue('igsttax', newValue);
                           }}
+                          inputValue={igstTaxValue}
+                          onInputChange={(event, newInput_Igst_Value) => {
+                            setIgstTaxValue(newInput_Igst_Value);
+                            formik.setFieldValue('igsttax', newInput_Igst_Value);
+                          }}
+                          id="controllable-states-demo"
+                          options={igsttaxrate}
+                          sx={{ width: '100%' }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              error={Boolean(touched.igsttax && errors.igsttax)}
+                              helperText={touched.igsttax && errors.igsttax ? 'Please Enter I SGST Tax Rate' : ''}
+                            />
+                          )}
                         />
                       </Stack>
                     </Grid>
@@ -438,18 +423,18 @@ export default function AddProductForm() {
                       <Stack spacing={0.5} alignItems="left" justifyContent="start" sx={{ display: 'flex', flexDirection: 'column' }}>
                         <InputLabel>Initial Stock</InputLabel>
                         <TextField
-                          required
-                          id="initialstock"
-                          name="initialstock"
-                          placeholder="Enter Initial Stock"
                           fullWidth
+                          id="initialstock"
+                          required
+                          type="text"
+                          placeholder="Enter Initial Stock"
+                          inputProps={{ style: { textAlign: 'right' } }}
                           error={Boolean(touched.initialstock && errors.initialstock)}
                           helperText={touched.initialstock && typeof errors.initialstock === 'string' ? errors.initialstock : ''}
                           onBlur={formik.handleBlur}
                           onChange={(e) => {
                             formik.handleChange(e);
-                            formik.setFieldTouched('initialstock', true);
-                            formik.setFieldError('initialstock', '');
+                            formik.setFieldTouched('initialstock', true, false);
                           }}
                         />
                       </Stack>
@@ -459,18 +444,18 @@ export default function AddProductForm() {
                       <Stack spacing={0.5} alignItems="left" justifyContent="start" sx={{ display: 'flex', flexDirection: 'column' }}>
                         <InputLabel>Minimum Stock</InputLabel>
                         <TextField
-                          required
-                          id="minimumstock"
-                          name="minimumstock"
-                          placeholder="Enter Minimum Stock"
                           fullWidth
+                          id="minimumstock"
+                          required
+                          type="text"
+                          placeholder="Enter Minimum Stock"
+                          inputProps={{ style: { textAlign: 'right' } }}
                           error={Boolean(touched.minimumstock && errors.minimumstock)}
                           helperText={touched.minimumstock && typeof errors.minimumstock === 'string' ? errors.minimumstock : ''}
                           onBlur={formik.handleBlur}
                           onChange={(e) => {
                             formik.handleChange(e);
-                            formik.setFieldTouched('minimumstock', true);
-                            formik.setFieldError('minimumstock', '');
+                            formik.setFieldTouched('minimumstock', true, false);
                           }}
                         />
                       </Stack>
