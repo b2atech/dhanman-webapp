@@ -17,7 +17,10 @@ const initialState: CustomizationProps = {
   onChangeDirection: (direction: ThemeDirection) => {},
   onChangeMiniDrawer: (miniDrawer: boolean) => {},
   onChangeMenuOrientation: (menuOrientation: MenuOrientation) => {},
-  onChangeFontFamily: (fontFamily: FontFamily) => {}
+  onChangeFontFamily: (fontFamily: FontFamily) => {},
+  onChangeClient: (clientId: String) => {},
+  onChangeCurrentUser: (currentUser: String) => {},
+  onChangeFinancialYear: (financialYear: Number) => {}
 };
 
 // ==============================|| CONFIG CONTEXT & PROVIDER ||============================== //
@@ -87,6 +90,27 @@ function ConfigProvider({ children }: ConfigProviderProps) {
     });
   };
 
+  const onChangeClient = (clientId: String) => {
+    setConfig({
+      ...config,
+      clientId
+    });
+  };
+
+  const onChangeCurrentUser = (currentUser: String) => {
+    setConfig({
+      ...config,
+      currentUser
+    });
+  };
+
+  const onChangeFinancialYear = (financialYear: Number) => {
+    setConfig({
+      ...config,
+      financialYear
+    });
+  };
+
   return (
     <ConfigContext.Provider
       value={{
@@ -98,7 +122,10 @@ function ConfigProvider({ children }: ConfigProviderProps) {
         onChangeDirection,
         onChangeMiniDrawer,
         onChangeMenuOrientation,
-        onChangeFontFamily
+        onChangeFontFamily,
+        onChangeClient,
+        onChangeCurrentUser,
+        onChangeFinancialYear
       }}
     >
       {children}

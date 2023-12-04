@@ -31,13 +31,13 @@ import AlertCustomerDelete from './AlertCustomerDelete';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { createCustomerRequest, updateCustomerRequest } from 'api/services/SalesService';
+import useConfig from 'hooks/useConfig';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   if (customer) {
     const newCustomer = {
       id: customer.id,
-      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       firstName: customer.firstName,
       lastName: customer.lastName,
       phoneNumber: customer.phoneNumber,
@@ -52,7 +52,6 @@ const getInitialValues = (customer: FormikValues | null) => {
   } else {
     const newCustomer = {
       id: '',
-      clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
       firstName: '',
       lastName: '',
       phoneNumber: '',
@@ -81,6 +80,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   const [selectedCountryId, setSelectedCountryId] = useState('');
   const [selectedStateId, setSelectedStateId] = useState('');
   const [selectedCityId, setselectedCityId] = useState('');
+
+  const { clientId } = useConfig();
 
   useEffect(() => {
     getAllCountries()
@@ -157,7 +158,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       try {
         const customerData = {
           userId: values.id,
-          clientId: values.clientId,
+          clientId: clientId,
           firstName: values.firstName,
           lastName: values.lastName,
           email: values.email,

@@ -1,3 +1,4 @@
+import { PaidPaymentData } from 'types/bill';
 import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { BillEdit, BillHeader } from 'types/billiingDetails';
@@ -78,14 +79,6 @@ export const BillAPI = {
       throw error;
     }
   },
-  updateBillRequest = async function (billdata: BillEdit) {
-    const response = await apiPurchase.request({
-      url: `v1/bill`,
-      method: 'PUT',
-      data: billdata
-    });
-    return response.status;
-  },
   getBillById = async function (id: string, cancel = false) {
     const response = await apiPurchase.request({
       url: `v1/GetBill/${id}`,
@@ -131,6 +124,23 @@ export const BillAPI = {
       console.error('Error deleting paid payment:', error);
       throw error;
     }
+  },
+  createPaidPaymentRequest = async function (piadPaymentData: PaidPaymentData) {
+    const response = await apiPurchase.request({
+      url: `v1/paidPayment`,
+      method: 'POST',
+      data: piadPaymentData
+    });
+    return response.status;
   };
+
+export async function updateBillRequest(billEdit: BillEdit) {
+  const response = await apiPurchase.request({
+    url: `v1/bill/`,
+    method: 'PUT',
+    data: billEdit
+  });
+  return response.data;
+}
 
 const cancelApiObject = defineCancelApiObject(BillAPI);

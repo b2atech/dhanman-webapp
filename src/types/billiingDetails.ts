@@ -71,12 +71,12 @@ export interface BillHeader_main {
 }
 
 export interface BillLine {
+  id: string | number;
   name: string;
   description: string;
   price: string | number;
   quantity: number;
   amount: string | number;
-  id: string | number;
 }
 export interface BillingList {
   note: String;
@@ -108,10 +108,8 @@ export interface BillingList {
 }
 
 export interface BillEdit {
-  billNumber: string;
-  billHeaederId: string;
+  billHeaderId: string;
   vendorId: string;
-  vendorInfo: InfoType;
   billDate: Date | string | number;
   dueDate: Date | string | number;
   totalAmount: number | null;
