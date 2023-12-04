@@ -28,7 +28,9 @@ const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 const AppPullRequests = Loadable(lazy(() => import('pages/dev/pr')));
 const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details')));
 const AppProducts = Loadable(lazy(() => import('pages/inventory/products/list')));
+const AppAddProduct = Loadable(lazy(() => import('pages/inventory/products/addproduct')));
 const AppPaidPayments = Loadable(lazy(() => import('pages/purchase/paidpayments/list')));
+const AppAccountGroups = Loadable(lazy(() => import('pages/company/accountGroup/list')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -67,6 +69,16 @@ const MainRoutes = {
             {
               path: 'coaContainer',
               element: <AppCoaContainer />
+            }
+          ]
+        },
+        {
+          path: 'accountgroup',
+          element: <CommonLayout />,
+          children: [
+            {
+              path: 'list',
+              element: <AppAccountGroups />
             }
           ]
         }
@@ -255,7 +267,6 @@ const MainRoutes = {
       children: [
         {
           path: 'products',
-          element: <AppProducts />,
           children: [
             {
               path: 'list',
@@ -263,7 +274,7 @@ const MainRoutes = {
             },
             {
               path: 'create',
-              element: <MaintenanceComingSoon />
+              element: <AppAddProduct />
             }
           ]
         },

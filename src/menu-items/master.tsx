@@ -75,6 +75,13 @@ const master: NavItemType = {
           icon: icons.TableOutlined
         },
         {
+          id: 'accountgroups',
+          title: <FormattedMessage id="accountgroups" />,
+          type: 'item',
+          url: '/company/accountgroup/list',
+          icon: icons.TableOutlined
+        },
+        {
           id: 'customers',
           title: <FormattedMessage id="customers" />,
           type: 'item',
@@ -176,8 +183,8 @@ const master: NavItemType = {
           icon: icons.TagOutlined
         },
         {
-          id: 'createproduct',
-          title: <FormattedMessage id="createProduct" />,
+          id: 'addproducts',
+          title: <FormattedMessage id="addproducts" />,
           type: 'item',
           url: '/inventory/products/create',
           icon: icons.PlusSquareOutlined
