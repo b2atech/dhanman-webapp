@@ -397,7 +397,7 @@ const Bills = () => {
           accessor: 'billStatus',
           className: 'cell-left',
           disableFilters: true,
-          filter: 'includes',
+          Filter: ({ column }) => <>{column.render('Filter')}</>,
           Cell: ({ value }: { value: string }) => {
             switch (value) {
               case 'Cancel':
