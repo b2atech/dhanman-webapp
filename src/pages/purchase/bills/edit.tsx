@@ -30,7 +30,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 // third-party
 import { format } from 'date-fns';
 import { FieldArray, Form, Formik } from 'formik';
-import * as yup from 'yup';
+// import * as yup from 'yup';
+import { v4 as UIDV4 } from 'uuid';
 
 // project import
 import Loader from 'components/Loader';
@@ -50,29 +51,29 @@ import { BillEdit, BillLine } from 'types/billiingDetails';
 import AddressBillModal from 'sections/apps/bill/BillAddressModal';
 import BillItem from 'sections/apps/bill/billItem';
 
-const validationSchema = yup.object({
-  date: yup.date().required('bill date is required'),
-  due_date: yup
-    .date()
-    .when('date', (date, schema) => date && schema.min(date, "Due date can't be before bill date"))
-    .nullable()
-    .required('Due date is required'),
-  vendorInfo: yup
-    .object({
-      name: yup.string().required('bill receiver information is required')
-    })
-    .required('bill receiver information is required'),
-  status: yup.string().required('Status selection is required'),
-  bill_detail: yup
-    .array()
-    .required('bill details is required')
-    .of(
-      yup.object().shape({
-        name: yup.string().required('Product name is required')
-      })
-    )
-    .min(1, 'bill must have at least 1 items')
-});
+// const validationSchema = yup.object({
+//   date: yup.date().required('bill date is required'),
+//   due_date: yup
+//     .date()
+//     .when('date', (date, schema) => date && schema.min(date, "Due date can't be before bill date"))
+//     .nullable()
+//     .required('Due date is required'),
+//   vendorInfo: yup
+//     .object({
+//       name: yup.string().required('bill receiver information is required')
+//     })
+//     .required('bill receiver information is required'),
+//   status: yup.string().required('Status selection is required'),
+//   bill_detail: yup
+//     .array()
+//     .required('bill details is required')
+//     .of(
+//       yup.object().shape({
+//         name: yup.string().required('Product name is required')
+//       })
+//     )
+//     .min(1, 'bill must have at least 1 items')
+// });
 
 // ==============================|| Bill - EDIT ||============================== //
 
@@ -99,15 +100,13 @@ const EditBill = () => {
 
   const handlerEdit = (values: any) => {
     const updateBill: BillEdit = {
-      billHeaederId: values.id,
-      billNumber: values.invoiceNumber,
+      billHeaderId: values.id,
       discount: Number(values.discount),
       tax: Number(values.tax),
       billDate: format(values.date, 'yyyy-MM-dd'),
       dueDate: format(values.due_date, 'yyyy-MM-dd'),
       totalAmount: Number(values.totalAmount),
       currency: 'INR',
-      vendorInfo: values.vendorInfo,
       vendorId: values.vendorInfo.id,
       note: values.notes
     };
@@ -122,7 +121,7 @@ const EditBill = () => {
       billLine.id = billItem.id;
       return billLine;
     });
-
+    console.log(updateBill);
     updateBillRequest(updateBill).then(() => {
       dispatch(
         openSnackbar({
@@ -168,7 +167,7 @@ const EditBill = () => {
           notes: list1?.note || '',
           totalAmount: list1?.totalAmount
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={(values) => {
           handlerEdit(values);
         }}
@@ -385,6 +384,7 @@ const EditBill = () => {
                                   startIcon={<PlusOutlined />}
                                   onClick={() =>
                                     push({
+                                      id: UIDV4(),
                                       name: '',
                                       description: '',
                                       quantity: 1,

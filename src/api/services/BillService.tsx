@@ -79,14 +79,6 @@ export const BillAPI = {
       throw error;
     }
   },
-  updateBillRequest = async function (billdata: BillEdit) {
-    const response = await apiPurchase.request({
-      url: `v1/bill`,
-      method: 'PUT',
-      data: billdata
-    });
-    return response.status;
-  },
   getBillById = async function (id: string, cancel = false) {
     const response = await apiPurchase.request({
       url: `v1/GetBill/${id}`,
@@ -141,5 +133,14 @@ export const BillAPI = {
     });
     return response.status;
   };
+
+export async function updateBillRequest(billEdit: BillEdit) {
+  const response = await apiPurchase.request({
+    url: `v1/bill/`,
+    method: 'PUT',
+    data: billEdit
+  });
+  return response.data;
+}
 
 const cancelApiObject = defineCancelApiObject(BillAPI);

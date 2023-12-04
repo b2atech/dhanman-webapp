@@ -100,6 +100,9 @@ export type DefaultConfigProps = {
    * 'rtl' - ThemeDirection.RTL
    */
   themeDirection: ThemeDirection;
+  clientId: String;
+  financialYear: Number;
+  currentUser: String;
 };
 
 export type CustomizationProps = {
@@ -111,6 +114,9 @@ export type CustomizationProps = {
   mode: ThemeMode;
   presetColor: PresetColor;
   themeDirection: ThemeDirection;
+  clientId: String;
+  currentUser: String;
+  financialYear: Number;
   onChangeContainer: VoidFunction;
   onChangeLocalization: (lang: I18n) => void;
   onChangeMode: (mode: ThemeMode) => void;
@@ -119,4 +125,7 @@ export type CustomizationProps = {
   onChangeMiniDrawer: (miniDrawer: boolean) => void;
   onChangeMenuOrientation: (menuOrientation: MenuOrientation) => void;
   onChangeFontFamily: (fontFamily: FontFamily) => void;
+  onChangeClient: (clientId: String) => void;
+  onChangeFinancialYear: (financialYear: Number) => void;
+  onChangeCurrentUser: (currentUser: String) => void;
 };
