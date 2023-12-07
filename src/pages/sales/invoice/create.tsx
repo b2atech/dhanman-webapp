@@ -1,4 +1,4 @@
-import { Button, Grid, MenuItem, Select, Stack } from '@mui/material';
+import { Button, Grid, Stack } from '@mui/material';
 
 import MainCard from 'components/MainCard';
 
@@ -16,7 +16,11 @@ import {
   TableContainer,
   TableBody,
   Table,
-  Divider
+  Divider,
+  FormControlLabel,
+  Switch,
+  Checkbox,
+  Tooltip
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -84,6 +88,9 @@ const Createinvoice = () => {
   const notesLimit: number = 500;
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
+  const [showGSTRates, setShowGSTRates] = useState(true);
+  const [discountFees, setDiscountFees] = useState(true);
+  const [defaultGSTRates, setDefaultGSTRates] = useState();
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -189,11 +196,22 @@ const Createinvoice = () => {
           },
           invoice_detail: [
             {
+              soNo: 0,
+              soDate: '',
               name: '',
               description: '',
               quantity: 0,
               price: 0,
-              amount: 0
+              amount: 0,
+              discount: 0,
+              fees: 0,
+              taxableAmount: 0,
+              cRt: 0,
+              cgstAmount: 0,
+              sRt: 0,
+              sgstAmount: 0,
+              iRt: 0,
+              igstAmount: 0
             }
           ],
           discount: 0,
@@ -212,6 +230,10 @@ const Createinvoice = () => {
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
+          const cgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.cgstAmount);
+            else return prev;
+          }, 0);
           const discountRate = (values.discount * subtotal) / 100;
           const grandAmount = subtotal - discountRate + taxRate;
           values.totalAmount = grandAmount;
@@ -241,40 +263,6 @@ const Createinvoice = () => {
                   {touched.invoiceNumber && errors.invoiceNumber && (
                     <FormHelperText error={true}>{errors.invoiceNumber as string}</FormHelperText>
                   )}
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Stack spacing={1}>
-                    <InputLabel>Status</InputLabel>
-                    <FormControl sx={{ width: '100%' }}>
-                      <Select
-                        value="Draft" // Set the default value to "Drafted"
-                        displayEmpty
-                        name="status"
-                        renderValue={(selected) => {
-                          if (selected.length === 0) {
-                            return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
-                          }
-                          return selected;
-                        }}
-                        onChange={handleChange}
-                        error={Boolean(errors.status && touched.status)}
-                      >
-                        <MenuItem disabled value="">
-                          Select status
-                        </MenuItem>
-                        <MenuItem value="Paid" disabled>
-                          Paid
-                        </MenuItem>
-                        <MenuItem value="Unpaid" disabled>
-                          Unpaid
-                        </MenuItem>
-                        <MenuItem value="Cancelled" disabled>
-                          Cancelled
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                  {touched.status && errors.status && <FormHelperText error={true}>{errors.status}</FormHelperText>}
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
@@ -391,9 +379,34 @@ const Createinvoice = () => {
                     <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
                   )}
                 </Grid>
-
-                <Grid item xs={12}>
-                  <Typography variant="h5">Detail</Typography>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={6}>
+                    <Typography variant="h5">
+                      Detail <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
+                    <FormControlLabel
+                      control={<Switch checked={showGSTRates} onChange={() => setShowGSTRates(!showGSTRates)} name="showGSTRates" />}
+                      label="GST Rates"
+                    />
+                    <FormControlLabel
+                      control={<Switch checked={discountFees} onChange={() => setDiscountFees(!discountFees)} name="discountFees" />}
+                      label="Discount/Fees"
+                    />
+                    <Tooltip title="Default GSt Rates">
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={defaultGSTRates}
+                            onChange={() => setDefaultGSTRates(defaultGSTRates)} // Update the state with the new value
+                            name="defaultGSTRates"
+                          />
+                        }
+                        label=""
+                      />
+                    </Tooltip>
+                  </Grid>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -406,12 +419,31 @@ const Createinvoice = () => {
                             <Table sx={{ minWidth: 650 }}>
                               <TableHead>
                                 <TableRow>
-                                  <TableCell>#</TableCell>
+                                  <TableCell>Sr No</TableCell>
+                                  <TableCell>So No</TableCell>
+                                  <TableCell>So Date</TableCell>
                                   <TableCell>Name</TableCell>
                                   <TableCell>Description</TableCell>
                                   <TableCell>Qty</TableCell>
                                   <TableCell>Price</TableCell>
-                                  <TableCell align="right">Amount</TableCell>
+                                  {discountFees && (
+                                    <>
+                                      <TableCell>Fees</TableCell>
+                                      <TableCell>Discount</TableCell>
+                                    </>
+                                  )}
+                                  <TableCell>Taxable Amt</TableCell>
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell>C Rt</TableCell>
+                                      <TableCell>S Rt</TableCell>
+                                      <TableCell>I Rt</TableCell>
+                                    </>
+                                  )}
+                                  <TableCell>CGST Amt</TableCell>
+                                  <TableCell>SGST Amt</TableCell>
+                                  <TableCell>IGST Amt</TableCell>
+                                  <TableCell align="right">Total Amt</TableCell>
                                   <TableCell align="right">Action</TableCell>
                                 </TableRow>
                               </TableHead>
@@ -423,10 +455,18 @@ const Createinvoice = () => {
                                       key={item.id}
                                       id={item.id}
                                       index={index}
+                                      soNo={item.soNo}
+                                      soDate={item.soDate}
                                       name={item.name}
                                       description={item.description}
                                       qty={item.quantity}
                                       price={item.price}
+                                      fees={item.fees}
+                                      discount={item.discount}
+                                      taxableAmount={item.taxableAmount}
+                                      cgst={item.cgst}
+                                      sgst={item.sgst}
+                                      igst={item.igst}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
                                       Blur={handleBlur}
@@ -469,42 +509,6 @@ const Createinvoice = () => {
                               </Box>
                             </Grid>
                             <Grid item xs={12} md={4}>
-                              <Grid container justifyContent="space-between" spacing={2} sx={{ pt: 2.5, pb: 2.5 }}>
-                                <Grid item xs={6}>
-                                  <Stack spacing={1}>
-                                    <InputLabel>Discount(%)</InputLabel>
-                                    <TextField
-                                      type="number"
-                                      fullWidth
-                                      name="discount"
-                                      id="discount"
-                                      placeholder="0.0"
-                                      value={values.discount}
-                                      onChange={handleChange}
-                                      inputProps={{
-                                        min: 0
-                                      }}
-                                    />
-                                  </Stack>
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Stack spacing={1}>
-                                    <InputLabel>Tax(%)</InputLabel>
-                                    <TextField
-                                      type="number"
-                                      fullWidth
-                                      name="tax"
-                                      id="tax"
-                                      placeholder="0.0"
-                                      value={values.tax}
-                                      onChange={handleChange}
-                                      inputProps={{
-                                        min: 0
-                                      }}
-                                    />
-                                  </Stack>
-                                </Grid>
-                              </Grid>
                               <Grid item xs={12}>
                                 <Stack spacing={2}>
                                   <Stack direction="row" justifyContent="space-between">
@@ -512,13 +516,23 @@ const Createinvoice = () => {
                                     <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>Discount:</Typography>
-                                    <Typography variant="h6" color={theme.palette.success.main}>
-                                      {country?.prefix + '' + discountRate.toFixed(2)}
-                                    </Typography>
+                                    <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                                    <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>Tax:</Typography>
+                                    <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
+                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>After Fees:</Typography>
+                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>After Discount:</Typography>
                                     <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">

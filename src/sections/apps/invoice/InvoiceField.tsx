@@ -5,7 +5,7 @@ import { MenuItem, Select, TableCell, TextField } from '@mui/material';
 
 const InvoiceField = ({ onEditItem, cellData }: any) => {
   return (
-    <TableCell sx={{ '& .MuiFormHelperText-root': { position: 'absolute', bottom: -24, ml: 0 } }}>
+    <TableCell sx={{ '& .MuiFormHelperText-root': { position: 'absolute', bottom: -24, ml: 0 }, minWidth: 100, overflowX: 'auto' }}>
       {cellData.select ? (
         <Select
           value={cellData.value}
