@@ -42,6 +42,8 @@ import { useNavigate } from 'react-router';
 import { BillHeader_main, BillLine } from 'types/billiingDetails';
 import { createBillRequest } from 'api/services/BillService';
 import AddressBillModal from 'sections/apps/bill/BillAddressModal';
+import { useEffect, useState } from 'react';
+import { getAllProducts } from 'api/services/InventoryService';
 // import BillModal from 'sections/apps/bill/BillModal';
 
 const validationSchema = yup.object({
@@ -85,6 +87,7 @@ const CreateBill = () => {
   const { open, isCustomerOpen, country, countries } = useSelector((state) => state.invoice);
   const notesLimit: number = 500;
   const navigation = useNavigate();
+  const [products, setProducts] = useState<any[]>([]);
 
   const handlerCreate = (values: any) => {
     const bill: BillHeader_main = {
@@ -144,6 +147,18 @@ const CreateBill = () => {
       navigation('/purchase/bills/list');
     });
   };
+
+  useEffect(() => {
+    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((productList) => {
+        if (Array.isArray(productList)) {
+          setProducts(productList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   // const addNextBillHandler = () => {
   //   dispatch(
@@ -217,40 +232,6 @@ const CreateBill = () => {
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
-                    <InputLabel>Status</InputLabel>
-                    <FormControl sx={{ width: '100%' }}>
-                      <Select
-                        value="Unpaid"
-                        displayEmpty
-                        name="status"
-                        renderValue={(selected) => {
-                          if (selected.length === 0) {
-                            return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
-                          }
-                          return selected;
-                        }}
-                        onChange={handleChange}
-                        error={Boolean(errors.status && touched.status)}
-                      >
-                        <MenuItem disabled value="">
-                          Select status
-                        </MenuItem>
-                        <MenuItem value="Paid" disabled>
-                          Paid
-                        </MenuItem>
-                        <MenuItem value="Unpaid" disabled>
-                          Unpaid
-                        </MenuItem>
-                        <MenuItem value="Cancelled" disabled>
-                          Cancelled
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                  {touched.status && errors.status && <FormHelperText error={true}>{errors.status}</FormHelperText>}
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Stack spacing={1}>
                     <InputLabel>Date</InputLabel>
                     <FormControl sx={{ width: '100%' }} error={Boolean(touched.billDate && errors.billDate)}>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -278,6 +259,40 @@ const CreateBill = () => {
                     </FormControl>
                   </Stack>
                   {touched.due_date && errors.due_date && <FormHelperText error={true}>{errors.due_date as string}</FormHelperText>}
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Stack spacing={1}>
+                    <InputLabel>Status</InputLabel>
+                    <FormControl sx={{ width: '100%' }}>
+                      <Select
+                        value="Draft"
+                        displayEmpty
+                        name="status"
+                        renderValue={(selected) => {
+                          if (selected.length === 0) {
+                            return <Box sx={{ color: 'secondary.400' }}>Select status</Box>;
+                          }
+                          return selected;
+                        }}
+                        onChange={handleChange}
+                        error={Boolean(errors.status && touched.status)}
+                      >
+                        <MenuItem disabled value="">
+                          Select status
+                        </MenuItem>
+                        <MenuItem value="Paid" disabled>
+                          Paid
+                        </MenuItem>
+                        <MenuItem value="Unpaid" disabled>
+                          Unpaid
+                        </MenuItem>
+                        <MenuItem value="Cancelled" disabled>
+                          Cancelled
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Stack>
+                  {touched.status && errors.status && <FormHelperText error={true}>{errors.status}</FormHelperText>}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
@@ -398,6 +413,8 @@ const CreateBill = () => {
                                       Blur={handleBlur}
                                       errors={errors}
                                       touched={touched}
+                                      products={products}
+                                      setFieldValue={setFieldValue}
                                     />
                                   </TableRow>
                                 ))}
