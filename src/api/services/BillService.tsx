@@ -17,7 +17,7 @@ export const BillAPI = {
   },
   getAllBillDetail = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `/Bill/GetAllBillDetail/${clientId}`,
+      url: `/Bill/billDetails/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllBillDetail.name].handleRequestCancellation().signal : undefined
     });
@@ -26,7 +26,7 @@ export const BillAPI = {
   },
   getAllVendors = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/GetAllVendors/${clientId}`,
+      url: `v1/vendors/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllVendors.name].handleRequestCancellation().signal : undefined
     });
@@ -132,6 +132,15 @@ export const BillAPI = {
       data: piadPaymentData
     });
     return response.status;
+  },
+  getBillDefaultStatus = async function (id: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/billDefaultStatus/${id}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getBillDefaultStatus.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
   };
 
 export async function updateBillRequest(billEdit: BillEdit) {
