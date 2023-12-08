@@ -573,7 +573,9 @@ const List = () => {
       {
         Header: 'Invoice ID',
         accessor: 'id',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Customer Name',
@@ -615,7 +617,7 @@ const List = () => {
         Header: 'Status',
         accessor: 'invoiceStatus',
         disableFilters: true,
-        filter: 'includes',
+        Filter: ({ column }: { column: any }) => <>{column.render('Filter')}</>,
         Cell: ({ value }: { value: string }) => {
           switch (value) {
             case 'Closed':
@@ -678,21 +680,29 @@ const List = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Modified By',
-        accessor: 'modifiedBy'
+        accessor: 'modifiedBy',
+        disableSortBy: true,
+        disableFilters: true
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
