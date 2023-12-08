@@ -1,11 +1,10 @@
-// material-ui
 import { MenuItem, Select, TableCell, TextField } from '@mui/material';
 
 // ==============================|| Bill - TEXT FIELD ||============================== //
 
-const BillField = ({ onEditItem, cellData }: any) => {
+const BillField = ({ onEditItem, cellData, showGSTRates }: any) => {
   return (
-    <TableCell sx={{ '& .MuiFormHelperText-root': { position: 'absolute', bottom: -24, ml: 0 } }}>
+    <TableCell sx={{ '& .MuiFormHelperText-root': { position: 'absolute', bottom: -24, ml: 0 }, minWidth: 100, overflowX: 'auto' }}>
       {cellData.select ? (
         <Select
           value={cellData.value}
@@ -39,5 +38,4 @@ const BillField = ({ onEditItem, cellData }: any) => {
     </TableCell>
   );
 };
-
 export default BillField;

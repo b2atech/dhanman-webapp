@@ -79,6 +79,14 @@ export const BillAPI = {
 
     return response.data;
   },
+    getBillDefaultStatus = async function (id: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/billDefaultStatus/${id}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getBillDefaultStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data;
+  },
   createBillRequest = async function (billdata: BillHeader) {
     const response = await apiPurchase.request({
       url: `v1/bill`,
