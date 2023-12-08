@@ -251,27 +251,6 @@ const Createinvoice = () => {
           values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
-              <Grid container justifyContent="flex-end" alignItems="center">
-                <Grid item xs={12} sm={6} md={3}>
-                  <Stack spacing={1}>
-                    <InputLabel>Status</InputLabel>
-                    <FormControl sx={{ width: '100%' }}>
-                      <Box
-                        sx={{
-                          border: '1px solid #ced4da',
-                          borderRadius: '4px',
-                          padding: '8px',
-                          '&:hover': {
-                            border: '1px solid #757575'
-                          }
-                        }}
-                      >
-                        <Typography>{defaultStatus}</Typography>
-                      </Box>
-                    </FormControl>
-                  </Stack>
-                </Grid>
-              </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
@@ -323,6 +302,25 @@ const Createinvoice = () => {
                     </FormControl>
                   </Stack>
                   {touched.due_date && errors.due_date && <FormHelperText error={true}>{errors.due_date as string}</FormHelperText>}
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Stack spacing={1}>
+                    <InputLabel>Status</InputLabel>
+                    <FormControl sx={{ width: '100%' }}>
+                      <Box
+                        sx={{
+                          border: '1px solid #ced4da',
+                          borderRadius: '4px',
+                          padding: '8px',
+                          '&:hover': {
+                            border: '1px solid #757575'
+                          }
+                        }}
+                      >
+                        <Typography>{defaultStatus}</Typography>
+                      </Box>
+                    </FormControl>
+                  </Stack>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <MainCard sx={{ minHeight: 168 }}>
