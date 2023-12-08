@@ -33,7 +33,7 @@ import InvoiceItem from 'sections/apps/invoice/InvoiceItem';
 import { useTheme } from '@mui/material/styles';
 import { v4 as UIDV4 } from 'uuid';
 import { InvoiceHeader_main, InvoiceLine } from 'types/invoiceDetails';
-import { createInvoiceRequest } from 'api/services/SalesService';
+import { createInvoiceRequest, getInvoiceDefaultStatus } from 'api/services/SalesService';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
 import InvoiceModal from 'sections/apps/invoice/InvoiceModal';
@@ -91,6 +91,7 @@ const Createinvoice = () => {
   const [showGSTRates, setShowGSTRates] = useState(true);
   const [discountFees, setDiscountFees] = useState(true);
   const [defaultGSTRates, setDefaultGSTRates] = useState();
+  const [defaultStatus, setDefaultStatus] = useState();
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -158,6 +159,16 @@ const Createinvoice = () => {
         if (Array.isArray(productList)) {
           setProducts(productList);
         }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    getInvoiceDefaultStatus('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((status) => {
+        setDefaultStatus(status.initialStatusName);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -240,8 +251,24 @@ const Createinvoice = () => {
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container justifyContent="flex-end" alignItems="center">
-                <Grid item>
-                  <InputLabel sx={{ color: 'grey' }}>Status: Drafted</InputLabel>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Stack spacing={1}>
+                    <InputLabel>Status</InputLabel>
+                    <FormControl sx={{ width: '100%' }}>
+                      <Box
+                        sx={{
+                          border: '1px solid #ced4da',
+                          borderRadius: '4px',
+                          padding: '8px',
+                          '&:hover': {
+                            border: '1px solid #757575'
+                          }
+                        }}
+                      >
+                        <Typography>{defaultStatus}</Typography>
+                      </Box>
+                    </FormControl>
+                  </Stack>
                 </Grid>
               </Grid>
               <Grid container spacing={2}>
