@@ -79,7 +79,7 @@ export const BillAPI = {
 
     return response.data;
   },
-    getBillDefaultStatus = async function (id: string, cancel = false) {
+  getBillDefaultStatus = async function (id: string, cancel = false) {
     const response = await apiPurchase.request({
       url: `v1/billDefaultStatus/${id}`,
       method: 'GET',
