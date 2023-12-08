@@ -203,7 +203,8 @@ const Createinvoice = () => {
             email: '',
             firstName: '',
             lastName: '',
-            city: ''
+            city: '',
+            gstIn: ''
           },
           invoice_detail: [
             {
@@ -367,6 +368,7 @@ const Createinvoice = () => {
                             <Typography color="secondary">{values?.customerInfo?.city}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
                             <Typography color="secondary">{values?.customerInfo?.email}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.gstIn}</Typography>
                           </Stack>
                         </Stack>
                       </Grid>
