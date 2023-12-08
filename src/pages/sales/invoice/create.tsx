@@ -1,4 +1,4 @@
-import { Button, Grid, Stack } from '@mui/material';
+import { Button, Grid, MenuItem, Select, Stack } from '@mui/material';
 
 import MainCard from 'components/MainCard';
 
@@ -7,9 +7,7 @@ import {
   InputLabel,
   FormControl,
   TextField,
-  MenuItem,
   Box,
-  Select,
   FormHelperText,
   Typography,
   TableCell,
@@ -41,6 +39,8 @@ import { format } from 'date-fns';
 import { FieldArray, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router';
 import VendorAddressModel from 'sections/apps/bill/VendorAddressModel';
+import { useEffect, useState } from 'react';
+import { getAllProducts } from 'api/services/InventoryService';
 
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
@@ -83,6 +83,7 @@ const Createinvoice = () => {
   const { open, isCustomerOpen, country, countries, isOpen } = useSelector((state) => state.invoice);
   const notesLimit: number = 500;
   const navigation = useNavigate();
+  const [products, setProducts] = useState<any[]>([]);
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -144,6 +145,18 @@ const Createinvoice = () => {
     });
   };
 
+  useEffect(() => {
+    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((productList) => {
+        if (Array.isArray(productList)) {
+          setProducts(productList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
   const addNextInvoiceHandler = () => {
     dispatch(
       reviewInvoicePopup({
@@ -204,6 +217,11 @@ const Createinvoice = () => {
           values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
+              <Grid container justifyContent="flex-end" alignItems="center">
+                <Grid item>
+                  <InputLabel sx={{ color: 'grey' }}>Status: Drafted</InputLabel>
+                </Grid>
+              </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Stack spacing={1}>
@@ -229,7 +247,7 @@ const Createinvoice = () => {
                     <InputLabel>Status</InputLabel>
                     <FormControl sx={{ width: '100%' }}>
                       <Select
-                        value="Unpaid" // Set the default value to "Unpaid"
+                        value="Draft" // Set the default value to "Drafted"
                         displayEmpty
                         name="status"
                         renderValue={(selected) => {
@@ -414,6 +432,8 @@ const Createinvoice = () => {
                                       Blur={handleBlur}
                                       errors={errors}
                                       touched={touched}
+                                      products={products}
+                                      setFieldValue={setFieldValue}
                                     />
                                   </TableRow>
                                 ))}

@@ -54,7 +54,14 @@ import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import AlertBillDelete from 'sections/apps/bill/AlertBillDelete';
-import { CSVExport, HeaderSort, IndeterminateCheckbox, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
+import {
+  CSVExport,
+  HeaderSort,
+  IndeterminateCheckbox,
+  SortingSelect,
+  TablePagination,
+  TableRowSelection
+} from 'components/third-party/ReactTable';
 import { getAllBills } from 'api/services/BillService';
 
 import { GlobalFilter, renderFilterTypes, DateColumnFilter } from 'utils/react-table';
@@ -107,6 +114,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   );
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const sortBy = { id: 'vendorName', desc: false };
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const initialState = useMemo(
     () => ({
@@ -128,6 +136,8 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     state: { globalFilter, selectedRowIds, pageIndex, pageSize },
     preGlobalFilteredRows,
     setGlobalFilter,
+    setSortBy,
+    allColumns,
     setFilter
   } = useTable(
     {
@@ -194,7 +204,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
                       : billStatus === 'Cancel'
                       ? counts.Cancel
                       : billStatus === 'Unpaid'
-                      ? counts.Unpaid
+                      ? counts.Draft
                       : counts.Paid
                   }
                   color={
@@ -219,6 +229,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           />
         </Stack>
         <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={matchDownSM ? 1 : 0}>
+          <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
           <TableRowSelection selected={Object.keys(selectedRowIds).length} />
           {headerGroups.map((group: HeaderGroup<{}>, index: number) => (
             <Stack direction={matchDownSM ? 'column' : 'row'} spacing={1} {...group.getHeaderGroupProps()}>
@@ -227,6 +238,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
               ))}
             </Stack>
           ))}
+
           <CSVExport data={data} filename={'Bill-list.csv'} />
           <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
             <FormControlLabel
@@ -374,7 +386,9 @@ const Bills = () => {
         {
           Header: 'Bill ID',
           accessor: 'id',
-          Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+          Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+          disableSortBy: true,
+          disableFilters: true
         },
         {
           Header: 'Create Date',
@@ -397,7 +411,7 @@ const Bills = () => {
           accessor: 'billStatus',
           className: 'cell-left',
           disableFilters: true,
-          filter: 'includes',
+          Filter: ({ column }) => <>{column.render('Filter')}</>,
           Cell: ({ value }: { value: string }) => {
             switch (value) {
               case 'Cancel':
@@ -486,21 +500,29 @@ const Bills = () => {
         {
           Header: 'Created On',
           accessor: 'createdOnUtc',
+          disableFilters: true,
+          disableSortBy: true,
           Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
         },
         {
           Header: 'Modified On',
           accessor: 'modifiedOnUtc',
+          disableFilters: true,
+          disableSortBy: true,
           Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
         },
         {
           Header: 'Created By',
           accessor: 'createdBy',
+          disableFilters: true,
+          disableSortBy: true,
           Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
         },
         {
           Header: 'Modified By',
-          accessor: 'modifiedBy'
+          accessor: 'modifiedBy',
+          disableSortBy: true,
+          disableFilters: true
         }
       ] as Column[],
     // eslint-disable-next-line react-hooks/exhaustive-deps
