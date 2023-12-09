@@ -658,7 +658,8 @@ const List = () => {
         Header: 'Invoice ID',
         accessor: 'id',
         disableFilters: true,
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true
       },
       {
         Header: 'Invoice Number',
@@ -710,7 +711,7 @@ const List = () => {
         Header: 'Status',
         accessor: 'invoiceStatus',
         disableFilters: true,
-        filter: 'includes',
+        Filter: ({ column }: { column: any }) => <>{column.render('Filter')}</>,
         Cell: ({ value }: { value: string }) => {
           switch (value) {
             case 'Draft':
@@ -771,24 +772,28 @@ const List = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        disableFilters: true,
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
-        disableFilters: true,
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
-        disableFilters: true,
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: 'Modified By',
         accessor: 'modifiedBy',
+        disableSortBy: true,
         disableFilters: true
       }
     ],

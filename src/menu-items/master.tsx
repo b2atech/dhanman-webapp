@@ -164,7 +164,7 @@ const master: NavItemType = {
           id: 'paymentmade',
           title: <FormattedMessage id="paymentmade" />,
           type: 'item',
-          url: '/purchase/payments',
+          url: '/purchase/payments/list',
           icon: icons.PlusSquareOutlined
         }
       ]
@@ -183,8 +183,8 @@ const master: NavItemType = {
           icon: icons.TagOutlined
         },
         {
-          id: 'createproduct',
-          title: <FormattedMessage id="createProduct" />,
+          id: 'addproducts',
+          title: <FormattedMessage id="addproducts" />,
           type: 'item',
           url: '/inventory/products/create',
           icon: icons.PlusSquareOutlined

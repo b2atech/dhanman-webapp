@@ -124,6 +124,9 @@ const Address = ({ handlerAddress }: AddressProps) => {
               {vendorList.city}
             </Typography>
           </Stack>
+          <Typography textAlign="left" variant="body2" color="secondary">
+            {vendorList.gstIn}
+          </Typography>
         </Box>
       ))}
     </>
