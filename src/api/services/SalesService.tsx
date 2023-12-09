@@ -131,6 +131,14 @@ export const InvoiceAPI = {
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
     });
     return response.data;
+  },
+  getInvoiceDefaultStatus = async function (headerId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceDefaultStatus/${headerId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getInvoiceDefaultStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data;
   };
 
 const cancelApiObject = defineCancelApiObject(InvoiceAPI);
