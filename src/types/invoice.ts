@@ -17,6 +17,7 @@ export interface CountryType {
 export interface IInvoiceList {
   id: number;
   invoice_id: number;
+  invoice_number: number;
   customer_name: string;
   email: string;
   avatar: number;
@@ -171,4 +172,16 @@ export interface IGetCustomerResponse {
   data: {
     vendrors: ICustomer[];
   };
+}
+
+export interface IStatus {
+  id: string | number;
+  companyId: string | number;
+  status: number;
+  statusName: string;
+  nextStatus: number;
+  nextStatusName: string;
+  PreviousStatus: number;
+  PreviousStatusName: string;
+  isInitial: boolean;
 }

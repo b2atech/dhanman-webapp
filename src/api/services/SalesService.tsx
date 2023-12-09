@@ -132,6 +132,14 @@ export const InvoiceAPI = {
     });
     return response.data;
   },
+  getAllStatus = async function (companyId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceStatusesByCompany/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
   getInvoiceDefaultStatus = async function (headerId: string, cancel = false) {
     const response = await apiSales.request({
       url: `v1/invoiceDefaultStatus/${headerId}`,
