@@ -15,7 +15,7 @@ export const InvoiceAPI = {
   },
   getAllCustomers = async function (clientId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetAllcustomers/${clientId}`,
+      url: `v1/customers/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllCustomers.name].handleRequestCancellation().signal : undefined
     });
@@ -24,7 +24,7 @@ export const InvoiceAPI = {
   },
   getAllInvoices = async function (clientId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetAllInvoices/${clientId}`,
+      url: `v1/invoices/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
     });
@@ -126,11 +126,19 @@ export const InvoiceAPI = {
   },
   getInvoice = async function (headerId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetInvoice/${headerId}`,
+      url: `v1/invoice/${headerId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
     });
     return response.data;
+  },
+  getAllStatus = async function (companyId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceStatusesByCompany/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
   };
 
 const cancelApiObject = defineCancelApiObject(InvoiceAPI);

@@ -22,9 +22,12 @@ import {
   Tooltip,
   Chip,
   Skeleton,
-  styled
+  styled,
+  Button
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { openDrawer } from 'store/reducers/menu';
+import { useDispatch } from 'store';
 
 // third-party
 import { useSticky } from 'react-table-sticky';
@@ -43,15 +46,7 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import {
-  DeleteTwoTone,
-  DownOutlined,
-  EditTwoTone,
-  EyeTwoTone,
-  FileDoneOutlined,
-  InfoCircleOutlined,
-  RightOutlined
-} from '@ant-design/icons';
+import { DeleteTwoTone, DownOutlined, EditTwoTone, FileDoneOutlined, InfoCircleOutlined, RightOutlined } from '@ant-design/icons';
 
 // project import
 import MainCard from 'components/MainCard';
@@ -72,11 +67,12 @@ import { NumericFormat } from 'react-number-format';
 // types
 import { IInvoiceList } from 'types/invoice';
 import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
-import { getAllInvoices, getInvoiceDetailsByHeaderId } from 'api/services/SalesService';
+import { getAllInvoices, getAllStatus, getInvoiceDetailsByHeaderId } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import { PaletteColor } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const moment = require('moment');
 export interface InvoiceWidgets {
@@ -323,7 +319,7 @@ function ReactTable({
 
   const [isInvoiceIdVisible, setIsInvoiceIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [activeTab, setActiveTab] = useState(groups[0]);
+  const [invoicestatus, setStatus] = useState<IInvoiceList[]>([]);
 
   const handleSwitchChange = () => {
     setIsInvoiceIdVisible((prevIsInvoiceIdVisible) => !prevIsInvoiceIdVisible);
@@ -334,16 +330,98 @@ function ReactTable({
   };
 
   useEffect(() => {
-    setFilter('invoiceStatus', activeTab === 'All' ? '' : activeTab);
+    getAllStatus('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((statusList) => {
+        if (Array.isArray(statusList)) {
+        }
+        setStatus(statusList);
+      })
+      .catch((error: any) => {
+        console.error('Error fetching data:', error);
+      });
+  });
+
+  const handleStatus = () => {
+    getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((updatedStatus) => {
+        const rowIndex = invoicestatus.findIndex((invoice) => invoice.id === invoice.invoice_number);
+        if (rowIndex !== -1) {
+          const updatedInvoiceList = [...invoicestatus];
+          updatedInvoiceList[rowIndex].invoiceStatus = updatedStatus;
+          setStatus(updatedInvoiceList);
+          window.location.reload();
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating status:', error);
+      });
+  };
+
+  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+
+  const updateStatusButtons = () => {
+    const buttons: React.ReactNode[] = [];
+    switch (selectedStatus) {
+      case 'Draft':
+        buttons.push(
+          <Button key="draft" variant="contained" color="primary" onClick={handleStatus}>
+            Send for Approval
+          </Button>
+        );
+        break;
+      case 'Approved':
+        buttons.push(
+          <Button key="approval" variant="contained" color="primary">
+            Send for Partially Paid
+          </Button>
+        );
+        break;
+      case 'Pending Approval':
+        buttons.push(
+          <>
+            <Button key="reject" variant="contained" color="primary" style={{ marginRight: '8px' }}>
+              Reject
+            </Button>
+            <Button key="approve" variant="contained" color="primary">
+              Approve
+            </Button>
+          </>
+        );
+        break;
+      case 'Partially Paid':
+        buttons.push(
+          <Button
+            key="paid"
+            variant="contained"
+            color="primary"
+            // onClick={(e: any) => {
+            //   e.stopPropagation();
+            //   navigation(/purchase/paidpayments/list);
+            // }}
+          >
+            Pay Now
+          </Button>
+        );
+        break;
+      case 'Paid':
+        break;
+      default:
+        break;
+    }
+    return buttons;
+  };
+
+  useEffect(() => {
+    setFilter('invoiceStatus', selectedStatus === 'All' ? '' : selectedStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, [selectedStatus]);
 
   return (
     <>
       <Box sx={{ p: 3, pb: 0, width: '100%' }}>
         <Tabs
-          value={activeTab}
-          onChange={(e: ChangeEvent<{}>, value: string) => setActiveTab(value)}
+          value={selectedStatus}
+          onChange={(e: ChangeEvent<{}>, value: string) => setSelectedStatus(value)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
           {groups.map((invoiceStatus: string, index: number) => (
@@ -353,21 +431,17 @@ function ReactTable({
               value={invoiceStatus}
               icon={
                 <Chip
-                  label={
-                    invoiceStatus === 'All'
-                      ? data.length
-                      : invoiceStatus === 'Paid'
-                      ? counts.Paid
-                      : invoiceStatus === 'Unpaid'
-                      ? counts.Unpaid
-                      : counts.Closed
-                  }
+                  label={invoiceStatus === 'All' ? data.length : counts[invoiceStatus]}
                   color={
                     invoiceStatus === 'All'
                       ? 'primary'
-                      : invoiceStatus === 'Paid'
+                      : invoiceStatus === 'Draft' || invoiceStatus === 'Pending Approval'
+                      ? 'info'
+                      : invoiceStatus === 'Approved' || invoiceStatus === 'Partially' || invoiceStatus === 'Paid'
                       ? 'success'
-                      : invoiceStatus === 'Unpaid'
+                      : invoiceStatus === 'Rejected'
+                      ? 'error'
+                      : invoiceStatus === 'Cancelled'
                       ? 'warning'
                       : 'error'
                   }
@@ -380,7 +454,13 @@ function ReactTable({
           ))}
         </Tabs>
       </Box>
-      <Stack direction={matchDownSM ? 'column' : 'row'} spacing={1} justifyContent="space-between" alignItems="center" sx={{ p: 3, pb: 3 }}>
+      <Stack
+        direction={matchDownSM ? 'column' : 'row'}
+        spacing={matchDownSM ? 0 : 5}
+        justifyContent="left"
+        alignItems="center"
+        sx={{ p: 3, pb: 3 }}
+      >
         <Stack direction={matchDownSM ? 'column' : 'row'} spacing={2}>
           <GlobalFilter
             preGlobalFilteredRows={preGlobalFilteredRows}
@@ -389,9 +469,10 @@ function ReactTable({
             size="small"
           />
         </Stack>
-        <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={matchDownSM ? 1 : 0}>
+        <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="left" justifyContent="left" spacing={matchDownSM ? 0 : 5}>
           <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
           <TableRowSelection selected={Object.keys(selectedRowIds).length} />
+          {updateStatusButtons()}
           {headerGroups.map((group: HeaderGroup<{}>, index: number) => (
             <Stack direction={matchDownSM ? 'column' : 'row'} spacing={1} {...group.getHeaderGroupProps()}>
               {group.headers.map((column: HeaderGroup<{}>) => (
@@ -505,6 +586,9 @@ const List = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
+  const dispatch = useDispatch();
+
+  dispatch(openDrawer(false));
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
@@ -573,7 +657,18 @@ const List = () => {
       {
         Header: 'Invoice ID',
         accessor: 'id',
+        disableFilters: true,
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+      },
+      {
+        Header: 'Invoice Number',
+        accessor: 'invoiceNumber',
+        disableFilters: true,
+        Cell: ({ row }: { row: Row<{}> }) => (
+          <Link to={`/sales/invoices/details/${row.values.id}`} style={{ whiteSpace: 'nowrap' }}>
+            {row.values.invoiceNumber}
+          </Link>
+        )
       },
       {
         Header: 'Customer Name',
@@ -618,13 +713,22 @@ const List = () => {
         filter: 'includes',
         Cell: ({ value }: { value: string }) => {
           switch (value) {
-            case 'Closed':
-              return <Chip color="error" label="Closed" size="small" variant="light" />;
+            case 'Draft':
+              return <Chip color="primary" label="Draft" size="small" variant="light" />;
+            case 'Pending Approval':
+              return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
+            case 'Approved':
+              return <Chip color="success" label="Approval" size="small" variant="light" />;
+            case 'Partially':
+              return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
+            case 'Rejected':
+              return <Chip color="error" label="Rejected" size="small" variant="light" />;
+            case 'Cancelled':
+              return <Chip color="error" label="Cancelled" size="small" variant="light" />;
             case 'Paid':
               return <Chip color="success" label="Paid" size="small" variant="light" />;
-            case 'Unpaid':
             default:
-              return <Chip color="info" label="Unpaid" size="small" variant="light" />;
+              return <Chip color="warning" label={value} size="small" variant="light" />;
           }
         }
       },
@@ -636,17 +740,6 @@ const List = () => {
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
             <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    navigation(`/sales/invoices/details/${row.values.id}`);
-                  }}
-                >
-                  <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-                </IconButton>
-              </Tooltip>
               <Tooltip title="Edit">
                 <IconButton
                   color="primary"
@@ -678,21 +771,25 @@ const List = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
+        disableFilters: true,
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
+        disableFilters: true,
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
+        disableFilters: true,
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Modified By',
-        accessor: 'modifiedBy'
+        accessor: 'modifiedBy',
+        disableFilters: true
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
