@@ -45,6 +45,7 @@ import { useNavigate } from 'react-router';
 import VendorAddressModel from 'sections/apps/bill/VendorAddressModel';
 import { useEffect, useState } from 'react';
 import { getAllProducts } from 'api/services/InventoryService';
+import { openDrawer } from 'store/reducers/menu';
 
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
@@ -182,6 +183,7 @@ const Createinvoice = () => {
       })
     );
   };
+  dispatch(openDrawer(false));
 
   return (
     <MainCard>
