@@ -5,24 +5,15 @@ import { BillEdit, BillHeader } from 'types/billiingDetails';
 import { VendorData } from 'types/customerinfo';
 
 export const BillAPI = {
-    get: async function (clientId: string, cancel = false) {
+    get: async function (companyId: string, cancel = false) {
       const response = await apiPurchase.request({
-        url: `/Vendor/GetAllVendors/${clientId}`,
+        url: `v1/vendors/${companyId}`,
         method: 'GET',
         signal: cancel ? cancelApiObject[this.get.name].handleRequestCancellation().signal : undefined
       });
 
       return response.data;
     }
-  },
-  getAllBillDetail = async function (clientId: string, cancel = false) {
-    const response = await apiPurchase.request({
-      url: `/Bill/GetAllBillDetail/${clientId}`,
-      method: 'GET',
-      signal: cancel ? cancelApiObject[getAllBillDetail.name].handleRequestCancellation().signal : undefined
-    });
-
-    return response.data;
   },
   getAllVendors = async function (companyId: string, cancel = false) {
     const response = await apiPurchase.request({
@@ -33,9 +24,9 @@ export const BillAPI = {
 
     return response.data.items;
   },
-  getAllBills = async function (clientId: string, cancel = false) {
+  getAllBills = async function (companyId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/bills/${clientId}`,
+      url: `v1/bills/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllBills.name].handleRequestCancellation().signal : undefined
     });
@@ -81,7 +72,24 @@ export const BillAPI = {
   },
   getBillById = async function (id: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/GetBill/${id}`,
+      url: `v1/bill/${id}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getBillById.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
+  },
+  getBillDefaultStatus = async function (id: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/billDefaultStatus/${id}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getBillDefaultStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data;
+  },
+  getDefaultStatus = async function (companyId: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/billDefaultStatus/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getBillById.name].handleRequestCancellation().signal : undefined
     });
@@ -90,7 +98,7 @@ export const BillAPI = {
   },
   createBillRequest = async function (billdata: BillHeader) {
     const response = await apiPurchase.request({
-      url: `v1/bill/`,
+      url: `v1/bill`,
       method: 'POST',
       data: billdata
     });
@@ -98,19 +106,18 @@ export const BillAPI = {
   },
   createVendorRequest = async function (vendordata: VendorData) {
     const response = await apiPurchase.request({
-      url: `v1/vendors`,
+      url: `v1/vendor`,
       method: 'POST',
       data: vendordata
     });
     return response.status;
   },
-  getAllPaidPayments = async function (clientId: string, cancel = false) {
+  getAllPaidPayments = async function (companyId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/billPayments//${clientId}`,
+      url: `v1/billPayments//${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllPaidPayments.name].handleRequestCancellation().signal : undefined
     });
-
     return response.data.items;
   },
   deletepaidPaymentRequest = async function (id: string) {
@@ -132,15 +139,14 @@ export const BillAPI = {
       data: piadPaymentData
     });
     return response.status;
+  },
+  updateBillRequest = async function (billEdit: BillEdit) {
+    const response = await apiPurchase.request({
+      url: `v1/bill/`,
+      method: 'PUT',
+      data: billEdit
+    });
+    return response.data;
   };
-
-export async function updateBillRequest(billEdit: BillEdit) {
-  const response = await apiPurchase.request({
-    url: `v1/bill/`,
-    method: 'PUT',
-    data: billEdit
-  });
-  return response.data;
-}
 
 const cancelApiObject = defineCancelApiObject(BillAPI);

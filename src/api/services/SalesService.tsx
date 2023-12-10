@@ -13,26 +13,26 @@ export const InvoiceAPI = {
       return response.data;
     }
   },
-  getAllCustomers = async function (clientId: string, cancel = false) {
+  getAllCustomers = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetAllcustomers/${clientId}`,
+      url: `v1/customers/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllCustomers.name].handleRequestCancellation().signal : undefined
     });
 
     return response.data.items;
   },
-  getAllInvoices = async function (clientId: string, cancel = false) {
+  getAllInvoices = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetAllInvoices/${clientId}`,
+      url: `v1/invoices/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
     });
     return response.data.items;
   },
-  getAllReceivePayments = async function (clientId: string, cancel = false) {
+  getAllReceivePayments = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetAllreceivedPayments/${clientId}`,
+      url: `v1/receivedPayments/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllReceivePayments.name].handleRequestCancellation().signal : undefined
     });
@@ -57,7 +57,7 @@ export const InvoiceAPI = {
   },
   updateInvoiceRequest = async function (invoicedata: InvoiceEdit) {
     const response = await apiSales.request({
-      url: `v1/invoices`,
+      url: `v1/invoice`,
       method: 'PUT',
       data: invoicedata
     });
@@ -65,7 +65,7 @@ export const InvoiceAPI = {
   },
   createCustomerRequest = async function (customerData: CustomerData) {
     const response = await apiSales.request({
-      url: `v1/customers`,
+      url: `v1/customer`,
       method: 'POST',
       data: customerData
     });
@@ -73,7 +73,7 @@ export const InvoiceAPI = {
   },
   updateCustomerRequest = async function (customerData: CustomerData) {
     const response = await apiSales.request({
-      url: `v1/customers`,
+      url: `v1/customer`,
       method: 'PUT',
       data: customerData
     });
@@ -126,9 +126,25 @@ export const InvoiceAPI = {
   },
   getInvoice = async function (headerId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/GetInvoice/${headerId}`,
+      url: `v1/invoice/${headerId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data;
+  },
+  getAllStatus = async function (companyId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceStatusesByCompany/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
+  getInvoiceDefaultStatus = async function (headerId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceDefaultStatus/${headerId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getInvoiceDefaultStatus.name].handleRequestCancellation().signal : undefined
     });
     return response.data;
   };

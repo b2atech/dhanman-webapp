@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
 
 // material-ui
@@ -62,6 +61,7 @@ import ProductDetails from './details';
 import AlertProductDelete from './alertProductDelete';
 import { InventoryData } from 'types/inventoryInfo';
 import { getAllProducts } from 'api/services/InventoryService';
+import { useNavigate } from 'react-router';
 
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
@@ -90,7 +90,7 @@ interface Props {
 function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const navigation = useNavigate();
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'productName', desc: false };
   const {
@@ -166,8 +166,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Paid Payment
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                navigation(`/inventory/products/create`);
+              }}
+              size="small"
+            >
+              Add Product
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -503,7 +511,6 @@ const ProductListPage = () => {
       )}
 
       <AlertProductDelete title={productDeleteName} open={open} handleClose={handleClose} id={productDeleteId} />
-
     </MainCard>
   );
 };

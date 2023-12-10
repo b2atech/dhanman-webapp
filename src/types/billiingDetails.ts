@@ -77,6 +77,9 @@ export interface BillLine {
   price: string | number;
   quantity: number;
   amount: string | number;
+  // cgst: number;
+  // sgst: number;
+  // igst: number;
 }
 export interface BillingList {
   note: String;
