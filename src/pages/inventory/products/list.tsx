@@ -6,7 +6,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
-  Dialog,
+  // Dialog,
   FormControlLabel,
   Stack,
   Switch,
@@ -43,7 +43,7 @@ import {
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
-import { PopupTransition } from 'components/@extended/Transitions';
+// import { PopupTransition } from 'components/@extended/Transitions';
 import {
   CSVExport,
   HeaderSort,
@@ -504,17 +504,6 @@ const ProductListPage = () => {
 
       <AlertProductDelete title={productDeleteName} open={open} handleClose={handleClose} id={productDeleteId} />
 
-      <Dialog
-        maxWidth="sm"
-        TransitionComponent={PopupTransition}
-        keepMounted
-        fullWidth
-        onClose={handleAdd}
-        open={add}
-        sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-        aria-describedby="alert-dialog-slide-description"
-      >
-      </Dialog>
     </MainCard>
   );
 };

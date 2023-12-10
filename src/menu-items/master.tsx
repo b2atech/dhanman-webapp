@@ -164,7 +164,7 @@ const master: NavItemType = {
           id: 'paymentmade',
           title: <FormattedMessage id="paymentmade" />,
           type: 'item',
-          url: '/purchase/payments',
+          url: '/purchase/payments/list',
           icon: icons.PlusSquareOutlined
         }
       ]

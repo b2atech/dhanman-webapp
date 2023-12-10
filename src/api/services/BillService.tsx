@@ -24,9 +24,9 @@ export const BillAPI = {
 
     return response.data;
   },
-  getAllVendors = async function (clientId: string, cancel = false) {
+  getAllVendors = async function (companyId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/GetAllVendors/${clientId}`,
+      url: `v1/vendors/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllVendors.name].handleRequestCancellation().signal : undefined
     });
@@ -35,7 +35,7 @@ export const BillAPI = {
   },
   getAllBills = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/GetAllBills/${clientId}`,
+      url: `v1/bills/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllBills.name].handleRequestCancellation().signal : undefined
     });
@@ -106,7 +106,7 @@ export const BillAPI = {
   },
   getAllPaidPayments = async function (clientId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/GetpaidPayment/${clientId}`,
+      url: `v1/billPayments//${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllPaidPayments.name].handleRequestCancellation().signal : undefined
     });
