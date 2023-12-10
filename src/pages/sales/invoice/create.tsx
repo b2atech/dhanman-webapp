@@ -46,6 +46,8 @@ import VendorAddressModel from 'sections/apps/bill/VendorAddressModel';
 import { useEffect, useState } from 'react';
 import { getAllProducts } from 'api/services/InventoryService';
 import { openDrawer } from 'store/reducers/menu';
+import { getCompanyDetail } from 'api/services/CommonService';
+import Loader from 'components/Loader';
 
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
@@ -93,6 +95,8 @@ const Createinvoice = () => {
   const [discountFees, setDiscountFees] = useState(true);
   const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [company, setCompany] = useState<any>();
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -176,6 +180,17 @@ const Createinvoice = () => {
       });
   }, []);
 
+  useEffect(() => {
+    getCompanyDetail('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((comapanyName) => {
+        setCompany(comapanyName);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
   const addNextInvoiceHandler = () => {
     dispatch(
       reviewInvoicePopup({
@@ -240,14 +255,32 @@ const Createinvoice = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0)
+              return (
+                prev +
+                Number(
+                  (curr.sgst && curr.cgst
+                    ? (curr.cgst / 100) * curr.price + (curr.sgst / 100) * curr.price
+                    : (curr.igst / 100) * curr.price) +
+                    curr.price * Math.floor(curr.quantity)
+                )
+              );
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.cgstAmount);
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
             else return prev;
           }, 0);
+          const sgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price);
+            else return prev;
+          }, 0);
+          const igstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price);
+            else return prev;
+          }, 0);
+          //const afterDiscount =
           const discountRate = (values.discount * subtotal) / 100;
           const grandAmount = subtotal - discountRate + taxRate;
           values.totalAmount = grandAmount;
@@ -330,12 +363,18 @@ const Createinvoice = () => {
                       <Grid item xs={12} sm={8}>
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
-                          <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
-                          </Stack>
+                          {loading ? (
+                            <Loader />
+                          ) : (
+                            <Stack sx={{ width: '100%' }}>
+                              <Typography variant="subtitle1">{company?.name || ''}</Typography>
+                              <Typography color="secondary">{company?.email || ''}</Typography>
+                              <Typography color="secondary">{`${company?.addressLine || ''} \u00A0 \u00A0 ${
+                                company?.phoneNumber || ''
+                              }`}</Typography>
+                              <Typography color="secondary">{company?.gstIn || ''}</Typography>
+                            </Stack>
+                          )}
                         </Stack>
                       </Grid>
                       <Grid item xs={12} sm={4}>
@@ -539,7 +578,7 @@ const Createinvoice = () => {
                             </Grid>
                             <Grid item xs={12} md={4}>
                               <Grid item xs={12}>
-                                <Stack spacing={2}>
+                                <Stack spacing={2} sx={{ marginTop: 3 }}>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
                                     <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
@@ -550,11 +589,11 @@ const Createinvoice = () => {
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
-                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                    <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
-                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                    <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography color={theme.palette.grey[500]}>After Fees:</Typography>

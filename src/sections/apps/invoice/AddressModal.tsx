@@ -50,21 +50,6 @@ const AddressModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
       </DialogTitle>
       <Divider />
       <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
-        <FormControl sx={{ width: '100%', pb: 2 }}>
-          <TextField
-            autoFocus
-            id="name"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchOutlined />
-                </InputAdornment>
-              )
-            }}
-            placeholder="Search"
-            fullWidth
-          />
-        </FormControl>
         <Stack spacing={2}>
           <Address handlerAddress={handlerAddress} />
         </Stack>
@@ -87,19 +72,41 @@ type AddressProps = {
 };
 const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
-  const [addressModel, setAddressModel] = useState([]);
+  const [addressList, setAddressList] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
-    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((response) => {
-      setAddressModel(response);
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6').then((customerList) => {
+      setAddressList(customerList);
     });
   }, []);
-
+  const filteredAddressList = addressList.filter((customer: any) =>
+    `${customer.customerName}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
     <>
-      {addressModel.map((customerList: any) => (
+      <FormControl sx={{ width: '100%', pb: 2 }}>
+        <TextField
+          autoFocus
+          id="name"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined />
+              </InputAdornment>
+            )
+          }}
+          placeholder="Search"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </FormControl>
+
+      {filteredAddressList.map((customer: any) => (
         <Box
-          onClick={() => handlerAddress(customerList)}
-          key={customerList.id}
+          onClick={() => handlerAddress(customer)}
+          key={customer.id}
           sx={{
             width: '100%',
             border: '1px solid',
@@ -113,21 +120,21 @@ const Address = ({ handlerAddress }: AddressProps) => {
           }}
         >
           <Typography textAlign="left" variant="subtitle1">
-            {`${customerList.firstName} ${customerList.lastName}`}
+            {`${customer.firstName} ${customer.lastName}`}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {customerList.email}
+              {customer.email}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {customerList.phoneNumber}
+              {customer.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {customerList.city}
+              {customer.city}
             </Typography>
           </Stack>
           <Typography textAlign="left" variant="body2" color="secondary">
-            {customerList.gstIn}
+            {customer.gstIn}
           </Typography>
         </Box>
       ))}
