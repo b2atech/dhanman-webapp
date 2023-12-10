@@ -178,7 +178,7 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
             dispatch(
               openSnackbar({
                 open: true,
-                message: 'Vendor updated successfully. nad kra pn amacha kuthe',
+                message: 'Vendor updated successfully.',
                 anchorOrigin: { vertical: 'top', horizontal: 'right' },
                 variant: 'alert',
                 alert: {

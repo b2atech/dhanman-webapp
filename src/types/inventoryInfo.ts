@@ -18,4 +18,5 @@ export interface InventoryData {
   minimumStock: number;
   vendorId: string;
   vendorName: string;
+  taxCategoryId: number;
 }
