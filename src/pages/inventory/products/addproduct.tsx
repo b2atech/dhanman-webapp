@@ -22,7 +22,7 @@ import MainCard from 'components/MainCard';
 import { getAllVendors } from 'api/services/BillService';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { dispatch } from 'store';
-import { createProductRequest, getAllCategories, getAllProducts, getAllTaxCategory, getAllUnits } from 'api/services/InventoryService';
+import { createProductRequest, getAllCategories, getAllTaxCategory, getAllUnits } from 'api/services/InventoryService';
 import { useNavigate } from 'react-router';
 // ==============================|| ADD PRODUCTS  ||============================== //
 
@@ -177,7 +177,6 @@ export default function AddProductForm() {
     }
   });
 
-  const [productnames, setProductstNames] = useState<any>();
   const [vendorName, setVendorNames] = useState<any>();
   const [unitName, setUnitNames] = useState<any>();
   const [categories, setCategories] = useState<any>();
@@ -232,22 +231,6 @@ export default function AddProductForm() {
   }, []);
 
   useEffect(() => {
-    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((productList) => {
-        if (Array.isArray(productList)) {
-          const names = productList.map((allproducts) => ({
-            id: allproducts.id,
-            name: `${allproducts.productName}`
-          }));
-          setProductstNames(names);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  useEffect(() => {
     getAllTaxCategory()
       .then((taxCategoryList) => {
         if (Array.isArray(taxCategoryList)) {
@@ -288,43 +271,21 @@ export default function AddProductForm() {
                         </Typography>
                       </Stack>
                     </InputLabel>
-                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.productName && errors.productName)}>
-                      {productnames && productnames.length > 0 ? (
-                        <Autocomplete
-                          onChange={(event: any, newValue: { id: string; name: string } | null) => {
-                            formik.setFieldTouched('productName', false);
-                            if (newValue !== null) {
-                              handleChange({ target: { name: 'productName', value: newValue.name } });
-                            } else {
-                              handleChange({ target: { name: 'productName', value: '' } });
-                            }
-                          }}
-                          id="productsnamelist"
-                          options={productnames}
-                          getOptionLabel={(option) => option.name}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              error={Boolean(touched.productName && errors.productName && formik.submitCount > 0)}
-                              helperText={
-                                touched.productName && formik.submitCount > 0 && typeof errors.productName === 'string'
-                                  ? errors.productName
-                                  : ''
-                              }
-                            />
-                          )}
-                        />
-                      ) : (
-                        <Box display="flex" flexDirection="row" alignItems="left" justifyContent="left" height="100px" padding={'10'}>
-                          <CircularProgress size={20} thickness={4} style={{ marginRight: '10px' }} />
-                          <Grid flexDirection={'column'}>
-                            <Typography variant="body1" style={{ marginTop: '32x', fontSize: '12px' }}>
-                              Loading Product List...
-                            </Typography>
-                          </Grid>
-                        </Box>
-                      )}
-                    </FormControl>
+                    <TextField
+                      required
+                      id="productName"
+                      name="productName"
+                      placeholder="Enter product name"
+                      fullWidth
+                      error={Boolean(touched.productName && errors.productName)}
+                      helperText={touched.productName && typeof errors.productName === 'string' ? errors.productName : ''}
+                      onBlur={formik.handleBlur}
+                      onChange={(e) => {
+                        formik.handleChange(e);
+                        formik.setFieldTouched('productName', true);
+                        formik.setFieldError('productName', '');
+                      }}
+                    />
                   </Stack>
                 </Grid>
 
