@@ -31,6 +31,7 @@ const AppProducts = Loadable(lazy(() => import('pages/inventory/products/list'))
 const AppAddProduct = Loadable(lazy(() => import('pages/inventory/products/addproduct')));
 const AppPaidPayments = Loadable(lazy(() => import('pages/purchase/paidpayments/list')));
 const AppAccountGroups = Loadable(lazy(() => import('pages/company/accountGroup/list')));
+const AppMakePayment = Loadable(lazy(() => import('pages/purchase/paidpayments/add')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -201,15 +202,14 @@ const MainRoutes = {
         },
         {
           path: 'payments',
-          element: <AppPaidPayments />,
           children: [
             {
               path: 'list',
-              element: <MaintenanceComingSoon />
+              element: <AppPaidPayments />
             },
             {
-              path: 'make',
-              element: <MaintenanceComingSoon />
+              path: 'add',
+              element: <AppMakePayment />
             }
           ]
         }

@@ -56,11 +56,11 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AddPaidPayment from './add';
 import { IPaidPayment } from 'types/bill';
 import AlertpaidPaymentDelete from './deleteAlert';
 import { getAllPaidPayments } from 'api/services/BillService';
 import PaidPaymentView from './details';
+import { useNavigate } from 'react-router';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -88,6 +88,7 @@ interface Props {
 }
 
 function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
+  const navToPaidPayment = useNavigate();
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -165,8 +166,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Comming soon
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                navToPaidPayment(`/purchase/payments/add`);
+              }}
+              size="small"
+            >
+              Make Payment
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -465,7 +474,7 @@ const PaidPaymentListPage = () => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddPaidPayment paidpayment={paidPayments} onCancel={handleAdd} />
+        {/* <MakePayment paidpayment={paidPayments} onCancel={handleAdd} /> */}
       </Dialog>
     </MainCard>
   );
