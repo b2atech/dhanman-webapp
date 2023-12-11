@@ -272,6 +272,7 @@ export default function AddProductForm() {
                       </Stack>
                     </InputLabel>
                     <TextField
+                      autoFocus
                       required
                       id="productName"
                       name="productName"
@@ -282,7 +283,7 @@ export default function AddProductForm() {
                       onBlur={formik.handleBlur}
                       onChange={(e) => {
                         formik.handleChange(e);
-                        formik.setFieldTouched('productName', true);
+                        formik.setFieldTouched('productName', false);
                         formik.setFieldError('productName', '');
                       }}
                     />
