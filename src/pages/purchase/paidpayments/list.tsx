@@ -56,7 +56,6 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-//import AddPaidPayment from './add';
 import { IPaidPayment } from 'types/bill';
 import AlertpaidPaymentDelete from './deleteAlert';
 import { getAllPaidPayments } from 'api/services/BillService';
