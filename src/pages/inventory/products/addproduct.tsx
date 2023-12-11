@@ -295,10 +295,8 @@ export default function AddProductForm() {
                             formik.setFieldTouched('productName', false);
                             if (newValue !== null) {
                               handleChange({ target: { name: 'productName', value: newValue.name } });
-                              formik.setFieldValue('unitId', newValue.id);
                             } else {
                               handleChange({ target: { name: 'productName', value: '' } });
-                              formik.setFieldValue('unitId', '');
                             }
                           }}
                           id="productsnamelist"
