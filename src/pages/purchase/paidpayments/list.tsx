@@ -62,7 +62,6 @@ import AlertpaidPaymentDelete from './deleteAlert';
 import { getAllPaidPayments } from 'api/services/BillService';
 import PaidPaymentView from './details';
 import { useNavigate } from 'react-router';
-// import MakePayment from './makePayment';
 
 // ==============================|| REACT TABLE ||============================== //
 
