@@ -320,6 +320,7 @@ export default function AddProductForm() {
                           getOptionLabel={(option) => option.name}
                           renderInput={(params) => (
                             <TextField
+                              placeholder="Enter Unit"
                               {...params}
                               error={Boolean(touched.unit && errors.unit && formik.submitCount > 0)}
                               helperText={touched.unit && formik.submitCount > 0 && typeof errors.unit === 'string' ? errors.unit : ''}
@@ -379,6 +380,7 @@ export default function AddProductForm() {
                           sx={{ width: '100%' }}
                           renderInput={(params) => (
                             <TextField
+                              placeholder="Enter Tax Category"
                               {...params}
                               error={Boolean(touched.taxCategoryId && errors.taxCategoryId)}
                               helperText={touched.taxCategoryId && errors.taxCategoryId ? 'Please Enter Tax Category' : ''}
@@ -642,6 +644,7 @@ export default function AddProductForm() {
                           sx={{ width: '100%' }}
                           renderInput={(params) => (
                             <TextField
+                              placeholder="Enter Category"
                               {...params}
                               error={Boolean(touched.categoryName && errors.categoryName)}
                               helperText={touched.categoryName && errors.categoryName ? 'Please Enter Product Category' : ''}
@@ -672,7 +675,7 @@ export default function AddProductForm() {
                       </Stack>
                     </InputLabel>
                     <FormControl>
-                      <TextField />
+                      <TextField placeholder="Enter Sub-Category" />
                     </FormControl>
                   </Stack>
                 </Grid>
@@ -707,6 +710,7 @@ export default function AddProductForm() {
                           getOptionLabel={(option) => option.name}
                           renderInput={(params) => (
                             <TextField
+                              placeholder="Enter Preferred Supplier"
                               {...params}
                               error={Boolean(touched.vendorName && errors.vendorName && formik.submitCount > 0)}
                               helperText={
