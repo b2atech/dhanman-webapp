@@ -305,7 +305,7 @@ const Vendors = () => {
   };
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
+    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa')
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
           setVendors(vendorList);
