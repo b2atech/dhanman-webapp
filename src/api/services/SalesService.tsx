@@ -32,7 +32,7 @@ export const InvoiceAPI = {
   },
   getAllReceivePayments = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/receivedPayments/${companyId}`,
+      url: `v1/invoicePayments/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllReceivePayments.name].handleRequestCancellation().signal : undefined
     });

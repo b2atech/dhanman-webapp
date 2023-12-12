@@ -60,6 +60,8 @@ import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } f
 import { getAllReceivePayments } from 'api/services/SalesService';
 import { IReceivedPayment } from 'types/invoice';
 import AlertReceivedPaymentDelete from './AlertReceicedPaymentDelete';
+import { useNavigate } from 'react-router';
+import config from 'config';
 const moment = require('moment');
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
@@ -86,7 +88,7 @@ interface Props {
 function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const navigation = useNavigate();
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
   const {
@@ -153,7 +155,15 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                navigation(`/sales/payments/add`);
+              }}
+              size="small"
+            >
               Add Received Payments
             </Button>
             <CSVExport
@@ -249,13 +259,13 @@ const List = () => {
   const [receivedPAymentDeleteId, setReceivedPaymentDeleteId] = useState<string>('');
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const companyId: string = String(config.companyId);
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
   };
 
   useEffect(() => {
-    getAllReceivePayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllReceivePayments(companyId)
       .then((receivedPaymentList) => {
         if (Array.isArray(receivedPaymentList)) {
           setReceivePayments(receivedPaymentList);
@@ -266,7 +276,7 @@ const List = () => {
         console.error('Error fetching data:', error);
         setLoading(false);
       });
-  }, []);
+  }, [companyId]);
 
   const memoizedReceivedPayments = useMemo(() => receivedPayments, [receivedPayments]);
 

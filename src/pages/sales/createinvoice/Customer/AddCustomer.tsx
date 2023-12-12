@@ -81,7 +81,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   const [selectedStateId, setSelectedStateId] = useState('');
   const [selectedCityId, setselectedCityId] = useState('');
 
-  const { clientId } = useConfig();
+  const { companyId } = useConfig();
 
   useEffect(() => {
     getAllCountries()
@@ -158,7 +158,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       try {
         const customerData = {
           userId: values.id,
-          clientId: clientId,
+          companyId: companyId,
           firstName: values.firstName,
           lastName: values.lastName,
           email: values.email,
