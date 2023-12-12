@@ -13,17 +13,18 @@ import {
   Box,
   CircularProgress
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
 import { useFormik, FormikProvider, Form, FormikValues } from 'formik';
 import * as Yup from 'yup';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import MainCard from 'components/MainCard';
-import { getAllVendors } from 'api/services/BillService';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { dispatch } from 'store';
-import { createProductRequest, getAllCategories, getAllTaxCategory, getAllUnits } from 'api/services/InventoryService';
+import { createProductRequest } from 'api/services/InventoryService';
 import { useNavigate } from 'react-router';
+import config from 'config';
+import { useCategories, useTaxCategories, useUnits, useVendors } from './ProductAPI';
+import React from 'react';
 // ==============================|| ADD PRODUCTS  ||============================== //
 
 const getInitialValues = (inventroydata?: FormikValues | null) => {
@@ -113,18 +114,14 @@ const AddProductSchema = Yup.object().shape({
   unit: Yup.string().max(255).required('Please Enter Unit')
 });
 
-const sgsttaxrate = [0, 2, 4, 5, 9, 12, 18, 28];
-const cgsttaxrate = [0, 2, 4, 5, 9, 12, 18, 28];
-const igsttaxrate = [0, 2, 4, 5, 9, 12, 18, 28];
-
 export default function AddProductForm() {
   const navigation = useNavigate();
-  const [sgstTaxRender, setSgstTaxRender] = React.useState<number | null>(sgsttaxrate[0]);
+  const [sgstTaxRender, setSgstTaxRender] = React.useState<number | null>();
 
-  const [cgstTaxRender, setCgstTaxRender] = React.useState<number | null>(cgsttaxrate[0]);
+  const [cgstTaxRender, setCgstTaxRender] = React.useState<number | null>();
 
-  const [igstTaxRender, setIgstTaxRender] = React.useState<number | null>(igsttaxrate[0]);
-
+  const [igstTaxRender, setIgstTaxRender] = React.useState<number | null>();
+  const companyId: string = String(config.clientId);
   const formik = useFormik({
     initialValues: getInitialValues(),
     enableReinitialize: true,
@@ -132,7 +129,7 @@ export default function AddProductForm() {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const productdata = {
-          clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          clientId: companyId,
           productName: values.productName,
           unitId: values.unitId,
           unit: values.unit,
@@ -171,85 +168,14 @@ export default function AddProductForm() {
           navigation('/inventory/products/list');
         }
         setSubmitting(false);
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
     }
   });
 
-  const [vendorName, setVendorNames] = useState<any>();
-  const [unitName, setUnitNames] = useState<any>();
-  const [categories, setCategories] = useState<any>();
-  const [taxCategories, setTaxCategories] = useState<any>();
-
-  useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          const names = vendorList.map((vendor) => ({
-            id: vendor.id,
-            name: `${vendor.firstName} ${vendor.lastName}`
-          }));
-          setVendorNames(names);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    getAllUnits('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((unitList) => {
-        if (Array.isArray(unitList)) {
-          const names = unitList.map((unit) => ({
-            id: unit.id,
-            name: `${unit.unitName}`
-          }));
-          setUnitNames(names);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    getAllCategories('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((categoryList) => {
-        if (Array.isArray(categoryList)) {
-          const names = categoryList.map((category) => ({
-            id: category.id,
-            name: `${category.categoryName}`
-          }));
-          setCategories(names);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    getAllTaxCategory()
-      .then((taxCategoryList) => {
-        if (Array.isArray(taxCategoryList)) {
-          console.log(taxCategoryList);
-          const names = taxCategoryList.map((taxcategory) => ({
-            id: taxcategory.id,
-            name: taxcategory.name,
-            cGstRate: taxcategory.cGstRate,
-            sGstRate: taxcategory.sGstRate,
-            iGstRate: taxcategory.iGstRate
-          }));
-          console.log('Mapped Names:', names);
-          setTaxCategories(names);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+  const { vendorNames } = useVendors(companyId);
+  const { unitNames } = useUnits(companyId);
+  const { categories } = useCategories(companyId);
+  const { taxCategories } = useTaxCategories();
 
   const { errors, touched, handleSubmit, handleChange } = formik;
   return (
@@ -303,7 +229,7 @@ export default function AddProductForm() {
                       </Stack>
                     </InputLabel>
                     <FormControl sx={{ width: '100%' }} error={Boolean(touched.unit && errors.unit)}>
-                      {unitName && unitName.length > 0 ? (
+                      {unitNames && unitNames.length > 0 ? (
                         <Autocomplete
                           onChange={(event: any, newValue: { id: string; name: string } | null) => {
                             formik.setFieldTouched('unit', false);
@@ -316,7 +242,7 @@ export default function AddProductForm() {
                             }
                           }}
                           id="unitnameslist"
-                          options={unitName}
+                          options={unitNames}
                           getOptionLabel={(option) => option.name}
                           renderInput={(params) => (
                             <TextField
@@ -436,24 +362,22 @@ export default function AddProductForm() {
                   <Grid item xs={4} sm={4}>
                     <Stack spacing={0.5}>
                       <InputLabel>S GST Rate %</InputLabel>
-                      <Autocomplete
+                      <TextField
                         value={sgstTaxRender}
-                        onChange={(event: any, newValue: number | null) => {
+                        inputProps={{ style: { textAlign: 'right' } }}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                           formik.setFieldTouched('sgst', false);
-                          setSgstTaxRender(newValue);
-                          formik.setFieldValue('sgst', newValue);
+                          setSgstTaxRender(Number(event.target.value));
+                          formik.setFieldValue('sgst', Number(event.target.value));
                         }}
                         id="sgstnameslist"
-                        options={sgsttaxrate}
+                        type="number"
                         sx={{ width: '100%' }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            type="number"
-                            error={Boolean(touched.sgst && errors.sgst)}
-                            helperText={touched.sgst && errors.sgst ? 'Please Enter S GST Tax Rate' : ''}
-                          />
-                        )}
+                        error={Boolean(touched.sgst && errors.sgst)}
+                        helperText={touched.sgst && errors.sgst ? 'Please Enter S GST Tax Rate' : ''}
+                        InputProps={{
+                          readOnly: true
+                        }}
                       />
                     </Stack>
                   </Grid>
@@ -461,24 +385,22 @@ export default function AddProductForm() {
                   <Grid item xs={4} sm={4}>
                     <Stack spacing={0.5}>
                       <InputLabel>C GST Rate %</InputLabel>
-                      <Autocomplete
+                      <TextField
                         value={cgstTaxRender}
-                        onChange={(event: any, newValue: number | null) => {
+                        inputProps={{ style: { textAlign: 'right' } }}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                           formik.setFieldTouched('cgst', false);
-                          setCgstTaxRender(newValue);
-                          formik.setFieldValue('cgst', newValue);
+                          setCgstTaxRender(Number(event.target.value));
+                          formik.setFieldValue('cgst', Number(event.target.value));
                         }}
                         id="cgstnameslist"
-                        options={cgsttaxrate}
+                        type="number"
                         sx={{ width: '100%' }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            type="number"
-                            error={Boolean(touched.cgst && errors.cgst)}
-                            helperText={touched.cgst && errors.cgst ? 'Please Enter C GST Tax Rate' : ''}
-                          />
-                        )}
+                        error={Boolean(touched.cgst && errors.cgst)}
+                        helperText={touched.cgst && errors.cgst ? 'Please Enter C GST Tax Rate' : ''}
+                        InputProps={{
+                          readOnly: true
+                        }}
                       />
                     </Stack>
                   </Grid>
@@ -486,24 +408,22 @@ export default function AddProductForm() {
                   <Grid item xs={4} sm={4}>
                     <Stack spacing={0.5}>
                       <InputLabel>I GST Rate %</InputLabel>
-                      <Autocomplete
+                      <TextField
                         value={igstTaxRender}
-                        onChange={(event: any, newValue: number | null) => {
+                        inputProps={{ style: { textAlign: 'right' } }}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                           formik.setFieldTouched('igst', false);
-                          setIgstTaxRender(newValue);
-                          formik.setFieldValue('igst', newValue);
+                          setIgstTaxRender(Number(event.target.value));
+                          formik.setFieldValue('igst', Number(event.target.value));
                         }}
                         id="igstnameslist"
-                        options={igsttaxrate}
+                        type="number"
                         sx={{ width: '100%' }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            type="number"
-                            error={Boolean(touched.igst && errors.igst)}
-                            helperText={touched.igst && errors.igst ? 'Please Enter I GST Tax Rate' : ''}
-                          />
-                        )}
+                        error={Boolean(touched.igst && errors.igst)}
+                        helperText={touched.igst && errors.igst ? 'Please Enter I GST Tax Rate' : ''}
+                        InputProps={{
+                          readOnly: true
+                        }}
                       />
                     </Stack>
                   </Grid>
@@ -693,7 +613,7 @@ export default function AddProductForm() {
                       </Stack>
                     </InputLabel>
                     <FormControl sx={{ width: '100%' }} error={Boolean(touched.vendorName && errors.vendorName)}>
-                      {vendorName && vendorName.length > 0 ? (
+                      {vendorNames && vendorNames.length > 0 ? (
                         <Autocomplete
                           onChange={(event: any, newValue: { id: string; name: string } | null) => {
                             formik.setFieldTouched('vendorName', false);
@@ -706,7 +626,7 @@ export default function AddProductForm() {
                             }
                           }}
                           id="preferredsuppliernameslist"
-                          options={vendorName}
+                          options={vendorNames}
                           getOptionLabel={(option) => option.name}
                           renderInput={(params) => (
                             <TextField
