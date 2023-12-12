@@ -5,6 +5,8 @@ import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
+import UnderConstruction from 'pages/maintenance/under-construction';
+import ComingSoon from 'pages/maintenance/coming-soon';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -80,6 +82,10 @@ const MainRoutes = {
             {
               path: 'list',
               element: <AppAccountGroups />
+            },
+            {
+              path: 'add',
+              element: <ComingSoon />
             }
           ]
         }
@@ -154,8 +160,8 @@ const MainRoutes = {
               element: <AppRecievedPayment />
             },
             {
-              path: 'receive',
-              element: <MaintenanceComingSoon />
+              path: 'add',
+              element: <UnderConstruction />
             }
           ]
         }

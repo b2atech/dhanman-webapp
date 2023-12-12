@@ -129,6 +129,13 @@ const master: NavItemType = {
           title: <FormattedMessage id="paymentreceived" />,
           type: 'item',
           url: '/sales/payments/list',
+          icon: icons.ProfileOutlined
+        },
+        {
+          id: 'makepayment',
+          title: <FormattedMessage id="makepayment" />,
+          type: 'item',
+          url: '/sales/payments/add',
           icon: icons.PlusSquareOutlined
         }
       ]
@@ -165,6 +172,13 @@ const master: NavItemType = {
           title: <FormattedMessage id="paymentmade" />,
           type: 'item',
           url: '/purchase/payments/list',
+          icon: icons.PlusSquareOutlined
+        },
+        {
+          id: 'makepayment',
+          title: <FormattedMessage id="makepayment" />,
+          type: 'item',
+          url: '/purchase/payments/add',
           icon: icons.PlusSquareOutlined
         }
       ]
