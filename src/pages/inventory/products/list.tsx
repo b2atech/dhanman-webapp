@@ -124,9 +124,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     usePagination,
     useRowSelect
   );
-  
+
   const moment = require('moment');
-  const now = new Date();const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const now = new Date();
+  const formatedFilename = 'ProductsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   const [isProductIdVisible, setIsProductIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
 
@@ -338,7 +339,9 @@ const ProductListPage = () => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography variant="subtitle1" minWidth={150}>{values.productName}</Typography>
+              <Typography variant="subtitle1" minWidth={150}>
+                {values.productName}
+              </Typography>
             </Stack>
           );
         }
@@ -372,7 +375,6 @@ const ProductListPage = () => {
         accessor: 'sellingPrice',
         className: 'cell-right',
         Cell: ({ value }: { value: string }) => <Box sx={{ minWidth: 50 }}>{value}</Box>
-
       },
       {
         Header: 'CGST',
