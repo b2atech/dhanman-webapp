@@ -146,7 +146,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   //const placeholder
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
+    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
           const vendorData = vendorList.map((vendor) => ({
