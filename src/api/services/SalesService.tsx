@@ -32,7 +32,7 @@ export const InvoiceAPI = {
   },
   getAllReceivePayments = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/receivedPayments/${companyId}`,
+      url: `v1/invoicePayments/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllReceivePayments.name].handleRequestCancellation().signal : undefined
     });
@@ -129,6 +129,22 @@ export const InvoiceAPI = {
       url: `v1/invoice/${headerId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllInvoices.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data;
+  },
+  getAllStatus = async function (companyId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceStatusesByCompany/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
+  getInvoiceDefaultStatus = async function (headerId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceDefaultStatus/${headerId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getInvoiceDefaultStatus.name].handleRequestCancellation().signal : undefined
     });
     return response.data;
   };

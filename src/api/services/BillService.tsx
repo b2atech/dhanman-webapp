@@ -87,6 +87,15 @@ export const BillAPI = {
     });
     return response.data;
   },
+  getDefaultStatus = async function (companyId: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/billDefaultStatus/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getBillById.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data;
+  },
   createBillRequest = async function (billdata: BillHeader) {
     const response = await apiPurchase.request({
       url: `v1/bill`,
@@ -105,11 +114,10 @@ export const BillAPI = {
   },
   getAllPaidPayments = async function (companyId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/paidPayments/${companyId}`,
+      url: `v1/billPayments//${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllPaidPayments.name].handleRequestCancellation().signal : undefined
     });
-
     return response.data.items;
   },
   deletepaidPaymentRequest = async function (id: string) {
