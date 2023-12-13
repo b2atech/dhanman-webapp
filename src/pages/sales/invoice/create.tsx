@@ -232,8 +232,8 @@ const Createinvoice = () => {
               quantity: 0,
               price: 0,
               amount: 0,
-              discount: 0,
               fees: 0,
+              discount: 0,
               taxableAmount: 0,
               cRt: 0,
               cgstAmount: 0,
@@ -280,9 +280,15 @@ const Createinvoice = () => {
             if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price);
             else return prev;
           }, 0);
-          //const afterDiscount =
-          const discountRate = (values.discount * subtotal) / 100;
-          const grandAmount = subtotal - discountRate + taxRate;
+          const fees = values?.invoice_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.fees);
+            else return prev;
+          }, 0);
+          const discountRate = values?.invoice_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(-(curr.discount / 100) * curr.price * Math.floor(curr.quantity));
+            else return prev;
+          }, 0);
+          const grandAmount = subtotal + discountRate + fees;
           values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
@@ -447,6 +453,67 @@ const Createinvoice = () => {
                     <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
                   )}
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Stack spacing={1}>
+                    <InputLabel>Set Currency*</InputLabel>
+                    <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
+                      <Autocomplete
+                        id="country-select-demo"
+                        fullWidth
+                        options={countries}
+                        defaultValue={countries[2]}
+                        value={countries.find((option: CountryType) => option.code === country?.code)}
+                        onChange={(event, value) => {
+                          dispatch(
+                            selectCountry({
+                              country: value
+                            })
+                          );
+                        }}
+                        autoHighlight
+                        getOptionLabel={(option) => option.label}
+                        renderOption={(props, option) => (
+                          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                            {option.code && (
+                              <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`} alt="flag" />
+                            )}
+                            {option.label}
+                          </Box>
+                        )}
+                        renderInput={(params) => {
+                          const selected = countries.find((option: CountryType) => option.code === country?.code);
+                          return (
+                            <TextField
+                              {...params}
+                              name="phoneCode"
+                              placeholder="Select"
+                              InputProps={{
+                                ...params.InputProps,
+                                startAdornment: (
+                                  <>
+                                    {selected && selected.code !== '' && (
+                                      <img
+                                        style={{ marginRight: 6 }}
+                                        loading="lazy"
+                                        width="20"
+                                        src={`https://flagcdn.com/w20/${selected.code.toLowerCase()}.png`}
+                                        alt="flag"
+                                      />
+                                    )}
+                                  </>
+                                )
+                              }}
+                              inputProps={{
+                                ...params.inputProps,
+                                autoComplete: 'new-password' // disable autocomplete and autofill
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </FormControl>
+                  </Stack>
+                </Grid>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={6}>
                     <Typography variant="h5">
@@ -487,30 +554,38 @@ const Createinvoice = () => {
                             <Table sx={{ minWidth: 650 }}>
                               <TableHead>
                                 <TableRow>
-                                  <TableCell>Sr No</TableCell>
-                                  <TableCell>So No</TableCell>
-                                  <TableCell>So Date</TableCell>
-                                  <TableCell>Name</TableCell>
-                                  <TableCell>Description</TableCell>
-                                  <TableCell>Qty</TableCell>
-                                  <TableCell>Price</TableCell>
+                                  <TableCell align="center">No</TableCell>
+                                  <TableCell align="center">So No</TableCell>
+                                  <TableCell align="center">So Date</TableCell>
+                                  <TableCell align="center">Name</TableCell>
+                                  <TableCell align="center">Description</TableCell>
+                                  <TableCell align="center">Qty</TableCell>
+                                  <TableCell align="center">Price</TableCell>
                                   {discountFees && (
                                     <>
-                                      <TableCell>Fees</TableCell>
-                                      <TableCell>Discount</TableCell>
+                                      <TableCell align="center">Fees</TableCell>
+                                      <TableCell align="center">Discount (%)</TableCell>
                                     </>
                                   )}
-                                  <TableCell>Taxable Amt</TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell>C Rt</TableCell>
-                                      <TableCell>S Rt</TableCell>
-                                      <TableCell>I Rt</TableCell>
+                                      <TableCell align="center">CGST (%)</TableCell>
                                     </>
                                   )}
-                                  <TableCell>CGST Amt</TableCell>
-                                  <TableCell>SGST Amt</TableCell>
-                                  <TableCell>IGST Amt</TableCell>
+                                  <TableCell align="center">CGST Amt</TableCell>
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center">SGST (%)</TableCell>
+                                    </>
+                                  )}
+                                  <TableCell align="center">SGST Amt</TableCell>
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center">IGST (%)</TableCell>
+                                    </>
+                                  )}
+                                  <TableCell align="center">IGST Amt</TableCell>
+                                  <TableCell align="right">Taxable Amt</TableCell>
                                   <TableCell align="right">Total Amt</TableCell>
                                   <TableCell align="right">Action</TableCell>
                                 </TableRow>
@@ -596,12 +671,12 @@ const Createinvoice = () => {
                                     <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>After Fees:</Typography>
-                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                    <Typography color={theme.palette.grey[500]}>Fees:</Typography>
+                                    <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>After Discount:</Typography>
-                                    <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                    <Typography color={theme.palette.grey[500]}>Discount:</Typography>
+                                    <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
                                   </Stack>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography variant="subtitle1">Grand Total:</Typography>
@@ -645,68 +720,6 @@ const Createinvoice = () => {
                     />
                   </Stack>
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Stack spacing={1}>
-                    <InputLabel>Set Currency*</InputLabel>
-                    <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
-                      <Autocomplete
-                        id="country-select-demo"
-                        fullWidth
-                        options={countries}
-                        defaultValue={countries[2]}
-                        value={countries.find((option: CountryType) => option.code === country?.code)}
-                        onChange={(event, value) => {
-                          dispatch(
-                            selectCountry({
-                              country: value
-                            })
-                          );
-                        }}
-                        autoHighlight
-                        getOptionLabel={(option) => option.label}
-                        renderOption={(props, option) => (
-                          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                            {option.code && (
-                              <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`} alt="flag" />
-                            )}
-                            {option.label}
-                          </Box>
-                        )}
-                        renderInput={(params) => {
-                          const selected = countries.find((option: CountryType) => option.code === country?.code);
-                          return (
-                            <TextField
-                              {...params}
-                              name="phoneCode"
-                              placeholder="Select"
-                              InputProps={{
-                                ...params.InputProps,
-                                startAdornment: (
-                                  <>
-                                    {selected && selected.code !== '' && (
-                                      <img
-                                        style={{ marginRight: 6 }}
-                                        loading="lazy"
-                                        width="20"
-                                        src={`https://flagcdn.com/w20/${selected.code.toLowerCase()}.png`}
-                                        alt="flag"
-                                      />
-                                    )}
-                                  </>
-                                )
-                              }}
-                              inputProps={{
-                                ...params.inputProps,
-                                autoComplete: 'new-password' // disable autocomplete and autofill
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </FormControl>
-                  </Stack>
-                </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
                     <Button

@@ -25,9 +25,8 @@ const InvoiceItem = ({
   description,
   qty,
   price,
-  Fees,
-  Discount,
-  taxableAmount,
+  fees,
+  discount,
   cgst,
   sgst,
   igst,
@@ -122,26 +121,18 @@ const InvoiceItem = ({
     {
       placeholder: 'Fees',
       label: 'Fees',
-      name: `invoice_detail.${index}.Fees`,
+      name: `invoice_detail.${index}.fees`,
       type: 'number',
       id: id,
-      value: Fees
+      value: fees
     },
     {
       placeholder: 'Discount',
       label: 'Discount',
-      name: `invoice_detail.${index}.Discount`,
+      name: `invoice_detail.${index}.discount`,
       type: 'number',
       id: id,
-      value: Discount
-    },
-    {
-      placeholder: 'TaxableAmount',
-      label: 'TaxableAmount',
-      name: `invoice_detail.${index}.taxableAmount`,
-      type: 'number',
-      id: id,
-      value: taxableAmount
+      value: discount
     },
     {
       placeholder: 'CGSTRate',
@@ -152,22 +143,6 @@ const InvoiceItem = ({
       value: cgst
     },
     {
-      placeholder: 'SGSTRate',
-      label: 'Sgst Rt',
-      name: `invoice_detail.${index}.sgst`,
-      type: 'number',
-      id: id,
-      value: sgst
-    },
-    {
-      placeholder: 'IGSTRate',
-      label: 'Igst Rt',
-      name: `invoice_detail.${index}.igst`,
-      type: 'number',
-      id: id,
-      value: igst
-    },
-    {
       placeholder: 'CgstAmount',
       label: 'Cgst Amount',
       name: `invoice_detail.${index}.CgstAmount`,
@@ -176,12 +151,28 @@ const InvoiceItem = ({
       value: (cgst / 100) * price
     },
     {
+      placeholder: 'SGSTRate',
+      label: 'Sgst Rt',
+      name: `invoice_detail.${index}.sgst`,
+      type: 'number',
+      id: id,
+      value: sgst
+    },
+    {
       placeholder: 'SgstAmount',
       label: 'Sgst Amount',
       name: `invoice_detail.${index}.SgstAmount`,
       type: 'number',
       id: id,
       value: (sgst / 100) * price
+    },
+    {
+      placeholder: 'IGSTRate',
+      label: 'Igst Rt',
+      name: `invoice_detail.${index}.igst`,
+      type: 'number',
+      id: id,
+      value: igst
     },
     {
       placeholder: 'IgstAmount',
@@ -216,6 +207,15 @@ const InvoiceItem = ({
           />
         );
       })}
+      <TableCell>
+        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+          <Box sx={{ pr: 2, pl: 2 }}>
+            <Typography>
+              {country?.prefix + '' + (qty && price ? (price * qty - (discount / 100) * price * qty).toFixed(2) : '0.00')}
+            </Typography>
+          </Box>
+        </Stack>
+      </TableCell>
       <TableCell>
         <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
           <Box sx={{ pr: 2, pl: 2 }}>
