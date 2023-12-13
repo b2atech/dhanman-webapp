@@ -122,36 +122,12 @@ const BillItem = ({
     { placeholder: 'Fees', label: 'Fees', type: 'number', name: `bill_detail.${index}.fees`, id: id, value: fees },
     { placeholder: 'Discount', label: 'Discount', type: 'number', name: `bill_detail.${index}.discount`, id: id, value: discount },
     {
-      placeholder: 'Taxable Amount',
-      label: 'Taxable Amount',
-      type: 'text',
-      name: `bill_detail.${index}.taxableAmount`,
-      id: id,
-      value: taxableAmount
-    },
-    {
       placeholder: 'CGST Rate',
       label: 'CGST Rate',
       type: 'number',
       name: `bill_detail.${index}.cgstRate`,
       id: id,
       value: cgst
-    },
-    {
-      placeholder: 'SGST Rate',
-      label: 'SGST Rate',
-      type: 'number',
-      name: `bill_detail.${index}.sgstRate`,
-      id: id,
-      value: sgst
-    },
-    {
-      placeholder: 'IGST Rate',
-      label: 'IGST Rate',
-      type: 'number',
-      name: `bill_detail.${index}.igstRate`,
-      id: id,
-      value: igst
     },
     {
       placeholder: 'CGST Amount',
@@ -162,6 +138,14 @@ const BillItem = ({
       value: (cgst / 100) * price
     },
     {
+      placeholder: 'SGST Rate',
+      label: 'SGST Rate',
+      type: 'number',
+      name: `bill_detail.${index}.sgstRate`,
+      id: id,
+      value: sgst
+    },
+    {
       placeholder: 'SGST Amount',
       label: 'SGST Amount',
       type: 'number',
@@ -169,7 +153,14 @@ const BillItem = ({
       id: id,
       value: (sgst / 100) * price
     },
-
+    {
+      placeholder: 'IGST Rate',
+      label: 'IGST Rate',
+      type: 'number',
+      name: `bill_detail.${index}.igstRate`,
+      id: id,
+      value: igst
+    },
     {
       placeholder: 'IGST Amount',
       label: 'IGST Amount',
@@ -202,6 +193,15 @@ const BillItem = ({
         />
       ))}
 
+      <TableCell>
+        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+          <Box sx={{ pr: 2, pl: 2 }}>
+            <Typography>
+              {country?.prefix + '' + (qty && price ? (price * qty - (discount / 100) * price * qty).toFixed(2) : '0.00')}
+            </Typography>
+          </Box>
+        </Stack>
+      </TableCell>
       <TableCell>
         <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
           <Box sx={{ pr: 2, pl: 2 }}>

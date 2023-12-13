@@ -175,9 +175,6 @@ const CreateBill = () => {
       billLine.description = billItem.description;
       billLine.quantity = billItem.quantity;
       billLine.price = billItem.price;
-      // billLine.cgst = billItem.cgst;
-      // billLine.sgst = billItem.sgst;
-      // billLine.igst = billItem.igst;
       return billLine;
     });
 
@@ -243,10 +240,10 @@ const CreateBill = () => {
               discount: 0,
               taxableAmount: 0,
               cgst: 0,
-              sgst: 0,
-              igst: 0,
               CGSTAmount: 0,
+              sgst: 0,
               SGSTAmount: 0,
+              igst: 0,
               IGSTAmount: 0
             }
           ],
@@ -287,8 +284,15 @@ const CreateBill = () => {
             if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
             else return prev;
           }, 0);
-          const discountRate = (values.discount * subtotal) / 100;
-          const grandAmount = subtotal - discountRate + taxRate;
+          const fees = values?.bill_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.fees);
+            else return prev;
+          }, 0);
+          const discountRate = values?.bill_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(-(curr.discount / 100) * curr.price * Math.floor(curr.quantity));
+            else return prev;
+          }, 0);
+          const grandAmount = subtotal + discountRate + taxRate + fees;
           values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
@@ -442,6 +446,68 @@ const CreateBill = () => {
                   )}
                 </Grid>
 
+                <Grid item xs={12} sm={6}>
+                  <Stack spacing={1}>
+                    <InputLabel>Set Currency*</InputLabel>
+                    <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
+                      <Autocomplete
+                        id="country-select-demo"
+                        fullWidth
+                        options={countries}
+                        defaultValue={countries[2]}
+                        value={countries.find((option: CountryType) => option.code === country?.code)}
+                        onChange={(event, value) => {
+                          dispatch(
+                            selectCountry({
+                              country: value
+                            })
+                          );
+                        }}
+                        autoHighlight
+                        getOptionLabel={(option) => option.label}
+                        renderOption={(props, option) => (
+                          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                            {option.code && (
+                              <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`} alt="flag" />
+                            )}
+                            {option.label}
+                          </Box>
+                        )}
+                        renderInput={(params) => {
+                          const selected = countries.find((option: CountryType) => option.code === country?.code);
+                          return (
+                            <TextField
+                              {...params}
+                              name="phoneCode"
+                              placeholder="Select"
+                              InputProps={{
+                                ...params.InputProps,
+                                startAdornment: (
+                                  <>
+                                    {selected && selected.code !== '' && (
+                                      <img
+                                        style={{ marginRight: 6 }}
+                                        loading="lazy"
+                                        width="20"
+                                        src={`https://flagcdn.com/w20/${selected.code.toLowerCase()}.png`}
+                                        alt="flag"
+                                      />
+                                    )}
+                                  </>
+                                )
+                              }}
+                              inputProps={{
+                                ...params.inputProps,
+                                autoComplete: 'new-password'
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </FormControl>
+                  </Stack>
+                </Grid>
+
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={6}>
                     <Typography variant="h5" sx={{ ml: 1 }}>
@@ -478,32 +544,44 @@ const CreateBill = () => {
                             <Table sx={{ minWidth: 650 }}>
                               <TableHead>
                                 <TableRow>
-                                  <TableCell>Sr No</TableCell>
-                                  <TableCell>PO No</TableCell>
-                                  <TableCell>PO Date</TableCell>
-                                  <TableCell>Name</TableCell>
-                                  <TableCell>Description</TableCell>
-                                  <TableCell>Qty</TableCell>
-                                  <TableCell>Price</TableCell>
+                                  <TableCell align="center">No</TableCell>
+                                  <TableCell align="center">PO No</TableCell>
+                                  <TableCell align="center">PO Date</TableCell>
+                                  <TableCell align="center">Name</TableCell>
+                                  <TableCell align="center">Description</TableCell>
+                                  <TableCell align="center">Qty</TableCell>
+                                  <TableCell align="center">Price</TableCell>
                                   {discountFees && (
                                     <>
-                                      <TableCell>Fees</TableCell>
-                                      <TableCell>Discount</TableCell>
+                                      <TableCell align="center">Fees</TableCell>
+                                      <TableCell align="center">Discount (%)</TableCell>
                                     </>
                                   )}
-                                  <TableCell>Taxable Amt</TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell>C Rt</TableCell>
-                                      <TableCell>S Rt</TableCell>
-                                      <TableCell>I Rt</TableCell>
+                                      <TableCell align="center">CGST (%)</TableCell>
                                     </>
                                   )}
                                   <TableCell>CGST Amt</TableCell>
-                                  <TableCell>SGST Amt</TableCell>
-                                  <TableCell>IGST Amt</TableCell>
-                                  <TableCell>Total Amt</TableCell>
-                                  <TableCell>Action</TableCell>
+
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center">SGST (%)</TableCell>
+                                    </>
+                                  )}
+
+                                  <TableCell align="center">SGST Amt</TableCell>
+
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center">IGST (%)</TableCell>
+                                    </>
+                                  )}
+                                  <TableCell align="center">IGST Amt</TableCell>
+
+                                  <TableCell align="center">Taxable Amt</TableCell>
+                                  <TableCell align="center">Total Amt</TableCell>
+                                  <TableCell align="center">Action</TableCell>
                                 </TableRow>
                               </TableHead>
                               <TableBody>
@@ -598,12 +676,12 @@ const CreateBill = () => {
                                   <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>After Fees:</Typography>
-                                  <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  <Typography color={theme.palette.grey[500]}> Fees:</Typography>
+                                  <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>After Discount:</Typography>
-                                  <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  <Typography color={theme.palette.grey[500]}> Discount:</Typography>
+                                  <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography variant="subtitle1">Grand Total:</Typography>
@@ -647,68 +725,6 @@ const CreateBill = () => {
                   </Stack>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Stack spacing={1}>
-                    <InputLabel>Set Currency*</InputLabel>
-                    <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
-                      <Autocomplete
-                        id="country-select-demo"
-                        fullWidth
-                        options={countries}
-                        defaultValue={countries[2]}
-                        value={countries.find((option: CountryType) => option.code === country?.code)}
-                        onChange={(event, value) => {
-                          dispatch(
-                            selectCountry({
-                              country: value
-                            })
-                          );
-                        }}
-                        autoHighlight
-                        getOptionLabel={(option) => option.label}
-                        renderOption={(props, option) => (
-                          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                            {option.code && (
-                              <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`} alt="flag" />
-                            )}
-                            {option.label}
-                          </Box>
-                        )}
-                        renderInput={(params) => {
-                          const selected = countries.find((option: CountryType) => option.code === country?.code);
-                          return (
-                            <TextField
-                              {...params}
-                              name="phoneCode"
-                              placeholder="Select"
-                              InputProps={{
-                                ...params.InputProps,
-                                startAdornment: (
-                                  <>
-                                    {selected && selected.code !== '' && (
-                                      <img
-                                        style={{ marginRight: 6 }}
-                                        loading="lazy"
-                                        width="20"
-                                        src={`https://flagcdn.com/w20/${selected.code.toLowerCase()}.png`}
-                                        alt="flag"
-                                      />
-                                    )}
-                                  </>
-                                )
-                              }}
-                              inputProps={{
-                                ...params.inputProps,
-                                autoComplete: 'new-password'
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </FormControl>
-                  </Stack>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
                   <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
                     <Button
                       variant="outlined"
@@ -731,26 +747,6 @@ const CreateBill = () => {
                     <Button color="primary" variant="contained" type="submit">
                       Create & Send
                     </Button>
-                    {/* <BillModal
-                      Open={isOpen}
-                      setIsOpen={(value: any) =>
-                        dispatch(
-                          reviewInvoicePopup({
-                            isOpen: value
-                          })
-                        )
-                      }
-                      key={values.billNumber}
-                      invoiceInfo={{
-                        ...values,
-                        subtotal,
-                        taxRate,
-                        discountRate,
-                        grandAmount
-                      }}
-                      items={values?.bill_detail}
-                      onAddNextInvoice={addNextBillHandler}
-                    /> */}
                   </Stack>
                 </Grid>
               </Grid>
