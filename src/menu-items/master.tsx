@@ -206,6 +206,35 @@ const master: NavItemType = {
       ]
     },
     {
+      id: 'reports',
+      title: <FormattedMessage id="reports" />,
+      type: 'collapse',
+      icon: icons.PlusSquareOutlined,
+      children: [
+        {
+          id: 'inventoryreports',
+          title: (
+            <>
+              <FormattedMessage id="inventoryreports" />
+            </>
+          ),
+          type: 'collapse',
+          children: [
+            {
+              id: 'closingstock',
+              title: (
+                <>
+                  <FormattedMessage id="closingstock" />
+                </>
+              ),
+              type: 'item',
+              url: '/reports/inventoryreports/closingstock'
+            }
+          ]
+        }
+      ]
+    },
+    {
       id: 'timesheet-forms-layout',
       title: <FormattedMessage id="timesheet" />,
       type: 'collapse',
