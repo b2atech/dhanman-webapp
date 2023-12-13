@@ -34,6 +34,8 @@ import { useTheme } from '@mui/material/styles';
 import { v4 as UIDV4 } from 'uuid';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
+import { openDrawer } from 'store/reducers/menu';
+//import useConfig from 'hooks/useConfig';
 
 // third party
 import * as yup from 'yup';
@@ -46,6 +48,8 @@ import { createBillRequest, getBillDefaultStatus } from 'api/services/BillServic
 import AddressBillModal from 'sections/apps/bill/BillAddressModal';
 import { useEffect, useState } from 'react';
 import { getAllProducts } from 'api/services/InventoryService';
+import { getCompanyDetail } from 'api/services/CommonService';
+import Loader from 'components/Loader';
 // import { CheckBox } from '@mui/icons-material';
 // import BillModal from 'sections/apps/bill/BillModal';
 
@@ -95,6 +99,42 @@ const CreateBill = () => {
   const [discountFees, setDiscountFees] = useState(false);
   const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [company, setCompany] = useState<any>();
+
+  useEffect(() => {
+    getCompanyDetail('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((comapanyName) => {
+        setCompany(comapanyName);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((productList) => {
+        if (Array.isArray(productList)) {
+          setProducts(productList);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  console.log(company?.name);
+  useEffect(() => {
+    getBillDefaultStatus('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((status) => {
+        setDefaultStatus(status.initialStatusName);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   const handlerCreate = (values: any) => {
     const bill: BillHeader_main = {
@@ -141,6 +181,8 @@ const CreateBill = () => {
       return billLine;
     });
 
+    dispatch(openDrawer(false));
+
     createBillRequest(bill).then(() => {
       dispatch(
         openSnackbar({
@@ -158,28 +200,6 @@ const CreateBill = () => {
     });
   };
 
-  useEffect(() => {
-    getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((productList) => {
-        if (Array.isArray(productList)) {
-          setProducts(productList);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    getBillDefaultStatus('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((status) => {
-        setDefaultStatus(status.initialStatusName);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
   // const addNextBillHandler = () => {
   //   dispatch(
   //     reviewInvoicePopup({
@@ -187,7 +207,6 @@ const CreateBill = () => {
   //     })
   //   );
   // };
-
   return (
     <MainCard>
       <Formik
@@ -243,10 +262,31 @@ const CreateBill = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0)
+              return (
+                prev +
+                Number(
+                  (curr.sgst && curr.cgst
+                    ? (curr.cgst / 100) * curr.price + (curr.sgst / 100) * curr.price
+                    : (curr.igst / 100) * curr.price) +
+                    curr.price * Math.floor(curr.quantity)
+                )
+              );
             else return prev;
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
+          const cgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
+            else return prev;
+          }, 0);
+          const sgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
+            else return prev;
+          }, 0);
+          const igstAmount = values?.bill_detail.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
+            else return prev;
+          }, 0);
           const discountRate = (values.discount * subtotal) / 100;
           const grandAmount = subtotal - discountRate + taxRate;
           values.totalAmount = grandAmount;
@@ -318,12 +358,18 @@ const CreateBill = () => {
                       <Grid item xs={12} sm={8}>
                         <Stack spacing={2}>
                           <Typography variant="h5">From:</Typography>
-                          <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{values?.cashierInfo?.name}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.address}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.phone}</Typography>
-                            <Typography color="secondary">{values?.cashierInfo?.email}</Typography>
-                          </Stack>
+                          {loading ? (
+                            <Loader />
+                          ) : (
+                            <Stack sx={{ width: '100%' }}>
+                              <Typography variant="subtitle1">{company?.name || ''}</Typography>
+                              <Typography color="secondary">{company?.email || ''}</Typography>
+                              <Typography color="secondary">{`${company?.addressLine || ''} \u00A0 \u00A0 ${
+                                company?.phoneNumber || ''
+                              }`}</Typography>
+                              <Typography color="secondary">{company?.gstIn || ''}</Typography>
+                            </Stack>
+                          )}
                         </Stack>
                       </Grid>
                       <Grid item xs={12} sm={4}>
@@ -516,6 +562,8 @@ const CreateBill = () => {
                                       description: '',
                                       quantity: 0,
                                       price: 0,
+                                      fees: 0,
+                                      discount: 0,
                                       amount: 0,
                                       taxableAmount: 0,
                                       cRt: 0,
@@ -532,22 +580,22 @@ const CreateBill = () => {
                               </Box>
                             </Grid>
                             <Grid item xs={12} md={4}>
-                              <Stack spacing={2}>
+                              <Stack spacing={2} sx={{ marginTop: 4 }}>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
                                   <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>C GST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>S GST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>I GST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + taxRate.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>After Fees:</Typography>

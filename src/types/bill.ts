@@ -67,6 +67,7 @@ export interface IBill {
   tax: number | null;
   customerInfo: InfoType;
   notes: string;
+  amount: number;
 }
 
 export interface IBillType {

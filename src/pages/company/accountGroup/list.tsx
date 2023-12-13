@@ -58,6 +58,8 @@ import { getAllAccountGroups } from 'api/services/CommonService';
 import { IaccountGroup } from 'types/accountgroup';
 import moment from 'moment';
 import { useSticky } from 'react-table-sticky';
+import { useNavigate } from 'react-router';
+import config from 'config';
 
 // ==================================================|| REACT TABLE ||========================================================//
 
@@ -97,7 +99,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
-
+  const navigation = useNavigate();
   const {
     getTableProps,
     getTableBodyProps,
@@ -167,7 +169,15 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                navigation(`/company/accountgroup/add`);
+              }}
+              size="small"
+            >
               Add Account Group
             </Button>
             <CSVExport
@@ -270,7 +280,7 @@ const AccountGroups = () => {
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const companyId: string = String(config.companyId);
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
   };
@@ -280,7 +290,7 @@ const AccountGroups = () => {
   };
 
   useEffect(() => {
-    getAllAccountGroups('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllAccountGroups(companyId)
       .then((accountGroupList) => {
         if (Array.isArray(accountGroupList)) {
           setAccountGroups(accountGroupList);
@@ -291,7 +301,7 @@ const AccountGroups = () => {
         console.error('Error fetching data:', error);
         setLoading(false);
       });
-  }, []);
+  }, [companyId]);
 
   const memoizedAccountGroups = useMemo(() => accountgroups, [accountgroups]);
 

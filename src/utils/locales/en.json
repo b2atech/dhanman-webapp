@@ -163,5 +163,7 @@
   "createTask": "Create Task",
   "pullRequests": "Pull Requests",
   "dev": "Dev",
-  "addproducts": "Add Product"
+  "addproducts": "Add Product",
+  "makepayment": "Make Payment",
+  "accountgroups": "Account Groups"
 }

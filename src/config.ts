@@ -22,7 +22,7 @@ const config: DefaultConfigProps = {
   mode: ThemeMode.LIGHT,
   presetColor: 'default',
   themeDirection: ThemeDirection.LTR,
-  clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+  companyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
   currentUser: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
   financialYear: 2023
 };
