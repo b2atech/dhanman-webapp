@@ -220,9 +220,11 @@ const InvoiceItem = ({
         <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
           <Box sx={{ pr: 2, pl: 2 }}>
             <Typography>
-              {country?.prefix +
-                '' +
-                ((sgst && cgst ? (cgst / 100) * price + (sgst / 100) * price : (igst / 100) * price) + price * qty).toFixed(2)}
+              {!name || !price || !qty
+                ? '0.00'
+                : country?.prefix +
+                  '' +
+                  ((sgst && cgst ? (cgst / 100) * price + (sgst / 100) * price : (igst / 100) * price) + price * qty).toFixed(2)}
             </Typography>
           </Box>
         </Stack>
