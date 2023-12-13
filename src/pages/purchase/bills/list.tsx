@@ -23,7 +23,8 @@ import {
   PaletteColor,
   Grid,
   styled,
-  CircularProgress
+  CircularProgress,
+  Button
 } from '@mui/material';
 
 // third-party
@@ -62,12 +63,13 @@ import {
   TablePagination,
   TableRowSelection
 } from 'components/third-party/ReactTable';
-import { getAllBills } from 'api/services/BillService';
 
 import { GlobalFilter, renderFilterTypes, DateColumnFilter } from 'utils/react-table';
 import { IBill } from 'types/bill';
 import { alpha, useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
+import { Link } from 'react-router-dom';
+import { getAllBills } from 'api/services/BillService';
 
 const moment = require('moment');
 interface BillWidgets {
@@ -115,6 +117,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const sortBy = { id: 'vendorName', desc: false };
+  const navigation = useNavigate();
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const initialState = useMemo(
     () => ({
@@ -131,14 +134,14 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     prepareRow,
     rows,
     page,
+    allColumns,
     gotoPage,
     setPageSize,
     state: { globalFilter, selectedRowIds, pageIndex, pageSize },
     preGlobalFilteredRows,
     setGlobalFilter,
-    setSortBy,
-    allColumns,
-    setFilter
+    setFilter,
+    setSortBy
   } = useTable(
     {
       columns,
@@ -169,7 +172,8 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   );
   const [isBillIdVisible, setIsBillIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [activeTab, setActiveTab] = useState(groups[0]);
+  const handleUpdateStatus = async (newStatus: string) => {};
+  const [selectedStatus, setSelectedStatus] = useState<string>('All');
 
   const handleSwitchChange = () => {
     setIsBillIdVisible((prevIsBillIdVisible) => !prevIsBillIdVisible);
@@ -179,16 +183,85 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
+  const updateStatusButtons = () => {
+    const buttons: React.ReactNode[] = [];
+    const selectedBillStatus = selectedStatus;
+
+    switch (selectedBillStatus) {
+      case 'Draft':
+        buttons.push(
+          <Button key="sendForApproval" variant="contained" color="primary" onClick={() => handleUpdateStatus('Pending Approval')}>
+            Send for Approval
+          </Button>
+        );
+        break;
+      case 'Pending Approval':
+        buttons.push(
+          <>
+            <Button key="reject" variant="contained" color="error" style={{ marginRight: '8px' }}>
+              Reject
+            </Button>
+            <Button key="approve" variant="contained" color="success">
+              Approve
+            </Button>
+          </>
+        );
+        break;
+      case 'Approved':
+        buttons.push(
+          <>
+            <Button
+              key="sendForPartiallyPaid"
+              variant="contained"
+              color="secondary"
+              style={{ marginRight: '8px' }}
+              onClick={() => handleUpdateStatus('Partially Paid')}
+            >
+              Send for Partially Paid
+            </Button>
+            <Button
+              key="payNow"
+              variant="contained"
+              color="success"
+              onClick={() => {
+                navigation('/purchase/payments/list');
+              }}
+            >
+              Pay Now
+            </Button>
+          </>
+        );
+        break;
+      case 'Partially Paid':
+        buttons.push(
+          <Button
+            key="payNow"
+            variant="contained"
+            color="info"
+            onClick={() => {
+              navigation('/purchase/payments/');
+            }}
+          >
+            Pay Now
+          </Button>
+        );
+        break;
+      default:
+        break;
+    }
+    return buttons;
+  };
+
   useEffect(() => {
-    setFilter('billStatus', activeTab === 'All' ? '' : activeTab);
+    setFilter('billStatus', selectedStatus === 'All' ? '' : selectedStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, [selectedStatus]);
   return (
     <>
       <Box sx={{ p: 3, pb: 0, width: '100%' }}>
         <Tabs
-          value={activeTab}
-          onChange={(e: ChangeEvent<{}>, value: string) => setActiveTab(value)}
+          value={selectedStatus}
+          onChange={(e: ChangeEvent<{}>, value: string) => setSelectedStatus(value)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
           {groups.map((billStatus: string, index: number) => (
@@ -198,17 +271,19 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
               value={billStatus}
               icon={
                 <Chip
-                  label={
-                    billStatus === 'All'
-                      ? data.length
-                      : billStatus === 'Cancel'
-                      ? counts.Cancel
-                      : billStatus === 'Unpaid'
-                      ? counts.Draft
-                      : counts.Paid
-                  }
+                  label={billStatus === 'All' ? data.length : counts[billStatus]}
                   color={
-                    billStatus === 'All' ? 'primary' : billStatus === 'Paid' ? 'success' : billStatus === 'Unpaid' ? 'warning' : 'error'
+                    billStatus === 'All'
+                      ? 'primary'
+                      : billStatus === 'Draft' || billStatus === 'Pending Approval'
+                      ? 'info'
+                      : billStatus === 'Approved ' || billStatus === 'Partially' || billStatus === 'Paid'
+                      ? 'success'
+                      : billStatus === 'Rejected'
+                      ? 'error'
+                      : billStatus === 'Cancelled'
+                      ? 'warning'
+                      : 'error'
                   }
                   variant="light"
                   size="small"
@@ -231,6 +306,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
         <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={matchDownSM ? 1 : 0}>
           <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
           <TableRowSelection selected={Object.keys(selectedRowIds).length} />
+          {updateStatusButtons()}
           {headerGroups.map((group: HeaderGroup<{}>, index: number) => (
             <Stack direction={matchDownSM ? 'column' : 'row'} spacing={1} {...group.getHeaderGroupProps()}>
               {group.headers.map((column: HeaderGroup<{}>) => (
@@ -238,7 +314,6 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
               ))}
             </Stack>
           ))}
-
           <CSVExport data={data} filename={'Bill-list.csv'} />
           <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
             <FormControlLabel
@@ -387,7 +462,6 @@ const Bills = () => {
           Header: 'Bill ID',
           accessor: 'id',
           Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
-          disableSortBy: true,
           disableFilters: true
         },
         {
@@ -399,7 +473,16 @@ const Bills = () => {
         {
           Header: 'Bill No',
           accessor: 'billNumber',
-          disableFilters: true
+          disableFilters: true,
+          Cell: ({ value, row }: { value: string; row: Row }) => (
+            <Tooltip title="View Bill" arrow>
+              <span style={{ whiteSpace: 'nowrap' }}>
+                <Button component={Link} to={`/purchase/bills/details/${row.values.id}`} color="info" size="small">
+                  {value}
+                </Button>
+              </span>
+            </Tooltip>
+          )
         },
         {
           Header: 'Vendor Name',
@@ -414,13 +497,22 @@ const Bills = () => {
           Filter: ({ column }) => <>{column.render('Filter')}</>,
           Cell: ({ value }: { value: string }) => {
             switch (value) {
-              case 'Cancel':
+              case 'Draft':
+                return <Chip color="primary" label="Draft" size="small" variant="light" />;
+              case 'Pending Approval':
+                return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
+              case 'Approved ':
+                return <Chip color="success" label="Approved" size="small" variant="light" />;
+              case 'Partially Paid':
+                return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
+              case 'Rejected':
+                return <Chip color="error" label="Rejected" size="small" variant="light" />;
+              case 'Cancelled':
                 return <Chip color="error" label="Cancelled" size="small" variant="light" />;
               case 'Paid':
                 return <Chip color="success" label="Paid" size="small" variant="light" />;
-              case 'Unpaid':
               default:
-                return <Chip color="info" label="Unpaid" size="small" variant="light" />;
+                return <Chip color="warning" label={value} size="small" variant="light" />;
             }
           }
         },
@@ -444,12 +536,14 @@ const Bills = () => {
           Header: 'Tax',
           accessor: 'tax',
           className: 'cell-center',
+          Cell: ({ value }) => <>{value}%</>,
           disableFilters: true
         },
         {
-          Header: 'Term',
+          Header: 'Payment Term',
           accessor: 'paymentTerm',
           className: 'cell-center',
+          Cell: ({ value }) => <>{value} D</>,
           disableFilters: true
         },
         {
@@ -500,28 +594,24 @@ const Bills = () => {
         {
           Header: 'Created On',
           accessor: 'createdOnUtc',
-          disableFilters: true,
-          disableSortBy: true,
-          Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+          Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+          disableFilters: true
         },
         {
           Header: 'Modified On',
           accessor: 'modifiedOnUtc',
-          disableFilters: true,
-          disableSortBy: true,
-          Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+          Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
+          disableFilters: true
         },
         {
           Header: 'Created By',
           accessor: 'createdBy',
-          disableFilters: true,
-          disableSortBy: true,
-          Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+          Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+          disableFilters: true
         },
         {
           Header: 'Modified By',
           accessor: 'modifiedBy',
-          disableSortBy: true,
           disableFilters: true
         }
       ] as Column[],
