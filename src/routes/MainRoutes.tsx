@@ -5,6 +5,8 @@ import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
+import UnderConstruction from 'pages/maintenance/under-construction';
+import ComingSoon from 'pages/maintenance/coming-soon';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
@@ -32,6 +34,7 @@ const AppAddProduct = Loadable(lazy(() => import('pages/inventory/products/addpr
 const AppPaidPayments = Loadable(lazy(() => import('pages/purchase/paidpayments/list')));
 const AppAccountGroups = Loadable(lazy(() => import('pages/company/accountGroup/list')));
 const AppReports = Loadable(lazy(() => import('pages/reports/inventoryreports/closingStock')));
+const AppMakePayment = Loadable(lazy(() => import('pages/purchase/paidpayments/add')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -80,6 +83,10 @@ const MainRoutes = {
             {
               path: 'list',
               element: <AppAccountGroups />
+            },
+            {
+              path: 'add',
+              element: <ComingSoon />
             }
           ]
         }
@@ -154,8 +161,8 @@ const MainRoutes = {
               element: <AppRecievedPayment />
             },
             {
-              path: 'receive',
-              element: <MaintenanceComingSoon />
+              path: 'add',
+              element: <UnderConstruction />
             }
           ]
         }
@@ -202,15 +209,14 @@ const MainRoutes = {
         },
         {
           path: 'payments',
-          element: <AppPaidPayments />,
           children: [
             {
               path: 'list',
-              element: <MaintenanceComingSoon />
+              element: <AppPaidPayments />
             },
             {
-              path: 'make',
-              element: <MaintenanceComingSoon />
+              path: 'add',
+              element: <AppMakePayment />
             }
           ]
         }

@@ -1,6 +1,6 @@
 export interface CustomerData {
   userId: string;
-  clientId: String;
+  companyId: String;
   firstName: string;
   lastName: string;
   email: string;
@@ -13,7 +13,7 @@ export interface CustomerData {
 export interface VendorData {
   vendorId: String;
   userId: string;
-  clientId: String;
+  companyId: string;
   firstName: string;
   lastName: string;
   email: string;

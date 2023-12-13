@@ -13,6 +13,33 @@ export const InvetoryAPI = {
       return response.data;
     }
   },
+  getAllUnits = async function (companyId: string, cancel = false) {
+    const response = await apiInventory.request({
+      url: `/v1/GetAllUnits/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllUnits.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
+  getAllCategories = async function (categoryId: string, cancel = false) {
+    const response = await apiInventory.request({
+      url: `/v1/GetAllCategories/${categoryId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllCategories.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
+  getAllTaxCategory = async function (cancel = false) {
+    const response = await apiInventory.request({
+      url: `/v1/productTaxCategories`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllTaxCategory.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items;
+  },
   getAllProducts = async function (clientId: string, cancel = false) {
     const response = await apiInventory.request({
       url: `/v1/GetAllProducts/${clientId}`,

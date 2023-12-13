@@ -34,14 +34,14 @@ import { openSnackbar } from 'store/reducers/snackbar';
 // types
 import AlertVendorDelete from './AlertVendorDelete';
 import { createVendorRequest, updateVendorRequest } from 'api/services/BillService';
-
+import config from 'config';
 // constant
-
+const companyId: string = String(config.companyId);
 const getInitialValues = (vendor: FormikValues | null) => {
   if (vendor) {
     return {
       userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      clientId: '59ac0567-d0ac-4a75-91d5-b5246cfa8ff3',
+      companyId: companyId,
       firstName: vendor.firstName,
       lastName: vendor.lastName,
       phoneNumber: vendor.phoneNumber,
@@ -56,7 +56,7 @@ const getInitialValues = (vendor: FormikValues | null) => {
   } else {
     return {
       userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      clientId: '59ac0567-d0ac-4a75-91d5-b5246cfa8ff3',
+      clientId: companyId,
       firstName: '',
       lastName: '',
       phoneNumber: '',
@@ -162,7 +162,7 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
         const vendorData = {
           vendorId: values.id,
           userId: values.userId,
-          clientId: values.clientId,
+          companyId: companyId,
           firstName: values.firstName,
           lastName: values.lastName,
           email: values.email,
@@ -178,7 +178,7 @@ const AddVendor = ({ vendor, onCancel }: Props) => {
             dispatch(
               openSnackbar({
                 open: true,
-                message: 'Vendor updated successfully. nad kra pn amacha kuthe',
+                message: 'Vendor updated successfully.',
                 anchorOrigin: { vertical: 'top', horizontal: 'right' },
                 variant: 'alert',
                 alert: {

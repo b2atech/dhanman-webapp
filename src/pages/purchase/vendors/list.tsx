@@ -64,6 +64,7 @@ import AddVendor from '../createbills/Vendor/AddVendor';
 import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
 import { PatternFormat } from 'react-number-format';
 import { useSticky } from 'react-table-sticky';
+import config from 'config';
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
@@ -295,7 +296,7 @@ const Vendors = () => {
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const companyId: string = String(config.companyId);
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
   };
@@ -305,7 +306,7 @@ const Vendors = () => {
   };
 
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3')
+    getAllVendors(companyId)
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
           setVendors(vendorList);
@@ -316,7 +317,7 @@ const Vendors = () => {
         console.error('Error fetching data:', error);
         setLoading(false);
       });
-  }, []);
+  }, [companyId]);
 
   const memoizedVendors = useMemo(() => vendors, [vendors]);
 
