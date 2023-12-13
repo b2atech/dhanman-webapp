@@ -324,7 +324,7 @@ const MainRoutes = {
       children: [
         {
           path: 'closingstock',
-          element: <MaintenanceError500 />
+          element: <ComingSoon />
         }
       ]
     }
