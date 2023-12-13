@@ -164,10 +164,9 @@
   "pullRequests": "Pull Requests",
   "dev": "Dev",
   "addproducts": "Add Product",
-  "accountgroups": "Accounts Group",
   "reports": "Reports",
   "inventoryreports": "Inventory Reports",
-  "closingstock": "Closing Stock"
+  "closingstock": "Closing Stock",
   "makepayment": "Make Payment",
   "accountgroups": "Account Groups"
 }
