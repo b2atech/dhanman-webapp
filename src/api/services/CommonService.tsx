@@ -102,4 +102,5 @@ export const CommonAPI = {
 
     return response.data.items;
   };
+
 const cancelApiObject = defineCancelApiObject(CommonAPI);

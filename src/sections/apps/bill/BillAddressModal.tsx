@@ -50,21 +50,6 @@ const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) =
       </DialogTitle>
       <Divider />
       <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
-        <FormControl sx={{ width: '100%', pb: 2 }}>
-          <TextField
-            autoFocus
-            id="name"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchOutlined />
-                </InputAdornment>
-              )
-            }}
-            placeholder="Search"
-            fullWidth
-          />
-        </FormControl>
         <Stack spacing={2}>
           <Address handlerAddress={(value) => handlerAddress(value)} />
         </Stack>
@@ -87,14 +72,36 @@ type AddressProps = {
 };
 const Address = ({ handlerAddress }: AddressProps) => {
   const theme = useTheme();
-  const [Address, setAddress] = useState([]);
+  const [addressList, setAddressList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
-    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3').then((billAddressList) => setAddress(billAddressList));
+    getAllVendors('59ac0567-d0ac-4a75-91d5-b5246cfa8ff3').then((vendorList) => setAddressList(vendorList));
   }, []);
+
+  const filteredAddressList = addressList.filter((vendor: any) => `${vendor.vendorName}`.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <>
-      {Address.map((vendorList: any) => (
+      <FormControl sx={{ width: '100%', pb: 2 }}>
+        <TextField
+          autoFocus
+          id="name"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined />
+              </InputAdornment>
+            )
+          }}
+          placeholder="Search"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </FormControl>
+
+      {filteredAddressList.map((vendorList: any) => (
         <Box
           onClick={() => handlerAddress(vendorList)}
           key={vendorList.id}
