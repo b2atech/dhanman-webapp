@@ -121,7 +121,7 @@ export default function AddProductForm() {
   const [cgstTaxRender, setCgstTaxRender] = React.useState<number | null>();
 
   const [igstTaxRender, setIgstTaxRender] = React.useState<number | null>();
-  const companyId: string = String(config.clientId);
+  const companyId: string = String(config.companyId);
   const formik = useFormik({
     initialValues: getInitialValues(),
     enableReinitialize: true,
