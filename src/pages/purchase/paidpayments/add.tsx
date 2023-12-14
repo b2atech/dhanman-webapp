@@ -66,12 +66,6 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
     amount: Yup.string()
       .matches(/^\d+(\.\d{0,2})?$/, 'Use only two decimal places')
       .required('Please Enter Amount'),
-    // //.positive('Please Enter a positive unit price')
-    // .required('Please Enter Price')
-    // .test('decimal-places', 'Invalid price format. Use only two decimal places', (value) => {
-    //   // Use a regular expression to check for at most two decimal places
-    //   return /^\d+(\.\d{0,2})?$/.test(String(value));
-    //}),
     description: Yup.string().max(255).required('Please Enter Description')
   });
 
