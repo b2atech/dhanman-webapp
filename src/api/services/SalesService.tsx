@@ -2,6 +2,7 @@ import { CustomerData } from 'types/customerinfo';
 import { apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { InvoiceEdit, InvoiceHeader } from 'types/invoiceDetails';
+import { IUpdateInvoiceStatus } from 'types/invoice';
 
 export const InvoiceAPI = {
     get: async function (clientId: string, cancel = false) {
@@ -145,6 +146,14 @@ export const InvoiceAPI = {
       url: `v1/invoiceDefaultStatus/${headerId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getInvoiceDefaultStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data;
+  },
+  updateStatus = async function (updateInvoiceStatus: IUpdateInvoiceStatus) {
+    const response = await apiSales.request({
+      url: 'v1/invoiceStatuses',
+      method: 'PUT',
+      data: updateInvoiceStatus
     });
     return response.data;
   };

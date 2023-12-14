@@ -63,7 +63,9 @@ const moment = require('moment');
 const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   const PaidPaymentSchema = Yup.object().shape({
     vendorName: Yup.string().max(255).required('Please Enter vendor Name'),
-    amount: Yup.number().positive('Please Enter a positive unit price').required('Please Enter Price'),
+    amount: Yup.string()
+      .matches(/^\d+(\.\d{0,2})?$/, 'Use only two decimal places')
+      .required('Please Enter Amount'),
     description: Yup.string().max(255).required('Please Enter Description')
   });
 
@@ -284,11 +286,13 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                   <TextField
                     sx={{ width: '100%' }}
                     id="totalAmount"
-                    type="decimal"
+                    type="number"
                     placeholder={String(totalAmount)}
-                    {...getFieldProps('totalAmount')}
-                    helperText={`total payable amount : ${totalAmount}`}
-                  />
+                    {...getFieldProps('amount')}
+                    error={Boolean(touched.amount && errors.amount)}
+                    helperText={touched.amount && typeof errors.amount === 'string' ? errors.amount : ''}
+                  ></TextField>
+                  <InputLabel sx={{ mb: 3 }}>total payable amount : {totalAmount}</InputLabel>
                 </Grid>
                 <Grid item xs={12} sx={{ width: '100%' }}>
                   <Stack spacing={2}>
