@@ -1,3 +1,4 @@
+import { ReceivedPaymentData } from 'types/invoice';
 import { CustomerData } from 'types/customerinfo';
 import { apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
@@ -31,11 +32,11 @@ export const InvoiceAPI = {
     });
     return response.data.items;
   },
-  getAllReceivePayments = async function (companyId: string, cancel = false) {
+  getAllReceivedPayments = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
-      url: `v1/invoicePayments/${companyId}`,
+      url: `v1/invoicePayments//${companyId}`,
       method: 'GET',
-      signal: cancel ? cancelApiObject[getAllReceivePayments.name].handleRequestCancellation().signal : undefined
+      signal: cancel ? cancelApiObject[getAllReceivedPayments.name].handleRequestCancellation().signal : undefined
     });
     return response.data.items;
   },
@@ -103,6 +104,14 @@ export const InvoiceAPI = {
       console.error('Error deleting received payments:', error);
       throw error;
     }
+  },
+  createReceivedPaymentRequest = async function (receivedPaymentData: ReceivedPaymentData) {
+    const response = await apiSales.request({
+      url: `v1/invoicePayments`,
+      method: 'POST',
+      data: receivedPaymentData
+    });
+    return response.status;
   },
   deleteInvoiceRequest = async function (id: string) {
     try {

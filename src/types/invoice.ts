@@ -109,6 +109,7 @@ export interface IInvoice {
   tax: number | null;
   customerInfo: InfoType;
   notes: string;
+  amount: number;
 }
 
 export interface InvoiceDetail {
@@ -121,15 +122,24 @@ export interface InvoiceDetail {
 
 export interface IReceivedPayment {
   id: string;
-  clientId: string;
-  vendorId: number;
-  vendoeName: string;
+  companyId: string;
+  customerId: number;
+  customerName: string;
   transactionId: string;
   coaId: string;
   description: string;
   amount: number;
 }
 
+export interface ReceivedPaymentData {
+  companyId: string;
+  customerId: string;
+  customerName: string;
+  transactionId: string;
+  coaId: string;
+  description: string;
+  amount: string | number;
+}
 export interface ICustomer {
   id: string;
   clientId: string;

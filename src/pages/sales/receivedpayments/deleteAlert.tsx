@@ -5,29 +5,31 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { deleteReceivedPaymentsRequest } from 'api/services/SalesService';
 import { useDispatch } from 'store';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
+import { deleteReceivedPaymentsRequest } from 'api/services/SalesService';
 
 // types
-interface AlertReceivedPaymentsDeleteProps {
+interface AlertReceivedPaymentDeleteProps {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
   id: string;
 }
 
-export default function AlertReceivedPaymentDelete({ title, open, handleClose, id }: AlertReceivedPaymentsDeleteProps) {
+// ==============================|| ReceivedPayment - DELETE ||============================== //
+
+export default function AlertreceivedPaymentDelete({ title, open, handleClose, id }: AlertReceivedPaymentDeleteProps) {
   const dispatch = useDispatch();
-  const deleteReceivedPayment = () => {
+  const deletereceivedPayment = () => {
     handleClose(true);
     deleteReceivedPaymentsRequest(id).then(() => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Received Payments Deleted Successfully',
+          message: 'Received Payment deleted successfully',
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -39,6 +41,7 @@ export default function AlertReceivedPaymentDelete({ title, open, handleClose, i
       window.location.reload();
     });
   };
+
   return (
     <Dialog
       open={open}
@@ -64,7 +67,7 @@ export default function AlertReceivedPaymentDelete({ title, open, handleClose, i
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               Cancel
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={deleteReceivedPayment} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={deletereceivedPayment} autoFocus>
               Delete
             </Button>
           </Stack>
