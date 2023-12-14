@@ -171,7 +171,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
               startIcon={<PlusOutlined />}
               onClick={(e: any) => {
                 e.stopPropagation();
-                navToReceivedPayment(`/purchase/payments/add`);
+                navToReceivedPayment(`/sales/payments/add`);
               }}
               size="small"
             >
