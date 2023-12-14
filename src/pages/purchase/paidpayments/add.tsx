@@ -64,7 +64,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   const PaidPaymentSchema = Yup.object().shape({
     vendorName: Yup.string().max(255).required('Please Enter vendor Name'),
     amount: Yup.string()
-      .matches(/^\d+(\.\d{0,2})?$/, 'Invalid price format. Use only two decimal places')
+      .matches(/^\d+(\.\d{0,2})?$/, 'Use only two decimal places')
       .required('Please Enter Amount'),
     // //.positive('Please Enter a positive unit price')
     // .required('Please Enter Price')
@@ -298,6 +298,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                     error={Boolean(touched.amount && errors.amount)}
                     helperText={touched.amount && typeof errors.amount === 'string' ? errors.amount : ''}
                   ></TextField>
+                  <InputLabel sx={{ mb: 3 }}>total payable amount : {totalAmount}</InputLabel>
                 </Grid>
                 <Grid item xs={12} sx={{ width: '100%' }}>
                   <Stack spacing={2}>
