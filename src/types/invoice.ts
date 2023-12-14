@@ -24,6 +24,7 @@ export interface IInvoiceList {
   date: Date | string | number;
   due_date: Date | string | number;
   quantity: number;
+  invoiceStatusId: number;
   invoiceStatus: string;
   invoice_detail: Items[];
   cashierInfo: InfoType;
@@ -184,4 +185,8 @@ export interface IStatus {
   PreviousStatus: number;
   PreviousStatusName: string;
   isInitial: boolean;
+}
+export interface IUpdateInvoiceStatus {
+  invoiceIds: string[];
+  invoiceStatusId: number;
 }
