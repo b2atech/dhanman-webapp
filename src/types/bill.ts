@@ -60,6 +60,7 @@ export interface IBill {
   date: Date | string | number;
   due_date: Date | string | number;
   quantity: number;
+  billStatusId: number;
   billStatus: string;
   invoice_detail: Items[];
   cashierInfo: InfoType;
@@ -93,4 +94,9 @@ export interface IBillType {
   discount: number | null;
   note: string;
   lines: Items[];
+}
+
+export interface IUpdateBillStatus {
+  billIds: string[];
+  billStatusId: number;
 }
