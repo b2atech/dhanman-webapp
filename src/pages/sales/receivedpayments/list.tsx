@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState, Fragment, MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   FormControlLabel,
   Stack,
@@ -17,12 +18,10 @@ import {
   Tooltip,
   Typography,
   styled,
-  useMediaQuery,
-  CircularProgress
+  useMediaQuery
 } from '@mui/material';
 
 // third-party
-
 import {
   useFilters,
   useExpanded,
@@ -38,7 +37,7 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { useSticky } from 'react-table-sticky';
+
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
@@ -57,13 +56,14 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { getAllReceivePayments } from 'api/services/SalesService';
 import { IReceivedPayment } from 'types/invoice';
-import AlertReceivedPaymentDelete from './AlertReceicedPaymentDelete';
+import AlertreceivedPaymentDelete from './deleteAlert';
+import { getAllReceivedPayments } from 'api/services/SalesService';
+import ReceivedPaymentView from './details';
 import { useNavigate } from 'react-router';
-import config from 'config';
-const moment = require('moment');
+
 // ==============================|| REACT TABLE ||============================== //
+
 const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
     position: 'sticky',
@@ -76,32 +76,38 @@ const TableWrapper = styled('div')(({ theme }) => ({
   }
 }));
 
+const moment = require('moment');
 interface Props {
   columns: Column[];
   data: IReceivedPayment[];
   handleAdd: () => void;
-  getHeaderProps: (column: HeaderGroup) => {};
+  renderRowSubComponent: FC<any>;
   showIdColumn: boolean;
   handleSwitchChange: () => void;
+  getHeaderProps: (column: HeaderGroup) => {};
 }
 
-function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: Props) {
+function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
+  const navToReceivedPayment = useNavigate();
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
-  const navigation = useNavigate();
+
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'customerName', desc: false };
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    setHiddenColumns,
     allColumns,
+    visibleColumns,
     rows,
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, selectedRowIds, pageIndex, pageSize },
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -111,29 +117,34 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] },
-      hiddenColumns: ['']
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'email'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
     useSortBy,
     useExpanded,
     usePagination,
-    useRowSelect,
-    useSticky
+    useRowSelect
   );
 
-  const now = new Date();
-  const formatedFilename = 'ReceivedPaymentsList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
-  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const [isReceivedPaymentIdVisible, setIsReceivedPaymentIdVisible] = useState(false);
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+
+  useEffect(() => {
+    if (matchDownSM) {
+      setHiddenColumns(['age', 'contact', 'visits', 'email', 'status', 'avatar']);
+    } else {
+      setHiddenColumns(['avatar', 'email']);
+    }
+    // eslint-disable-next-line
+  }, [matchDownSM]);
 
   const handleSwitchChange = () => {
-    setIsReceivedPaymentIdVisible((prevIsReceivedPaymentIdVisible) => !prevIsReceivedPaymentIdVisible);
+    setIsReceivedPaymentIdVisible((prevIsReceivedPaymetIdVisible) => !prevIsReceivedPaymetIdVisible);
   };
 
-  const handleAuditSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAuditSwitchOn(event.target.checked);
+  const handleAuditSwitchChange = () => {
+    setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
   return (
@@ -160,15 +171,15 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
               startIcon={<PlusOutlined />}
               onClick={(e: any) => {
                 e.stopPropagation();
-                navigation(`/sales/payments/add`);
+                navToReceivedPayment(`/sales/payments/add`);
               }}
               size="small"
             >
-              Add Received Payments
+              Receive Payment
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
-              filename={formatedFilename}
+              filename={'receivedPayment-list.csv'}
             />
             <Tooltip title={isReceivedPaymentIdVisible ? 'Hide ID' : 'Show ID'}>
               <FormControlLabel
@@ -179,7 +190,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit Columns' : 'Show Audit Columns'}>
               <FormControlLabel
                 value=""
                 control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
@@ -190,19 +201,27 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
             </Tooltip>
           </Stack>
         </Stack>
-
-        <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+        <ScrollX sx={{ height: 500, overflowX: 'auto', overflowY: 'auto' }}>
           <TableWrapper>
             <Table {...getTableProps()} stickyHeader>
               <TableHead>
                 {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                   <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                     {headerGroup.headers.map((column: HeaderGroup) => {
-                      if (column.id === 'id' && !isReceivedPaymentIdVisible) {
+                      if (
+                        (column.id === 'id' && !isReceivedPaymentIdVisible) ||
+                        (column.id === '12' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                      ) {
                         return null;
                       }
                       return (
-                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                        <TableCell
+                          sx={{ position: 'sticky !important' }}
+                          {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
+                        >
                           <HeaderSort column={column} />
                         </TableCell>
                       );
@@ -213,6 +232,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
               <TableBody {...getTableBodyProps()}>
                 {page.map((row: Row, i: number) => {
                   prepareRow(row);
+                  const rowProps = row.getRowProps();
 
                   return (
                     <Fragment key={i}>
@@ -224,14 +244,22 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
                         {row.cells.map((cell: Cell) => {
-                          if (cell.column.id === 'id' && !isReceivedPaymentIdVisible) {
+                          if (
+                            (cell.column.id === 'id' && !isReceivedPaymentIdVisible) ||
+                            (cell.column.id === '12' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                          ) {
                             return null;
                           }
+
                           return (
                             <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                           );
                         })}
                       </TableRow>
+                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
                     </Fragment>
                   );
                 })}
@@ -239,7 +267,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
             </Table>
           </TableWrapper>
         </ScrollX>
-        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 2 }}>
+        <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
           <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
         </Box>
       </Stack>
@@ -247,28 +275,24 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn }: 
   );
 }
 
-// ==============================|| RECEIVED PAYMENT - LIST ||============================== //
+// ==============================|| Received Payment - LIST ||============================== //
 
-const List = () => {
+const ReceivedPaymentListPage = () => {
   const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [receivedPayment, setReceivedPayment] = useState<any>(null);
-  const [add, setAdd] = useState<boolean>(false);
-  const [receivedPayments, setReceivePayments] = useState<IReceivedPayment[]>([]);
   const [receivedPaymentDeleteName, setReceivedPaymentDeleteName] = useState<any>('');
-  const [receivedPAymentDeleteId, setReceivedPaymentDeleteId] = useState<string>('');
+  const [setReceivedPaymentDeleteId, setReceivedPaymentsDeleteId] = useState<string>('');
+  const [receivedPayments, setReceivedPayments] = useState<IReceivedPayment[]>([]);
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [loading, setLoading] = useState(true);
-  const companyId: string = String(config.companyId);
-  const handleSwitchChange = () => {
-    setShowIdColumn(!showIdColumn);
-  };
+  const [add, setAdd] = useState<boolean>(false);
 
   useEffect(() => {
-    getAllReceivePayments(companyId)
+    getAllReceivedPayments('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((receivedPaymentList) => {
         if (Array.isArray(receivedPaymentList)) {
-          setReceivePayments(receivedPaymentList);
+          setReceivedPayments(receivedPaymentList);
           setLoading(false);
         }
       })
@@ -276,9 +300,9 @@ const List = () => {
         console.error('Error fetching data:', error);
         setLoading(false);
       });
-  }, [companyId]);
+  }, []);
 
-  const memoizedReceivedPayments = useMemo(() => receivedPayments, [receivedPayments]);
+  const memoizedReceivedPayment = useMemo(() => receivedPayments, [receivedPayments]);
 
   const handleAdd = () => {
     setAdd(!add);
@@ -288,13 +312,14 @@ const List = () => {
   const handleClose = () => {
     setOpen(!open);
   };
+  const handleSwitchChange = () => {
+    setShowIdColumn(!showIdColumn);
+  };
 
   const columns = useMemo(
     () => [
       {
         title: 'Row Selection',
-        width: 10,
-        sticky: 'left',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
           <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
@@ -303,23 +328,18 @@ const List = () => {
         disableSortBy: true
       },
       {
-        Header: 'Payments Received id',
-        accessor: 'id',
-        width: -200,
-        sticky: 'left'
+        Header: 'ReceivedPayment id',
+        accessor: 'id'
       },
       {
         Header: 'Create Date',
-        accessor: 'receivedDate',
-        sticky: 'left',
+        accessor: 'createdOnUtc',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>,
         disableFilters: true
       },
       {
         Header: 'Customer Name',
         accessor: 'customerName',
-        width: 200,
-        sticky: 'left',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
@@ -331,21 +351,15 @@ const List = () => {
       },
       {
         Header: 'Amount',
-        accessor: 'amount',
-        width: 200,
-        sticky: 'left'
+        accessor: 'amount'
       },
       {
         Header: 'Description',
-        accessor: 'description',
-        width: 200,
-        sticky: 'left'
+        accessor: 'description'
       },
       {
         Header: 'Actions',
-        className: 'cell-left',
-        width: 200,
-        sticky: 'left',
+        className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -354,50 +368,76 @@ const List = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-              <Tooltip title="View">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    row.toggleRowExpanded();
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setReceivedPayment(row.values);
-                    handleAdd();
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setReceivedPaymentDeleteName(row.values.customerName);
-                    setReceivedPaymentDeleteId(row.values.id);
-                    setOpen(true);
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0}>
+              <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={0}>
+                <Tooltip title="View">
+                  <IconButton
+                    color="secondary"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      row.toggleRowExpanded();
+                    }}
+                  >
+                    {collapseIcon}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Edit">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      setReceivedPayment(row.values);
+                      handleAdd();
+                    }}
+                  >
+                    <EditTwoTone twoToneColor={theme.palette.primary.main} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete">
+                  <IconButton
+                    color="error"
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      handleClose();
+                      setReceivedPaymentDeleteName(row.values.customerName);
+                      setReceivedPaymentsDeleteId(row.values.id);
+                    }}
+                  >
+                    <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
             </Stack>
           );
         }
+      },
+      //shreyas: need to change as per accessor name
+      {
+        Header: 'Created On',
+        accessor: '12',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Created By',
+        accessor: 'createdBy'
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy'
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
+  );
+
+  const renderRowSubComponent = useCallback(
+    ({ row }: { row: Row<{}> }) => <ReceivedPaymentView data={memoizedReceivedPayment[Number(row.id)]} />,
+    [memoizedReceivedPayment]
   );
 
   return (
@@ -413,8 +453,9 @@ const List = () => {
         <ScrollX>
           <ReactTable
             columns={columns}
-            data={memoizedReceivedPayments}
+            data={memoizedReceivedPayment}
             handleAdd={handleAdd}
+            renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
@@ -422,8 +463,8 @@ const List = () => {
         </ScrollX>
       )}
 
-      <AlertReceivedPaymentDelete title={receivedPaymentDeleteName} open={open} handleClose={handleClose} id={receivedPAymentDeleteId} />
-
+      <AlertreceivedPaymentDelete title={receivedPaymentDeleteName} open={open} handleClose={handleClose} id={setReceivedPaymentDeleteId} />
+      {/* add receivedPayment dialog */}
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -432,9 +473,11 @@ const List = () => {
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
-      ></Dialog>
+      >
+        {/* <ReceivePayment receivedpayment={receivedPayments} onCancel={handleAdd} /> */}
+      </Dialog>
     </MainCard>
   );
 };
 
-export default List;
+export default ReceivedPaymentListPage;
