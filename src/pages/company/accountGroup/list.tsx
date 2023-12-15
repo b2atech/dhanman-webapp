@@ -123,7 +123,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
       filterTypes,
       initialState: {
         pageIndex: 0,
-        pageSize: 10,
+        pageSize: 1000,
         hiddenColumns: ['isMainGroup'],
         sortBy: [sortBy]
       }
@@ -205,62 +205,60 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
           </Stack>
         </Stack>
         <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
-            <TableWrapper>
-              <Table {...getTableProps()} stickyHeader>
-                <TableHead>
-                  {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                      {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (
-                          (column.id === 'id' && !isAccountGroupIdVisible) ||
-                          (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                          (column.id === 'createdBy' && !isAuditSwitchOn)
-                        ) {
-                          return null;
-                        }
-                        return (
-                          <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
-                            <HeaderSort column={column} />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHead>
-                <TableBody {...getTableBodyProps()}>
-                  {page.map((row: Row, i: number) => {
-                    prepareRow(row);
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (
+                        (column.id === 'id' && !isAccountGroupIdVisible) ||
+                        (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'createdBy' && !isAuditSwitchOn)
+                      ) {
+                        return null;
+                      }
+                      return (
+                        <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
 
-                    return (
-                      <Fragment key={i}>
-                        <TableRow
-                          {...row.getRowProps()}
-                          onClick={() => {
-                            row.toggleRowSelected();
-                          }}
-                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                        >
-                          {row.cells.map((cell: Cell) => {
-                            if (
-                              (cell.column.id === 'id' && !isAccountGroupIdVisible) ||
-                              (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                              (cell.column.id === 'createdBy' && !isAuditSwitchOn)
-                            ) {
-                              return null;
-                            }
-                            return (
-                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      </Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableWrapper>
-          </ScrollX>
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          if (
+                            (cell.column.id === 'id' && !isAccountGroupIdVisible) ||
+                            (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn)
+                          ) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableWrapper>
           <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
             <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
           </Box>
@@ -341,7 +339,7 @@ const AccountGroups = () => {
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Typography variant="subtitle1">
                 {' '}
-                <span style={{ whiteSpace: 'nowrap' }}>{values.name}</span>
+                <span style={{ whiteSpace: 'pre-wrap' }}>{values.name}</span>
               </Typography>
             </Stack>
           );
