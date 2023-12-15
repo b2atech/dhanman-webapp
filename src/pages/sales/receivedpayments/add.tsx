@@ -31,38 +31,38 @@ import { Column, useTable, HeaderGroup, Cell, CellProps } from 'react-table';
 // project imports
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { createPaidPaymentRequest, getAllBills, getAllVendors } from 'api/services/BillService';
-//import AlertpaidPaymentDelete from './deleteAlert';
+import { createReceivedPaymentRequest, getAllInvoices, getAllCustomers } from 'api/services/SalesService';
+//import AlertreceivedPaymentDelete from './deleteAlert';
 import MainCard from 'components/MainCard';
-import { IBill } from 'types/bill';
+import { IInvoice } from 'types/invoice';
 
 // constant
-const getInitialValues = (paidPayment: FormikValues | null) => {
-  const newPaidPayment = {
-    vendornames: '',
-    clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    vendorId: '',
-    vendorName: '',
+const getInitialValues = (receivedPayment: FormikValues | null) => {
+  const newReceivedPayment = {
+    customernames: '',
+    companyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    customerId: '',
+    customerName: '',
     transactionId: '',
     coaId: '',
     description: '',
     amount: ''
   };
 
-  return newPaidPayment;
+  return newReceivedPayment;
 };
 
-// ==============================|| Paid Payment ADD / EDIT ||============================== //
+// ==============================|| Received Payment ADD / EDIT ||============================== //
 
 export interface Props {
-  paidpayment?: any;
+  receivedpayment?: any;
   onCancel: () => void;
 }
 const moment = require('moment');
 
-const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
-  const PaidPaymentSchema = Yup.object().shape({
-    vendorName: Yup.string().max(255).required('Please Enter vendor Name'),
+const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
+  const ReceivedPaymentSchema = Yup.object().shape({
+    customerName: Yup.string().max(255).required('Please Enter customer Name'),
     amount: Yup.string()
       .matches(/^\d+(\.\d{0,2})?$/, 'Use only two decimal places')
       .required('Please Enter Amount'),
@@ -77,25 +77,25 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   };
 
   const formik = useFormik({
-    initialValues: getInitialValues(paidpayment!),
-    validationSchema: PaidPaymentSchema,
+    initialValues: getInitialValues(receivedpayment!),
+    validationSchema: ReceivedPaymentSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const piadPaymentData = {
-          clientId: values.clientId,
-          vendorId: values.vendorId,
-          vendorName: values.vendorName,
+        const receivedPaymentData = {
+          companyId: values.companyId,
+          customerId: values.customerId,
+          customerName: values.customerName,
           transactionId: values.transactionId,
           coaId: values.coaId,
           description: values.description,
           amount: values.amount,
           paymentMode: paymentMode
         };
-        if (paidpayment) {
+        if (receivedpayment) {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Paid Payment updated successfully.',
+              message: 'Received Payment updated successfully.',
               anchorOrigin: { vertical: 'top', horizontal: 'right' },
               variant: 'alert',
               alert: {
@@ -105,12 +105,12 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
             })
           );
         } else {
-          const response = await createPaidPaymentRequest(piadPaymentData);
+          const response = await createReceivedPaymentRequest(receivedPaymentData);
           if (response === 200) {
             dispatch(
               openSnackbar({
                 open: true,
-                message: 'Paid Payment added successfully.',
+                message: 'Received Payment added successfully.',
                 anchorOrigin: { vertical: 'top', horizontal: 'right' },
                 variant: 'alert',
                 alert: {
@@ -130,7 +130,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
       }
     }
   });
-  // const isCreating = !paidpayment;
+  // const isCreating = !receivedpayment;
   const {
     errors,
     touched,
@@ -139,23 +139,23 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
     getFieldProps,
     handleChange
   } = formik;
-  const [vendornames, setVendorNames] = useState<any>();
+  const [customernames, setCustomerNames] = useState<any>();
   const [paymentMode, setPaymentMode] = useState('');
   const [paymentThrough, setPaymentThrough] = useState('');
-  const [selectedVendorId, setSelectedVendorId] = useState();
-  const [bills, setBills] = useState<IBill[]>();
+  const [selectedCustomerId, setSelectedCustomerId] = useState();
+  const [invoices, setInvoices] = useState<IInvoice[]>();
   const [totalAmount, setTotalAmount] = useState<number>(0);
   //const placeholder
 
   useEffect(() => {
-    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((vendorList) => {
-        if (Array.isArray(vendorList)) {
-          const vendorData = vendorList.map((vendor) => ({
-            id: vendor.id,
-            name: `${vendor.firstName} ${vendor.lastName}`
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((customerList) => {
+        if (Array.isArray(customerList)) {
+          const customerData = customerList.map((customer) => ({
+            id: customer.id,
+            name: `${customer.firstName} ${customer.lastName}`
           }));
-          setVendorNames(vendorData);
+          setCustomerNames(customerData);
         }
       })
       .catch((error) => {
@@ -164,36 +164,36 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (selectedVendorId && selectedVendorId !== '') {
-      getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-        .then((billList) => {
-          if (Array.isArray(billList)) {
-            var list = billList.filter(
-              (e) => e.vendorId === selectedVendorId && (e.billStatus === 'Approved' || e.billStatus === 'Partially Paid')
+    if (selectedCustomerId && selectedCustomerId !== '') {
+      getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+        .then((invoiceList) => {
+          if (Array.isArray(invoiceList)) {
+            var list = invoiceList.filter(
+              (e) => e.customerId === selectedCustomerId && (e.invoiceStatus === 'Approved' || e.invoiceStatus === 'Partially Received')
             );
-            setBills(list);
+            setInvoices(list);
             const total = list.reduce((acc, current) => acc + current.amount, 0);
             setTotalAmount(total);
           } else {
-            console.error('API response is not an array:', billList);
+            console.error('API response is not an array:', invoiceList);
           }
         })
         .catch((error) => {
-          console.error('Error fetching bill data:', error);
+          console.error('Error fetching invoice data:', error);
         });
     }
-  }, [selectedVendorId]);
+  }, [selectedCustomerId]);
 
   const columns = useMemo(
     () => [
       {
-        Header: 'Bill NO.',
-        accessor: 'billNumber',
+        Header: 'Invoice NO.',
+        accessor: 'invoiceNumber',
         className: 'cell-center'
       },
       {
-        Header: 'Bill Date',
-        accessor: 'billDate',
+        Header: 'Invoice Date',
+        accessor: 'invoiceDate',
         className: 'cell-center',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
@@ -206,7 +206,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
       {
         Header: 'Status',
         className: 'cell-center',
-        accessor: 'billStatus',
+        accessor: 'invoiceStatus',
         Cell: ({ value }: { value: string }) => {
           switch (value) {
             case 'Draft':
@@ -215,10 +215,10 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
               return <Chip color="default" label="Pending Approval" size="medium" variant="light" />;
             case 'Approved':
               return <Chip color="primary" label="Approved" size="medium" variant="light" />;
-            case 'Partially Paid':
-              return <Chip color="info" label="Partially Paid" size="medium" variant="light" />;
-            case 'Paid':
-              return <Chip color="success" label="Paid" size="medium" variant="light" />;
+            case 'Partially Received':
+              return <Chip color="info" label="Partially Received" size="medium" variant="light" />;
+            case 'Received':
+              return <Chip color="success" label="Received" size="medium" variant="light" />;
             case 'Rejected':
               return <Chip color="error" label="Rejected" size="medium" variant="light" />;
             case 'Cancelled':
@@ -245,24 +245,24 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
             <MainCard>
               <Grid container spacing={1} direction="column">
                 <Grid item xs={12}>
-                  <InputLabel sx={{ mb: 1 }}>Vendor Name</InputLabel>
-                  <FormControl sx={{ width: '100%' }} error={Boolean(touched.vendornames && errors.vendornames)}>
-                    {vendornames && vendornames.length > 0 ? (
+                  <InputLabel sx={{ mb: 1 }}>Customer Name</InputLabel>
+                  <FormControl sx={{ width: '100%' }} error={Boolean(touched.customernames && errors.customernames)}>
+                    {customernames && customernames.length > 0 ? (
                       <Autocomplete
                         id="controllable-states-demo"
-                        options={(vendornames || []) as any[]}
+                        options={(customernames || []) as any[]}
                         getOptionLabel={(option: any) => `${option.name}`}
                         onChange={(event, newValue) => {
                           if (newValue.id) {
-                            setSelectedVendorId(newValue.id);
+                            setSelectedCustomerId(newValue.id);
                           }
-                          handleChange({ target: { name: 'vendorName', value: newValue ? newValue.name : '' } });
+                          handleChange({ target: { name: 'customerName', value: newValue ? newValue.name : '' } });
                         }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            error={Boolean(touched.vendornames && errors.vendornames)}
-                            helperText={touched.vendornames && errors.vendornames ? errors.vendornames : ''}
+                            error={Boolean(touched.customernames && errors.customernames)}
+                            helperText={touched.customernames && errors.customernames ? errors.customernames : ''}
                           />
                         )}
                       />
@@ -271,7 +271,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         <CircularProgress size={30} thickness={4} />
                         <Grid flexDirection={'column'}>
                           <Typography variant="body1" style={{ marginTop: '32x' }}>
-                            Loading Vendor Names,
+                            Loading Customer Names,
                           </Typography>
                           <Typography variant="body1" style={{ marginTop: '32x' }}>
                             Please Wait...!
@@ -356,8 +356,8 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
             </MainCard>
           </Grid>
           <Grid item xs={12}>
-            <MainCard content={false} title="Bills">
-              <ReactTable columns={columns} data={bills ?? []} striped={true} />
+            <MainCard content={false} title="Invoices">
+              <ReactTable columns={columns} data={invoices ?? []} striped={true} />
             </MainCard>
           </Grid>
           <Grid item xs={12}>
@@ -373,7 +373,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                             Grand Total :
                           </Typography>
                           <Typography variant="subtitle1" paddingLeft={5}>
-                            {bills?.reduce((acc, current) => acc + current.amount, 0)}
+                            {invoices?.reduce((acc, current) => acc + current.amount, 0)}
                           </Typography>
                         </Stack>
                       </Stack>
@@ -384,7 +384,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                           Cancel
                         </Button>
                         <Button variant="contained" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>
-                          Pay Bill's
+                          Pay Invoice's
                         </Button>
                       </Stack>
                     </Grid>
@@ -399,11 +399,11 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   );
 };
 
-export default AddPaidPayment;
+export default AddReceivedPayment;
 
 // ==============================|| REACT TABLE ||============================== //
 
-function ReactTable({ columns, data, striped }: { columns: Column[]; data: IBill[]; striped?: boolean }) {
+function ReactTable({ columns, data, striped }: { columns: Column[]; data: IInvoice[]; striped?: boolean }) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
     columns,
     data

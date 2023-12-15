@@ -132,8 +132,8 @@ const master: NavItemType = {
           icon: icons.ProfileOutlined
         },
         {
-          id: 'makepayment',
-          title: <FormattedMessage id="makepayment" />,
+          id: 'receivepayment',
+          title: <FormattedMessage id="receivepayment" />,
           type: 'item',
           url: '/sales/payments/add',
           icon: icons.PlusSquareOutlined
@@ -202,6 +202,35 @@ const master: NavItemType = {
           type: 'item',
           url: '/inventory/products/create',
           icon: icons.PlusSquareOutlined
+        }
+      ]
+    },
+    {
+      id: 'reports',
+      title: <FormattedMessage id="reports" />,
+      type: 'collapse',
+      icon: icons.PlusSquareOutlined,
+      children: [
+        {
+          id: 'inventoryreports',
+          title: (
+            <>
+              <FormattedMessage id="inventoryreports" />
+            </>
+          ),
+          type: 'collapse',
+          children: [
+            {
+              id: 'closingstock',
+              title: (
+                <>
+                  <FormattedMessage id="closingstock" />
+                </>
+              ),
+              type: 'item',
+              url: '/reports/inventoryreports/closingstock'
+            }
+          ]
         }
       ]
     },

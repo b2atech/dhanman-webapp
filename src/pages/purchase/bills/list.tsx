@@ -65,11 +65,13 @@ import {
 } from 'components/third-party/ReactTable';
 
 import { GlobalFilter, renderFilterTypes, DateColumnFilter } from 'utils/react-table';
-import { IBill } from 'types/bill';
+import { IBill, IUpdateBillStatus } from 'types/bill';
 import { alpha, useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
 import { Link } from 'react-router-dom';
-import { getAllBills } from 'api/services/BillService';
+import { getAllBills, updateBillStatusRequest } from 'api/services/BillService';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
 
 const moment = require('moment');
 interface BillWidgets {
@@ -161,7 +163,27 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
-  const groups = ['All', ...new Set(data.map((item: IBill) => item.billStatus))];
+  // =============================================== Tab ================================================================
+
+  const selectedBillRowIds: string[] = [];
+  const groups = [{ id: 0, status: 'All' }];
+  const uniqueStatusSet = new Set();
+  const [selectedBillIDs, setSelectedBillIds] = useState<any>();
+  const [isBillIdVisible, setIsBillIdVisible] = useState(false);
+  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+
+  for (const item of data) {
+    if (!uniqueStatusSet.has(item.billStatusId)) {
+      groups.push({
+        id: item.billStatusId,
+        status: item.billStatus
+      });
+      uniqueStatusSet.add(item.billStatusId);
+    }
+  }
+  groups.sort((a, b) => a.id - b.id);
+
   const countGroup = data.map((item: IBill) => item.billStatus);
   const counts = countGroup.reduce(
     (acc: any, value: any) => ({
@@ -170,10 +192,6 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     }),
     {}
   );
-  const [isBillIdVisible, setIsBillIdVisible] = useState(false);
-  const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const handleUpdateStatus = async (newStatus: string) => {};
-  const [selectedStatus, setSelectedStatus] = useState<string>('All');
 
   const handleSwitchChange = () => {
     setIsBillIdVisible((prevIsBillIdVisible) => !prevIsBillIdVisible);
@@ -183,6 +201,32 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
+  const updateBillStatus = async (stausId: number) => {
+    const updateBillStatusData: IUpdateBillStatus = {
+      billIds: selectedBillIDs,
+      billStatusId: stausId
+    };
+    try {
+      await updateBillStatusRequest(updateBillStatusData);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Bill Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
   const updateStatusButtons = () => {
     const buttons: React.ReactNode[] = [];
     const selectedBillStatus = selectedStatus;
@@ -190,7 +234,13 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     switch (selectedBillStatus) {
       case 'Draft':
         buttons.push(
-          <Button key="sendForApproval" variant="contained" color="primary" onClick={() => handleUpdateStatus('Pending Approval')}>
+          <Button
+            key="sendForApproval"
+            variant="contained"
+            color="primary"
+            onClick={() => updateBillStatus(2)}
+            style={{ marginRight: '300px' }}
+          >
             Send for Approval
           </Button>
         );
@@ -198,10 +248,10 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
       case 'Pending Approval':
         buttons.push(
           <>
-            <Button key="reject" variant="contained" color="error" style={{ marginRight: '8px' }}>
+            <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateBillStatus(6)}>
               Reject
             </Button>
-            <Button key="approve" variant="contained" color="success">
+            <Button key="approve" variant="contained" color="primary" onClick={() => updateBillStatus(3)} style={{ marginRight: '300px' }}>
               Approve
             </Button>
           </>
@@ -211,20 +261,12 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
         buttons.push(
           <>
             <Button
-              key="sendForPartiallyPaid"
-              variant="contained"
-              color="secondary"
-              style={{ marginRight: '8px' }}
-              onClick={() => handleUpdateStatus('Partially Paid')}
-            >
-              Send for Partially Paid
-            </Button>
-            <Button
               key="payNow"
               variant="contained"
-              color="success"
+              color="primary"
+              style={{ marginRight: '300px' }}
               onClick={() => {
-                navigation('/purchase/payments/list');
+                navigation('/purchase/payments/add');
               }}
             >
               Pay Now
@@ -235,11 +277,13 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
       case 'Partially Paid':
         buttons.push(
           <Button
-            key="payNow"
+            key="paid"
             variant="contained"
-            color="info"
-            onClick={() => {
-              navigation('/purchase/payments/');
+            color="primary"
+            style={{ marginRight: '300px' }}
+            onClick={(e: any) => {
+              e.stopPropagation();
+              navigation('/purchase/payments/add');
             }}
           >
             Pay Now
@@ -264,24 +308,24 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           onChange={(e: ChangeEvent<{}>, value: string) => setSelectedStatus(value)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          {groups.map((billStatus: string, index: number) => (
+          {groups.map(({ id, status }) => (
             <Tab
-              key={index}
-              label={billStatus}
-              value={billStatus}
+              key={id}
+              label={status}
+              value={status}
               icon={
                 <Chip
-                  label={billStatus === 'All' ? data.length : counts[billStatus]}
+                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
                   color={
-                    billStatus === 'All'
+                    status === 'All'
                       ? 'primary'
-                      : billStatus === 'Draft' || billStatus === 'Pending Approval'
+                      : status === 'Draft' || status === 'Pending Approval'
                       ? 'info'
-                      : billStatus === 'Approved ' || billStatus === 'Partially' || billStatus === 'Paid'
+                      : status === 'Approved' || status === 'Partially' || status === 'Paid'
                       ? 'success'
-                      : billStatus === 'Rejected'
+                      : status === 'Rejected'
                       ? 'error'
-                      : billStatus === 'Cancelled'
+                      : status === 'Cancelled'
                       ? 'warning'
                       : 'error'
                   }
@@ -303,10 +347,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
             size="medium"
           />
         </Stack>
-        <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={matchDownSM ? 1 : 0}>
-          <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-          <TableRowSelection selected={Object.keys(selectedRowIds).length} />
-          {updateStatusButtons()}
+        <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="right" justifyContent="right" spacing={matchDownSM ? 1 : 2}>
           {headerGroups.map((group: HeaderGroup<{}>, index: number) => (
             <Stack direction={matchDownSM ? 'column' : 'row'} spacing={1} {...group.getHeaderGroupProps()}>
               {group.headers.map((column: HeaderGroup<{}>) => (
@@ -314,25 +355,30 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
               ))}
             </Stack>
           ))}
-          <CSVExport data={data} filename={'Bill-list.csv'} />
-          <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
-            <FormControlLabel
-              value=""
-              control={<Switch color="success" checked={isBillIdVisible} onChange={handleSwitchChange} />}
-              label=""
-              labelPlacement="start"
-              sx={{ margin: '0', padding: '0', marginRight: 0 }}
-            />
-          </Tooltip>
-          <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
-            <FormControlLabel
-              value=""
-              control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
-              label=""
-              labelPlacement="start"
-              sx={{ margin: '0', padding: '0', marginRight: 0 }}
-            />
-          </Tooltip>
+          <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
+            {updateStatusButtons()}
+            <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <TableRowSelection selected={Object.keys(selectedRowIds).length} />
+            <CSVExport data={data} filename={'invoice-list.csv'} />
+            <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
+              <FormControlLabel
+                value=""
+                control={<Switch color="success" checked={isBillIdVisible} onChange={handleSwitchChange} />}
+                label=""
+                labelPlacement="start"
+                sx={{ margin: '0', padding: '0', marginRight: 0 }}
+              />
+            </Tooltip>
+            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
+              <FormControlLabel
+                value=""
+                control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
+                label=""
+                labelPlacement="start"
+                sx={{ margin: '0', padding: '0', marginRight: 0 }}
+              />
+            </Tooltip>
+          </Stack>
         </Stack>
       </Stack>
       <Box ref={componentRef}>
@@ -353,8 +399,11 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
                         return null;
                       }
                       return (
-                        <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
-                          <HeaderSort column={column} />
+                        <TableCell
+                          sx={{ position: 'sticky !important' }}
+                          {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}
+                        >
+                          <HeaderSort column={column} sort />
                         </TableCell>
                       );
                     })}
@@ -370,6 +419,17 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
                         {...row.getRowProps()}
                         onClick={() => {
                           row.toggleRowSelected();
+                          setTimeout(() => {
+                            if (row.isSelected) {
+                              selectedBillRowIds.push(row.values.id);
+                            } else {
+                              const index = selectedBillRowIds.indexOf(row.id);
+                              if (index !== -1) {
+                                selectedBillRowIds.splice(index, 1);
+                              }
+                            }
+                            setSelectedBillIds(selectedBillRowIds);
+                          }, 0);
                         }}
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                       >
@@ -501,16 +561,16 @@ const Bills = () => {
                 return <Chip color="primary" label="Draft" size="small" variant="light" />;
               case 'Pending Approval':
                 return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
-              case 'Approved ':
-                return <Chip color="success" label="Approved" size="small" variant="light" />;
+              case 'Approved':
+                return <Chip color="success" label="Approval" size="small" variant="light" />;
               case 'Partially Paid':
                 return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
+              case 'Paid':
+                return <Chip color="success" label="Paid" size="small" variant="light" />;
               case 'Rejected':
                 return <Chip color="error" label="Rejected" size="small" variant="light" />;
               case 'Cancelled':
                 return <Chip color="error" label="Cancelled" size="small" variant="light" />;
-              case 'Paid':
-                return <Chip color="success" label="Paid" size="small" variant="light" />;
               default:
                 return <Chip color="warning" label={value} size="small" variant="light" />;
             }

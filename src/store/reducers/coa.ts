@@ -174,7 +174,6 @@ const slice = createSlice({
         'a551e319-06ac-4e99-a572-cc967dd2157e',
         'add54892-c39a-4e23-afe3-a80534a93367',
         'b4e793d2-c504-4a2e-abe7-78c20c4a9a2f',
-        'ff067859-adc8-4868-97bc-a1547ebf4c6f',
         '2076dffb-6d0e-4676-be49-51341466c348',
         '8be62def-c416-4901-bb0a-e4a21e58eeb8',
         '96489d72-a86b-477f-a5ee-290764cfa484',
