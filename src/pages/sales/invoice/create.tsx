@@ -1,4 +1,4 @@
-import { Button, Grid, Stack } from '@mui/material';
+import { Button, Grid, Stack, Tooltip } from '@mui/material';
 
 import MainCard from 'components/MainCard';
 
@@ -49,6 +49,10 @@ import { openDrawer } from 'store/reducers/menu';
 import { getCompanyDetail } from 'api/services/CommonService';
 import Loader from 'components/Loader';
 
+// assets
+import { DeleteOutlined } from '@ant-design/icons';
+import AlertProductDelete from '../../../sections/apps/invoice/AlertProductDelete';
+
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
   invoiceNumber: yup.string().required('Invoice number is required'),
@@ -91,12 +95,20 @@ const Createinvoice = () => {
   const notesLimit: number = 500;
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
-  const [showGSTRates, setShowGSTRates] = useState(true);
-  const [discountFees, setDiscountFees] = useState(true);
+  const [showGSTRates, setShowGSTRates] = useState(false);
+  const [discountFees, setDiscountFees] = useState(false);
   //const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
   const [loading, setLoading] = useState<boolean>(true);
   const [company, setCompany] = useState<any>();
+  const [funcToDelete, setfuncToDelete] = useState<any>();
+  const [itemUnderDeletion, setItemUnderDeletion] = useState<number>();
+
+  const handelDeleteItem = (func: any, index: number) => {
+    setfuncToDelete(() => func);
+    setItemUnderDeletion(index);
+    setOpenDelete(true);
+  };
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -156,6 +168,26 @@ const Createinvoice = () => {
       );
       navigation('/sales/invoices/list');
     });
+  };
+
+  const [openDelete, setOpenDelete] = useState(false);
+  const handleModalClose = (status: boolean) => {
+    setOpenDelete(false);
+    if (status) {
+      funcToDelete(itemUnderDeletion);
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'invoicve item deleted successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    }
   };
 
   const productId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
@@ -244,7 +276,9 @@ const Createinvoice = () => {
               sRt: 0,
               sgstAmount: 0,
               iRt: 0,
-              igstAmount: 0
+              igstAmount: 0,
+              rateVisibility: showGSTRates,
+              discountFeesVisibility: discountFees
             }
           ],
           discount: 0,
@@ -551,7 +585,7 @@ const Createinvoice = () => {
                                 <TableHead>
                                   <TableRow>
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      No
+                                      #
                                     </TableCell>
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                       So No
@@ -565,7 +599,7 @@ const Createinvoice = () => {
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                       Description
                                     </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    <TableCell align="center" sx={{ padding: '2px 0px', width: '20px' }} width={20}>
                                       Qty
                                     </TableCell>
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
@@ -581,6 +615,9 @@ const Createinvoice = () => {
                                         </TableCell>
                                       </>
                                     )}
+                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                      Taxable Amt
+                                    </TableCell>
                                     {showGSTRates && (
                                       <>
                                         <TableCell align="center" sx={{ padding: '2px 0px' }}>
@@ -612,20 +649,27 @@ const Createinvoice = () => {
                                       IGST Amt
                                     </TableCell>
                                     <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Taxable Amt
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                       Total Amt
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Action
                                     </TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
                                   {values.invoice_detail?.map((item: any, index: number) => (
                                     <TableRow key={item.id}>
-                                      <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
+                                      <TableCell>
+                                        <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+                                          {values.invoice_detail.indexOf(item) + 1}
+                                          <Tooltip title="Remove Item">
+                                            <Button
+                                              sx={{ minWidth: 10 }}
+                                              color="error"
+                                              onClick={() => handelDeleteItem((index: number) => remove(index), index)}
+                                            >
+                                              <DeleteOutlined />
+                                            </Button>
+                                          </Tooltip>
+                                        </Stack>
+                                      </TableCell>
                                       <InvoiceItem
                                         key={item.id}
                                         id={item.id}
@@ -642,6 +686,8 @@ const Createinvoice = () => {
                                         cgst={item.cgst}
                                         sgst={item.sgst}
                                         igst={item.igst}
+                                        ratesVisibility={showGSTRates}
+                                        discountFeesVisibility={discountFees}
                                         onDeleteItem={(index: number) => remove(index)}
                                         onEditItem={handleChange}
                                         Blur={handleBlur}
@@ -672,8 +718,8 @@ const Createinvoice = () => {
                                         id: UIDV4(),
                                         name: '',
                                         description: '',
-                                        quantity: 1,
-                                        price: '1.00'
+                                        quantity: 0,
+                                        price: 0
                                       })
                                     }
                                     variant="dashed"
@@ -804,6 +850,7 @@ const Createinvoice = () => {
           );
         }}
       </Formik>
+      <AlertProductDelete title="Item" open={openDelete} handleClose={handleModalClose} />
     </MainCard>
   );
 };
