@@ -27,7 +27,6 @@ const BillItem = ({
   price,
   fees,
   discount,
-  taxableAmount,
   cgst,
   sgst,
   igst,
@@ -81,7 +80,7 @@ const BillItem = ({
       placeholder: 'Purchase Order',
       label: 'poNo',
       name: `bill_detail.${index}.poNo`,
-      type: 'number',
+      type: '',
       id: id,
       value: poNo
     },
@@ -91,7 +90,9 @@ const BillItem = ({
       name: `bill_detail.${index}.poDate`,
       type: 'date',
       id: id,
-      value: poDate
+      value: poDate,
+      style: { width: '140px' },
+      sx: { width: '100%' }
     },
     {
       placeholder: 'Item name',
@@ -107,7 +108,8 @@ const BillItem = ({
         label: product.productName,
         value: product.productName
       })),
-      selectOnChange: handleNameChange
+      selectOnChange: handleNameChange,
+      style: { width: '135px' }
     },
     {
       placeholder: 'Description',
@@ -115,24 +117,42 @@ const BillItem = ({
       name: `bill_detail.${index}.description`,
       type: 'text',
       id: id,
-      value: description
+      value: description,
+      style: { width: '200px' }
     },
-    { placeholder: 'Qty', label: 'Qty', type: 'number', name: `bill_detail.${index}.quantity`, id: id, value: qty },
-    { placeholder: 'price', label: 'price', type: 'number', name: `bill_detail.${index}.price`, id: id, value: price },
+    {
+      placeholder: 'Qty',
+      label: 'Qty',
+      type: 'number',
+      name: `bill_detail.${index}.quantity`,
+      id: id,
+      value: qty,
+      style: { width: '70px' }
+    },
+    { placeholder: 'price', label: 'price', type: '', name: `bill_detail.${index}.price`, id: id, value: price },
     { placeholder: 'Fees', label: 'Fees', type: 'number', name: `bill_detail.${index}.fees`, id: id, value: fees },
-    { placeholder: 'Discount', label: 'Discount', type: 'number', name: `bill_detail.${index}.discount`, id: id, value: discount },
+    {
+      placeholder: 'Discount',
+      label: 'Discount',
+      type: 'number',
+      name: `bill_detail.${index}.discount`,
+      id: id,
+      value: discount,
+      style: { width: '70px' }
+    },
     {
       placeholder: 'CGST Rate',
       label: 'CGST Rate',
-      type: 'number',
+      type: '',
       name: `bill_detail.${index}.cgstRate`,
       id: id,
-      value: cgst
+      value: cgst,
+      style: { width: '50px' }
     },
     {
       placeholder: 'CGST Amount',
       label: 'CGST Amount',
-      type: 'number',
+      type: '',
       name: `bill_detail.${index}.cgstAmount`,
       id: id,
       value: (cgst / 100) * price
@@ -140,15 +160,16 @@ const BillItem = ({
     {
       placeholder: 'SGST Rate',
       label: 'SGST Rate',
-      type: 'number',
+      type: '',
       name: `bill_detail.${index}.sgstRate`,
       id: id,
-      value: sgst
+      value: sgst,
+      style: { width: '50px' }
     },
     {
       placeholder: 'SGST Amount',
       label: 'SGST Amount',
-      type: 'number',
+      type: '',
       name: `bill_detail.${index}.sgstAmount`,
       id: id,
       value: (sgst / 100) * price
@@ -156,15 +177,16 @@ const BillItem = ({
     {
       placeholder: 'IGST Rate',
       label: 'IGST Rate',
-      type: 'number',
+      type: '',
       name: `bill_detail.${index}.igstRate`,
       id: id,
-      value: igst
+      value: igst,
+      style: { width: '50px' }
     },
     {
       placeholder: 'IGST Amount',
       label: 'IGST Amount',
-      type: 'number',
+      type: '',
       name: `bill_detail.${index}.igstAmount`,
       id: id,
       value: (igst / 100) * price
@@ -187,14 +209,18 @@ const BillItem = ({
             touched: item.touched,
             select: item.select,
             selectOptions: item.selectOptions,
-            selectOnChange: item.selectOnChange
+            selectOnChange: item.selectOnChange,
+            sx: item.sx,
+            style: { ...item.style, textAlign: 'center' }
           }}
           key={item.label}
+          style={{ marginBottom: 0 }}
         />
       ))}
 
+      {/* Taxable Amount Calculation */}
       <TableCell>
-        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={1}>
           <Box sx={{ pr: 2, pl: 2 }}>
             <Typography>
               {country?.prefix + '' + (qty && price ? (price * qty - (discount / 100) * price * qty).toFixed(2) : '0.00')}
@@ -202,8 +228,10 @@ const BillItem = ({
           </Box>
         </Stack>
       </TableCell>
+
+      {/* Total Amount Calculation */}
       <TableCell>
-        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={1}>
           <Box sx={{ pr: 2, pl: 2 }}>
             <Typography>
               {country?.prefix +
