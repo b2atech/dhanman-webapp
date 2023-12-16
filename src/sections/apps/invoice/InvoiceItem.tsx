@@ -90,7 +90,9 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.soDate`,
       type: 'date',
       id: id,
-      value: soDate
+      value: soDate,
+      style: { width: '140px' },
+      sx: { width: '100%' }
     },
     {
       placeholder: 'Item name',
@@ -102,6 +104,7 @@ const InvoiceItem = ({
       errors: errorName,
       touched: touchedName,
       select: true,
+      style: { width: '135px' },
       selectOptions: products.map((product: any) => ({
         label: product.productName,
         value: product.productName
@@ -114,9 +117,18 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.description`,
       type: 'text',
       id: id,
-      value: description
+      value: description,
+      style: { width: '200px' }
     },
-    { placeholder: '', label: 'Qty', type: 'number', name: `invoice_detail.${index}.quantity`, id: id, value: qty },
+    {
+      placeholder: 'Qty',
+      label: 'Qty',
+      type: 'number',
+      name: `invoice_detail.${index}.quantity`,
+      id: id,
+      value: qty,
+      style: { width: '70px' }
+    },
     { placeholder: '', label: 'price', type: 'number', name: `invoice_detail.${index}.price`, id: id, value: price },
     {
       placeholder: 'Fees',
@@ -132,15 +144,17 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.discount`,
       type: 'number',
       id: id,
-      value: discount
+      value: discount,
+      style: { width: '70px' }
     },
     {
-      placeholder: 'CGSTRate',
+      placeholder: 'CgstRate',
       label: 'Cgst Rt',
       name: `invoice_detail.${index}.cgst`,
-      type: 'number',
+      type: '',
       id: id,
-      value: cgst
+      value: cgst,
+      style: { width: '50px' }
     },
     {
       placeholder: 'CgstAmount',
@@ -151,12 +165,13 @@ const InvoiceItem = ({
       value: (cgst / 100) * price
     },
     {
-      placeholder: 'SGSTRate',
+      placeholder: 'SgstRate',
       label: 'Sgst Rt',
       name: `invoice_detail.${index}.sgst`,
-      type: 'number',
+      type: '',
       id: id,
-      value: sgst
+      value: sgst,
+      style: { width: '50px' }
     },
     {
       placeholder: 'SgstAmount',
@@ -167,12 +182,13 @@ const InvoiceItem = ({
       value: (sgst / 100) * price
     },
     {
-      placeholder: 'IGSTRate',
+      placeholder: 'IgstRate',
       label: 'Igst Rt',
       name: `invoice_detail.${index}.igst`,
-      type: 'number',
+      type: '',
       id: id,
-      value: igst
+      value: igst,
+      style: { width: '50px' }
     },
     {
       placeholder: 'IgstAmount',
@@ -201,9 +217,12 @@ const InvoiceItem = ({
               touched: item.touched,
               select: item.select,
               selectOptions: item.selectOptions,
-              selectOnChange: item.selectOnChange
+              selectOnChange: item.selectOnChange,
+              sx: item.sx,
+              style: { ...item.style, textAlign: 'center' }
             }}
             key={item.label}
+            style={{ marginBottom: 0 }}
           />
         );
       })}
