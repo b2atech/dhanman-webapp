@@ -98,7 +98,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'orderSequence', desc: false };
   const navigation = useNavigate();
   const {
     getTableProps,
@@ -124,7 +124,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
       initialState: {
         pageIndex: 0,
         pageSize: 1000,
-        hiddenColumns: ['isMainGroup'],
+        hiddenColumns: ['isMainGroup', 'orderSequence', 'level'],
         sortBy: [sortBy]
       }
     },
@@ -214,7 +214,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
                       if (
                         (column.id === 'id' && !isAccountGroupIdVisible) ||
                         (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                        (column.id === 'createdBy' && !isAuditSwitchOn)
+                        (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedBy' && !isAuditSwitchOn)
                       ) {
                         return null;
                       }
@@ -244,7 +246,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
                           if (
                             (cell.column.id === 'id' && !isAccountGroupIdVisible) ||
                             (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                            (cell.column.id === 'createdBy' && !isAuditSwitchOn)
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
                           ) {
                             return null;
                           }
@@ -324,7 +328,7 @@ const AccountGroups = () => {
       {
         Header: 'ID',
         accessor: 'id',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
       },
       {
         Header: 'Account Code',
@@ -354,8 +358,20 @@ const AccountGroups = () => {
         accessor: 'topGroupCode'
       },
       {
+        Header: 'Parent Group Code',
+        accessor: 'parentGroupCode'
+      },
+      {
         Header: 'Schedule',
         accessor: 'schedule'
+      },
+      {
+        Header: 'Order Sequence',
+        accessor: 'orderSequence'
+      },
+      {
+        Header: 'Level',
+        accessor: 'level'
       },
       {
         Header: 'Actions',
@@ -406,14 +422,25 @@ const AccountGroups = () => {
         accessor: 'isMainGroup'
       },
       {
-        Header: 'Created By',
-        accessor: 'createdBy',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
-      },
-      {
         Header: 'Created On',
         accessor: 'createdOnUtc',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+
+      {
+        Header: 'Created By',
+        accessor: 'createdBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
