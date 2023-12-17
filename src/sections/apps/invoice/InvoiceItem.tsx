@@ -157,7 +157,7 @@ const InvoiceItem = ({
       style: { width: '50px' }
     },
     {
-      placeholder: 'CgstAmount',
+      placeholder: 'Cgst Amount',
       label: 'Cgst Amount',
       name: `invoice_detail.${index}.CgstAmount`,
       type: 'number',
@@ -174,7 +174,7 @@ const InvoiceItem = ({
       style: { width: '50px' }
     },
     {
-      placeholder: 'SgstAmount',
+      placeholder: 'Sgst Amount',
       label: 'Sgst Amount',
       name: `invoice_detail.${index}.SgstAmount`,
       type: 'number',
@@ -191,7 +191,7 @@ const InvoiceItem = ({
       style: { width: '50px' }
     },
     {
-      placeholder: 'IgstAmount',
+      placeholder: 'Igst Amount',
       label: 'Igst Amount',
       name: `invoice_detail.${index}.IgstAmount`,
       type: 'number',

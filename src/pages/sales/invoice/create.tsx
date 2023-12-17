@@ -296,507 +296,513 @@ const Createinvoice = () => {
           values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
-              <Grid container>
-                <Grid container justifyContent="flex-end" alignItems="flex-end">
-                  <Grid item xs={6} sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
-                    <InputLabel sx={{ color: 'grey' }}>Status : {defaultStatus}</InputLabel>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={5} md={2}>
+                  <Stack spacing={1}>
+                    <InputLabel>Invoice No.</InputLabel>
+                    <FormControl sx={{ width: '100%' }}>
+                      <TextField
+                        name="invoiceNumber"
+                        id="invoiceNumber"
+                        value={values.invoiceNumber}
+                        onChange={handleChange}
+                        inputProps={{
+                          maxLength: 16
+                        }}
+                      />
+                    </FormControl>
+                  </Stack>
+                  {touched.invoiceNumber && errors.invoiceNumber && (
+                    <FormHelperText error={true}>{errors.invoiceNumber as string}</FormHelperText>
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={5} md={2}>
+                  <Stack spacing={1}>
+                    <InputLabel>Date</InputLabel>
+                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.invoiceDate && errors.invoiceDate)}>
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                          format="dd/MM/yyyy"
+                          value={values.invoiceDate}
+                          onChange={(newValue) => setFieldValue('invoiceDate', newValue)}
+                        />
+                      </LocalizationProvider>
+                    </FormControl>
+                  </Stack>
+                  {touched.invoiceDate && errors.invoiceDate && (
+                    <FormHelperText error={true}>{errors.invoiceDate as string}</FormHelperText>
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={5} md={2}>
+                  <Stack spacing={1}>
+                    <InputLabel>Due Date</InputLabel>
+                    <FormControl sx={{ width: '100%' }} error={Boolean(touched.due_date && errors.due_date)}>
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                          format="dd/MM/yyyy"
+                          value={values.due_date}
+                          onChange={(newValue) => setFieldValue('due_date', newValue)}
+                        />
+                      </LocalizationProvider>
+                    </FormControl>
+                  </Stack>
+                  {touched.due_date && errors.due_date && <FormHelperText error={true}>{errors.due_date as string}</FormHelperText>}
+                </Grid>
+                <Grid item xs={12} sm={5} md={4}>
+                  <Stack spacing={1}>
+                    <InputLabel>Set Currency*</InputLabel>
+                    <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
+                      <Autocomplete
+                        id="country-select-demo"
+                        fullWidth
+                        options={countries}
+                        defaultValue={countries[2]}
+                        value={countries.find((option: CountryType) => option.code === country?.code)}
+                        onChange={(event, value) => {
+                          dispatch(
+                            selectCountry({
+                              country: value
+                            })
+                          );
+                        }}
+                        autoHighlight
+                        getOptionLabel={(option) => option.label}
+                        renderOption={(props, option) => (
+                          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                            {option.code && (
+                              <img loading="lazy" width="20" src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`} alt="flag" />
+                            )}
+                            {option.label}
+                          </Box>
+                        )}
+                        renderInput={(params) => {
+                          const selected = countries.find((option: CountryType) => option.code === country?.code);
+                          return (
+                            <TextField
+                              {...params}
+                              name="phoneCode"
+                              placeholder="Select"
+                              InputProps={{
+                                ...params.InputProps,
+                                startAdornment: (
+                                  <>
+                                    {selected && selected.code !== '' && (
+                                      <img
+                                        style={{ marginRight: 6 }}
+                                        loading="lazy"
+                                        width="20"
+                                        src={`https://flagcdn.com/w20/${selected.code.toLowerCase()}.png`}
+                                        alt="flag"
+                                      />
+                                    )}
+                                  </>
+                                )
+                              }}
+                              inputProps={{
+                                ...params.inputProps,
+                                autoComplete: 'new-password' // disable autocomplete and autofill
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </FormControl>
+                  </Stack>
+                </Grid>
+                <Grid item xs={12} sm={5} md={2}>
+                  <Grid container justifyContent="flex-end">
+                    <Stack spacing={1}>
+                      <InputLabel sx={{ color: 'grey' }}>Status : {defaultStatus}</InputLabel>
+                    </Stack>
                   </Grid>
                 </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Stack spacing={1}>
-                      <InputLabel>Invoice No.</InputLabel>
-                      <FormControl sx={{ width: '100%' }}>
-                        <TextField
-                          name="invoiceNumber"
-                          id="invoiceNumber"
-                          value={values.invoiceNumber}
-                          onChange={handleChange}
-                          inputProps={{
-                            maxLength: 16
-                          }}
-                        />
-                      </FormControl>
-                    </Stack>
-                    {touched.invoiceNumber && errors.invoiceNumber && (
-                      <FormHelperText error={true}>{errors.invoiceNumber as string}</FormHelperText>
-                    )}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Stack spacing={1}>
-                      <InputLabel>Date</InputLabel>
-                      <FormControl sx={{ width: '100%' }} error={Boolean(touched.invoiceDate && errors.invoiceDate)}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DatePicker
-                            format="dd/MM/yyyy"
-                            value={values.invoiceDate}
-                            onChange={(newValue) => setFieldValue('invoiceDate', newValue)}
-                          />
-                        </LocalizationProvider>
-                      </FormControl>
-                    </Stack>
-                    {touched.invoiceDate && errors.invoiceDate && (
-                      <FormHelperText error={true}>{errors.invoiceDate as string}</FormHelperText>
-                    )}
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Stack spacing={1}>
-                      <InputLabel>Due Date</InputLabel>
-                      <FormControl sx={{ width: '100%' }} error={Boolean(touched.due_date && errors.due_date)}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DatePicker
-                            format="dd/MM/yyyy"
-                            value={values.due_date}
-                            onChange={(newValue) => setFieldValue('due_date', newValue)}
-                          />
-                        </LocalizationProvider>
-                      </FormControl>
-                    </Stack>
-                    {touched.due_date && errors.due_date && <FormHelperText error={true}>{errors.due_date as string}</FormHelperText>}
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <MainCard sx={{ minHeight: 150 }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={8}>
-                          <Stack spacing={2}>
-                            <Typography variant="h5">From:</Typography>
-                            {loading ? (
-                              <Loader />
-                            ) : (
-                              <Stack sx={{ width: '100%' }}>
-                                <Typography variant="subtitle1">{company?.name || ''}</Typography>
-                                <Typography color="secondary">{company?.email || ''}</Typography>
-                                <Typography color="secondary">{`${company?.addressLine || ''} \u00A0 \u00A0 ${
-                                  company?.phoneNumber || ''
-                                }`}</Typography>
-                                <Typography color="secondary">{company?.gstIn || ''}</Typography>
-                              </Stack>
-                            )}
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
-                            <VendorAddressModel
-                              open={open}
-                              setOpen={(value) =>
-                                dispatch(
-                                  toggleCustomerPopup({
-                                    open: value
-                                  })
-                                )
-                              }
-                              handlerVendorAddress={(address) => setFieldValue('vendorInfo', address)}
-                            />
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </MainCard>
-                  </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <MainCard sx={{ minHeight: 168 }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={8}>
-                          <Stack spacing={2}>
-                            <Typography variant="h5">To:</Typography>
+                <Grid item xs={12} sm={6}>
+                  <MainCard sx={{ minHeight: 150 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={8}>
+                        <Stack spacing={2}>
+                          <Typography variant="h5">From:</Typography>
+                          {loading ? (
+                            <Loader />
+                          ) : (
                             <Stack sx={{ width: '100%' }}>
-                              <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
-                              <Typography color="secondary">{values?.customerInfo?.city}</Typography>
-                              <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
-                              <Typography color="secondary">{values?.customerInfo?.email}</Typography>
-                              <Typography color="secondary">{values?.customerInfo?.gstIn}</Typography>
+                              <Typography variant="subtitle1">{company?.name || ''}</Typography>
+                              <Typography color="secondary">{company?.email || ''}</Typography>
+                              <Typography color="secondary">{`${company?.addressLine || ''} \u00A0 \u00A0 ${
+                                company?.phoneNumber || ''
+                              }`}</Typography>
+                              <Typography color="secondary">{company?.gstIn || ''}</Typography>
                             </Stack>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                          <Box textAlign="right" color="grey.200">
-                            <Button
-                              size="small"
-                              startIcon={<PlusOutlined />}
-                              color="secondary"
-                              variant="outlined"
-                              onClick={() =>
-                                dispatch(
-                                  customerPopup({
-                                    isCustomerOpen: true
-                                  })
-                                )
-                              }
-                            >
-                              Select
-                            </Button>
-                            <AddressModal
-                              open={isCustomerOpen}
-                              setOpen={(value) =>
-                                dispatch(
-                                  customerPopup({
-                                    isCustomerOpen: value
-                                  })
-                                )
-                              }
-                              handlerAddress={(value) => setFieldValue('customerInfo', value)}
-                            />
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </MainCard>
-                    {touched.customerInfo && errors.customerInfo && (
-                      <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
-                    )}
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={1}>
-                      <InputLabel>Set Currency*</InputLabel>
-                      <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
-                        <Autocomplete
-                          id="country-select-demo"
-                          fullWidth
-                          options={countries}
-                          defaultValue={countries[2]}
-                          value={countries.find((option: CountryType) => option.code === country?.code)}
-                          onChange={(event, value) => {
-                            dispatch(
-                              selectCountry({
-                                country: value
-                              })
-                            );
-                          }}
-                          autoHighlight
-                          getOptionLabel={(option) => option.label}
-                          renderOption={(props, option) => (
-                            <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                              {option.code && (
-                                <img
-                                  loading="lazy"
-                                  width="20"
-                                  src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                                  alt="flag"
-                                />
-                              )}
-                              {option.label}
-                            </Box>
                           )}
-                          renderInput={(params) => {
-                            const selected = countries.find((option: CountryType) => option.code === country?.code);
-                            return (
-                              <TextField
-                                {...params}
-                                name="phoneCode"
-                                placeholder="Select"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  startAdornment: (
-                                    <>
-                                      {selected && selected.code !== '' && (
-                                        <img
-                                          style={{ marginRight: 6 }}
-                                          loading="lazy"
-                                          width="20"
-                                          src={`https://flagcdn.com/w20/${selected.code.toLowerCase()}.png`}
-                                          alt="flag"
-                                        />
-                                      )}
-                                    </>
-                                  )
-                                }}
-                                inputProps={{
-                                  ...params.inputProps,
-                                  autoComplete: 'new-password' // disable autocomplete and autofill
-                                }}
-                              />
-                            );
-                          }}
-                        />
-                      </FormControl>
-                    </Stack>
-                  </Grid>
+                        </Stack>
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Box textAlign={{ xs: 'left', sm: 'right' }} color="grey.200">
+                          <VendorAddressModel
+                            open={open}
+                            setOpen={(value) =>
+                              dispatch(
+                                toggleCustomerPopup({
+                                  open: value
+                                })
+                              )
+                            }
+                            handlerVendorAddress={(address) => setFieldValue('vendorInfo', address)}
+                          />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </MainCard>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <MainCard sx={{ minHeight: 168 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={8}>
+                        <Stack spacing={2}>
+                          <Typography variant="h5">To:</Typography>
+                          <Stack sx={{ width: '100%' }}>
+                            <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.city}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.email}</Typography>
+                            <Typography color="secondary">{values?.customerInfo?.gstIn}</Typography>
+                          </Stack>
+                        </Stack>
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Box textAlign="right" color="grey.200">
+                          <Button
+                            size="small"
+                            startIcon={<PlusOutlined />}
+                            color="secondary"
+                            variant="outlined"
+                            onClick={() =>
+                              dispatch(
+                                customerPopup({
+                                  isCustomerOpen: true
+                                })
+                              )
+                            }
+                          >
+                            Select
+                          </Button>
+                          <AddressModal
+                            open={isCustomerOpen}
+                            setOpen={(value) =>
+                              dispatch(
+                                customerPopup({
+                                  isCustomerOpen: value
+                                })
+                              )
+                            }
+                            handlerAddress={(value) => setFieldValue('customerInfo', value)}
+                          />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </MainCard>
+                  {touched.customerInfo && errors.customerInfo && (
+                    <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={12}>
                   <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={6}>
-                      <Typography variant="h5">
+                    <Grid item xs={6} style={{ paddingRight: '0px', paddingLeft: '15px' }}>
+                      <Typography variant="h5" style={{ margin: '0', padding: '15px 0' }}>
                         Detail <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
                       </Typography>
                     </Grid>
-                    <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
-                      <FormControlLabel
-                        control={<Switch checked={showGSTRates} onChange={() => setShowGSTRates(!showGSTRates)} name="showGSTRates" />}
-                        label="GST Rates"
-                      />
-                      <FormControlLabel
-                        control={<Switch checked={discountFees} onChange={() => setDiscountFees(!discountFees)} name="discountFees" />}
-                        label="Discount/Fees"
-                      />
-                      {/* <Tooltip title="Default GSt Rates">
+                    <Grid item xs={6} container justifyContent="flex-end" alignItems="center" style={{ paddingLeft: '5px' }}>
+                      <Grid item style={{ marginLeft: 'auto' }}>
                         <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={defaultGSTRates}
-                              onChange={() => setDefaultGSTRates(defaultGSTRates)} // Update the state with the new value
-                              name="defaultGSTRates"
-                            />
-                          }
-                          label=""
+                          control={<Switch checked={showGSTRates} onChange={() => setShowGSTRates(!showGSTRates)} name="showGSTRates" />}
+                          label="GST Rates"
+                          style={{ margin: '0' }}
                         />
-                      </Tooltip> */}
+                      </Grid>
+                      <Grid item style={{ marginLeft: '5px' }}>
+                        <FormControlLabel
+                          control={<Switch checked={discountFees} onChange={() => setDiscountFees(!discountFees)} name="discountFees" />}
+                          label="Discount/Fees"
+                          style={{ margin: '0' }}
+                        />
+                      </Grid>
+                      {/* <Grid item style={{ marginLeft: '5px' }}>
+                        <Tooltip title="Default GSt Rates">
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={defaultGSTRates}
+                                onChange={() => setDefaultGSTRates(defaultGSTRates)} // Update the state with the new value
+                                name="defaultGSTRates"
+                              />
+                            }
+                            label=""
+                          />
+                        </Tooltip>
+                      </Grid> */}
                     </Grid>
                   </Grid>
+                </Grid>
 
-                  <Grid item xs={12}>
-                    <FieldArray
-                      name="invoice_detail"
-                      render={({ remove, push }) => {
-                        return (
-                          <>
-                            <TableContainer>
-                              <Table sx={{ minWidth: 650 }}>
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      No
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      So No
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      So Date
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Name
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Description
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Qty
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Price
-                                    </TableCell>
-                                    {discountFees && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          Fees
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          Discount (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    {showGSTRates && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          CGST (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      CGST Amt
-                                    </TableCell>
-                                    {showGSTRates && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          SGST (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      SGST Amt
-                                    </TableCell>
-                                    {showGSTRates && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          IGST (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      IGST Amt
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Taxable Amt
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Total Amt
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Action
-                                    </TableCell>
+                <Grid item xs={12}>
+                  <FieldArray
+                    name="invoice_detail"
+                    render={({ remove, push }) => {
+                      return (
+                        <>
+                          <TableContainer>
+                            <Table sx={{ minWidth: 650 }}>
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    No
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    So No
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    So Date
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    Name
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    Description
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    Qty
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    Price
+                                  </TableCell>
+                                  {discountFees && (
+                                    <>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        Fees
+                                      </TableCell>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        Discount (%)
+                                      </TableCell>
+                                    </>
+                                  )}
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        CGST (%)
+                                      </TableCell>
+                                    </>
+                                  )}
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    CGST Amt
+                                  </TableCell>
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        SGST (%)
+                                      </TableCell>
+                                    </>
+                                  )}
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    SGST Amt
+                                  </TableCell>
+                                  {showGSTRates && (
+                                    <>
+                                      <TableCell align="center" sx={{ padding: '0px 0px' }}>
+                                        IGST (%)
+                                      </TableCell>
+                                    </>
+                                  )}
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    IGST Amt
+                                  </TableCell>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    Taxable
+                                  </TableCell>
+                                  <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                    Total Amt
+                                  </TableCell>
+                                  <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                    Action
+                                  </TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {values.invoice_detail?.map((item: any, index: number) => (
+                                  <TableRow key={item.id}>
+                                    <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
+                                    <InvoiceItem
+                                      key={item.id}
+                                      id={item.id}
+                                      index={index}
+                                      soNo={item.soNo}
+                                      soDate={item.soDate}
+                                      name={item.name}
+                                      description={item.description}
+                                      qty={item.quantity}
+                                      price={item.price}
+                                      fees={item.fees}
+                                      discount={item.discount}
+                                      taxableAmount={item.taxableAmount}
+                                      cgst={item.cgst}
+                                      sgst={item.sgst}
+                                      igst={item.igst}
+                                      onDeleteItem={(index: number) => remove(index)}
+                                      onEditItem={handleChange}
+                                      Blur={handleBlur}
+                                      errors={errors}
+                                      touched={touched}
+                                      products={products}
+                                      setFieldValue={setFieldValue}
+                                    />
                                   </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {values.invoice_detail?.map((item: any, index: number) => (
-                                    <TableRow key={item.id}>
-                                      <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
-                                      <InvoiceItem
-                                        key={item.id}
-                                        id={item.id}
-                                        index={index}
-                                        soNo={item.soNo}
-                                        soDate={item.soDate}
-                                        name={item.name}
-                                        description={item.description}
-                                        qty={item.quantity}
-                                        price={item.price}
-                                        fees={item.fees}
-                                        discount={item.discount}
-                                        taxableAmount={item.taxableAmount}
-                                        cgst={item.cgst}
-                                        sgst={item.sgst}
-                                        igst={item.igst}
-                                        onDeleteItem={(index: number) => remove(index)}
-                                        onEditItem={handleChange}
-                                        Blur={handleBlur}
-                                        errors={errors}
-                                        touched={touched}
-                                        products={products}
-                                        setFieldValue={setFieldValue}
-                                      />
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
-                            <Divider />
-                            {touched.invoice_detail && errors.invoice_detail && !Array.isArray(errors?.invoice_detail) && (
-                              <Stack direction="row" justifyContent="center" sx={{ p: 1.5 }}>
-                                <FormHelperText error={true}>{errors.invoice_detail as string}</FormHelperText>
-                              </Stack>
-                            )}
-                            <Grid container justifyContent="space-between">
-                              <Grid item xs={12} md={8}>
-                                <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
-                                  <Button
-                                    color="primary"
-                                    startIcon={<PlusOutlined />}
-                                    onClick={() =>
-                                      push({
-                                        id: UIDV4(),
-                                        name: '',
-                                        description: '',
-                                        quantity: 1,
-                                        price: '1.00'
-                                      })
-                                    }
-                                    variant="dashed"
-                                    sx={{ bgcolor: 'transparent !important' }}
-                                  >
-                                    Add Item
-                                  </Button>
-                                </Box>
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                <Grid item xs={12}>
-                                  <Stack spacing={2} sx={{ marginTop: 3 }}>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                                      <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
-                                      <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
-                                      <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
-                                      <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>Fees:</Typography>
-                                      <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>Discount:</Typography>
-                                      <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography variant="subtitle1">Grand Total:</Typography>
-                                      <Typography variant="subtitle1">
-                                        {grandAmount % 1 === 0
-                                          ? country?.prefix + '' + grandAmount
-                                          : country?.prefix + '' + grandAmount.toFixed(2)}
-                                      </Typography>
-                                    </Stack>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                          <Divider />
+                          {touched.invoice_detail && errors.invoice_detail && !Array.isArray(errors?.invoice_detail) && (
+                            <Stack direction="row" justifyContent="center" sx={{ p: 1.5 }}>
+                              <FormHelperText error={true}>{errors.invoice_detail as string}</FormHelperText>
+                            </Stack>
+                          )}
+                          <Grid container justifyContent="space-between">
+                            <Grid item xs={12} md={8}>
+                              <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
+                                <Button
+                                  color="primary"
+                                  startIcon={<PlusOutlined />}
+                                  onClick={() =>
+                                    push({
+                                      id: UIDV4(),
+                                      name: '',
+                                      description: '',
+                                      quantity: 1,
+                                      price: '1.00'
+                                    })
+                                  }
+                                  variant="dashed"
+                                  sx={{ bgcolor: 'transparent !important' }}
+                                >
+                                  Add Item
+                                </Button>
+                              </Box>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                              <Grid item xs={12}>
+                                <Stack spacing={2} sx={{ marginTop: 3 }}>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
+                                    <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
                                   </Stack>
-                                </Grid>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                                    <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
+                                    <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                                    <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>Fees:</Typography>
+                                    <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>Discount:</Typography>
+                                    <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
+                                  </Stack>
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography variant="subtitle1">Grand Total:</Typography>
+                                    <Typography variant="subtitle1">
+                                      {grandAmount % 1 === 0
+                                        ? country?.prefix + '' + grandAmount
+                                        : country?.prefix + '' + grandAmount.toFixed(2)}
+                                    </Typography>
+                                  </Stack>
+                                </Stack>
                               </Grid>
                             </Grid>
-                          </>
-                        );
+                          </Grid>
+                        </>
+                      );
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Stack spacing={1}>
+                    <InputLabel>Notes</InputLabel>
+                    <TextField
+                      placeholder="Address"
+                      rows={3}
+                      value={values.note}
+                      multiline
+                      name="note"
+                      onChange={handleChange}
+                      inputProps={{
+                        maxLength: notesLimit
+                      }}
+                      helperText={`${values.note.length} / ${notesLimit}`}
+                      sx={{
+                        width: '100%',
+                        '& .MuiFormHelperText-root': {
+                          mr: 0,
+                          display: 'flex',
+                          justifyContent: 'flex-end'
+                        }
                       }}
                     />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Stack spacing={1}>
-                      <InputLabel>Notes</InputLabel>
-                      <TextField
-                        placeholder="Address"
-                        rows={3}
-                        value={values.note}
-                        multiline
-                        name="note"
-                        onChange={handleChange}
-                        inputProps={{
-                          maxLength: notesLimit
+                  </Stack>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container justifyContent="flex-end" alignItems="flex-end">
+                    <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ color: 'secondary.dark' }}
+                        onClick={() =>
+                          dispatch(
+                            reviewInvoicePopup({
+                              isOpen: true
+                            })
+                          )
+                        }
+                      >
+                        Preview
+                      </Button>
+                      <Button variant="outlined" color="secondary" sx={{ color: 'secondary.dark' }}>
+                        Save
+                      </Button>
+                      <Button color="primary" variant="contained" type="submit">
+                        Create & Send
+                      </Button>
+                      <InvoiceModal
+                        isOpen={isOpen}
+                        setIsOpen={(value: any) =>
+                          dispatch(
+                            reviewInvoicePopup({
+                              isOpen: value
+                            })
+                          )
+                        }
+                        key={values.invoiceNumber}
+                        invoiceInfo={{
+                          ...values,
+                          subtotal,
+                          taxRate,
+                          discountRate,
+                          grandAmount
                         }}
-                        helperText={`${values.note.length} / ${notesLimit}`}
-                        sx={{
-                          width: '100%',
-                          '& .MuiFormHelperText-root': {
-                            mr: 0,
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                          }
-                        }}
+                        items={values?.invoice_detail}
+                        onAddNextInvoice={addNextInvoiceHandler}
                       />
                     </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container justifyContent="flex-end" alignItems="flex-end">
-                      <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          sx={{ color: 'secondary.dark' }}
-                          onClick={() =>
-                            dispatch(
-                              reviewInvoicePopup({
-                                isOpen: true
-                              })
-                            )
-                          }
-                        >
-                          Preview
-                        </Button>
-                        <Button variant="outlined" color="secondary" sx={{ color: 'secondary.dark' }}>
-                          Save
-                        </Button>
-                        <Button color="primary" variant="contained" type="submit">
-                          Create & Send
-                        </Button>
-                        <InvoiceModal
-                          isOpen={isOpen}
-                          setIsOpen={(value: any) =>
-                            dispatch(
-                              reviewInvoicePopup({
-                                isOpen: value
-                              })
-                            )
-                          }
-                          key={values.invoiceNumber}
-                          invoiceInfo={{
-                            ...values,
-                            subtotal,
-                            taxRate,
-                            discountRate,
-                            grandAmount
-                          }}
-                          items={values?.invoice_detail}
-                          onAddNextInvoice={addNextInvoiceHandler}
-                        />
-                      </Stack>
-                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
