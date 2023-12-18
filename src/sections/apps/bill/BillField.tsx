@@ -1,10 +1,12 @@
 import { MenuItem, Select, TableCell, TextField } from '@mui/material';
+import '../../../components/css/b2astyles.css';
 
 // ==============================|| Bill - TEXT FIELD ||============================== //
 
-const BillField = ({ onEditItem, cellData, showGSTRates }: any) => {
+const BillField = ({ onEditItem, cellData }: any) => {
   return (
     <TableCell
+      className={' ' + (cellData.visibility === false ? 'hide-tablecell' : '')}
       sx={{
         '& .MuiFormHelperText-root': { position: 'absolute', bottom: -24, ml: 0 },
         minWidth: 100,
