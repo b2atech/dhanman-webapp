@@ -1,5 +1,5 @@
 import { MenuItem, Select, TableCell, TextField } from '@mui/material';
-import '../../../components/css/b2asty';
+import '../../../components/css/b2astyles.css';
 
 // ==============================|| Bill - TEXT FIELD ||============================== //
 
