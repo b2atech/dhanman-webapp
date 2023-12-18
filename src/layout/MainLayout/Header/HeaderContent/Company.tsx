@@ -19,7 +19,7 @@ const Company = () => {
   const [selectedCompanyId, setSelectedCompanyId] = useState('');
   const { onChangeClient } = useConfig();
 
-  const handleListItemClick = (clientId: String) => {
+  const handleListItemClick = (clientId: string) => {
     onChangeClient(clientId);
   };
 

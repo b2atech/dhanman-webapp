@@ -1,4 +1,4 @@
-import { Button, Grid, Stack } from '@mui/material';
+import { Button, Grid, Stack, Tooltip } from '@mui/material';
 
 import MainCard from 'components/MainCard';
 
@@ -19,8 +19,8 @@ import {
   TableBody,
   Table,
   Divider
-  // Tooltip,
   // Checkbox
+  //Tooltip
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -35,12 +35,12 @@ import { v4 as UIDV4 } from 'uuid';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
 import { openDrawer } from 'store/reducers/menu';
+//import BillModal from 'sections/apps/bill/BillModal';
 //import useConfig from 'hooks/useConfig';
 
 // third party
 import * as yup from 'yup';
 import { format } from 'date-fns';
-
 import { FieldArray, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router';
 import { BillHeader_main, BillLine } from 'types/billiingDetails';
@@ -52,6 +52,10 @@ import { getCompanyDetail } from 'api/services/CommonService';
 import Loader from 'components/Loader';
 // import { CheckBox } from '@mui/icons-material';
 // import BillModal from 'sections/apps/bill/BillModal';
+
+//assets
+import { DeleteOutlined } from '@ant-design/icons';
+import AlertProductDelete from '../../../sections/apps/bill/AlertProductDelete';
 
 const validationSchema = yup.object({
   id: yup.string().required('Bill ID is required'),
@@ -101,6 +105,14 @@ const CreateBill = () => {
   const [defaultStatus, setDefaultStatus] = useState();
   const [loading, setLoading] = useState<boolean>(true);
   const [company, setCompany] = useState<any>();
+  const [funcToDelete, setfuncToDelete] = useState<any>();
+  const [itemUnderDeletion, setItemUnderDeletion] = useState<number>();
+
+  const handelDeleteItem = (func: any, index: number) => {
+    setfuncToDelete(() => func);
+    setItemUnderDeletion(index);
+    setOpenDelete(true);
+  };
 
   useEffect(() => {
     getCompanyDetail('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -112,6 +124,26 @@ const CreateBill = () => {
         console.error('Error fetching data:', error);
       });
   }, []);
+
+  const [openDelete, setOpenDelete] = useState(false);
+  const handleModalClose = (status: boolean) => {
+    setOpenDelete(false);
+    if (status) {
+      funcToDelete(itemUnderDeletion);
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'invoicve item deleted successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    }
+  };
 
   useEffect(() => {
     getAllProducts('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -244,7 +276,9 @@ const CreateBill = () => {
               sgst: 0,
               SGSTAmount: 0,
               igst: 0,
-              IGSTAmount: 0
+              IGSTAmount: 0,
+              rateVisibility: showGSTRates,
+              discountFeesVisibility: discountFees
             }
           ],
           discount: 0,
@@ -308,7 +342,13 @@ const CreateBill = () => {
                     <Stack spacing={1}>
                       <InputLabel>Bill No.</InputLabel>
                       <FormControl sx={{ width: '100%' }}>
-                        <TextField name="billNumber" id="billNumber" value={values.billNumber} onChange={handleChange} />
+                        <TextField
+                          name="billNumber"
+                          id="billNumber"
+                          value={values.billNumber}
+                          onChange={handleChange}
+                          inputProps={{ maxLength: 16 }}
+                        />
                       </FormControl>
                     </Stack>
                     {touched.billNumber && errors.billNumber && <FormHelperText error={true}>{errors.billNumber as string}</FormHelperText>}
@@ -411,7 +451,7 @@ const CreateBill = () => {
                                 )
                               }
                             >
-                              Add
+                              Select
                             </Button>
                             <AddressBillModal
                               open={isCustomerOpen}
@@ -506,7 +546,7 @@ const CreateBill = () => {
                         Detail <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
                       </Typography>
                     </Grid>
-                    <Grid item xs={6} textAlign="right">
+                    <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
                       <FormControlLabel
                         control={<Switch checked={showGSTRates} onChange={() => setShowGSTRates(!showGSTRates)} name="showGSTRates" />}
                         label="GST Rates"
@@ -537,11 +577,11 @@ const CreateBill = () => {
                         return (
                           <>
                             <TableContainer>
-                              <Table sx={{ minWidth: 600 }}>
+                              <Table sx={{ minWidth: 650 }}>
                                 <TableHead>
                                   <TableRow>
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      No
+                                      #
                                     </TableCell>
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                       PO No
@@ -555,7 +595,7 @@ const CreateBill = () => {
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                       Description
                                     </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    <TableCell align="center" sx={{ padding: '2px 0px', width: '20px' }} width={20}>
                                       Qty
                                     </TableCell>
                                     <TableCell align="center" sx={{ padding: '2px 0px' }}>
@@ -571,6 +611,9 @@ const CreateBill = () => {
                                         </TableCell>
                                       </>
                                     )}
+                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                      Taxable Amt
+                                    </TableCell>
                                     {showGSTRates && (
                                       <>
                                         <TableCell align="center" sx={{ padding: '2px 0px' }}>
@@ -605,21 +648,28 @@ const CreateBill = () => {
                                       IGST Amt
                                     </TableCell>
 
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Taxable Amt
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                       Total Amt
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Action
                                     </TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
                                   {values.bill_detail?.map((item: any, index: number) => (
                                     <TableRow key={item.id}>
-                                      <TableCell>{values.bill_detail.indexOf(item) + 1}</TableCell>
+                                      <TableCell>
+                                        <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+                                          {values.bill_detail.indexOf(item) + 1}
+                                          <Tooltip title="Remove Item">
+                                            <Button
+                                              sx={{ minWidth: 10 }}
+                                              color="error"
+                                              onClick={() => handelDeleteItem((index: number) => remove(index), index)}
+                                            >
+                                              <DeleteOutlined />
+                                            </Button>
+                                          </Tooltip>
+                                        </Stack>
+                                      </TableCell>
                                       <BillItem
                                         key={item.id}
                                         id={item.id}
@@ -636,12 +686,10 @@ const CreateBill = () => {
                                         cgst={item.cgst}
                                         sgst={item.sgst}
                                         igst={item.igst}
-                                        CGSTAmount={item.CGSTAmount}
-                                        SGSTAmount={item.SGSTAmount}
-                                        IGSTAmount={item.IGSTAmount}
+                                        ratesVisibility={showGSTRates}
+                                        discountFeesVisibility={discountFees}
                                         onDeleteItem={(index: number) => remove(index)}
                                         onEditItem={handleChange}
-                                        showGSTRates={showGSTRates}
                                         Blur={handleBlur}
                                         errors={errors}
                                         touched={touched}
@@ -671,15 +719,7 @@ const CreateBill = () => {
                                         name: '',
                                         description: '',
                                         quantity: 0,
-                                        price: 0,
-                                        fees: 0,
-                                        discount: 0,
-                                        amount: 0,
-                                        taxableAmount: 0,
-                                        cRt: 0,
-                                        CGSTAmount: 0,
-                                        sRt: 0,
-                                        SGSTAmount: 0
+                                        price: 0
                                       })
                                     }
                                     variant="dashed"
@@ -789,6 +829,7 @@ const CreateBill = () => {
           );
         }}
       </Formik>
+      <AlertProductDelete title="Item" open={openDelete} handleClose={handleModalClose} />
     </MainCard>
   );
 };
