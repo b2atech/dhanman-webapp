@@ -57,9 +57,9 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertCustomerDelete from '../createinvoice/Customer/AlertCustomerDelete';
-import AddCustomer from '../createinvoice/Customer/AddCustomer';
-import CustomerDetails from '../createinvoice/Customer/CustomerDetails';
+import AlertCustomerDelete from './AlertCustomerDelete';
+import AddCustomer from './AddCustomer';
+import CustomerDetails from './CustomerDetails';
 import { getAllCustomers } from 'api/services/SalesService';
 import { ICustomer } from 'types/invoice';
 import moment from 'moment';
@@ -352,7 +352,8 @@ const CustomerListPage = () => {
       {
         Header: 'Customer id',
         accessor: 'id',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true
       },
       {
         Header: 'Customer Name',
@@ -385,6 +386,10 @@ const CustomerListPage = () => {
         )
       },
       {
+        Header: 'GST NO.',
+        accessor: 'gstIn'
+      },
+      {
         Header: 'Email',
         accessor: 'email'
       },
@@ -398,7 +403,8 @@ const CustomerListPage = () => {
         Header: 'Address',
         accessor: 'addressLine',
         width: 200,
-        sticky: 'left'
+        sticky: 'left',
+        disableSortBy: true
       },
       {
         Header: 'Actions',
@@ -455,21 +461,25 @@ const CustomerListPage = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        disableSortBy: true,
+        Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
+        disableSortBy: true,
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
+        disableSortBy: true,
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Modified By',
-        accessor: 'modifiedBy'
+        accessor: 'modifiedBy',
+        disableSortBy: true
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps

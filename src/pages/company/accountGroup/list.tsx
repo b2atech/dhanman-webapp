@@ -326,6 +326,7 @@ const AccountGroups = () => {
       {
         Header: 'ID',
         accessor: 'id',
+        disableSortBy: true,
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
@@ -405,17 +406,20 @@ const AccountGroups = () => {
       },
       {
         Header: 'Is Main Group',
-        accessor: 'isMainGroup'
+        accessor: 'isMainGroup',
+        disableSortBy: true
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true
       },
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>,
+        disableSortBy: true
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
