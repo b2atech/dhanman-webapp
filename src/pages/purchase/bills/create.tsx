@@ -56,6 +56,7 @@ import Loader from 'components/Loader';
 //assets
 import { DeleteOutlined } from '@ant-design/icons';
 import AlertProductDelete from '../../../sections/apps/bill/AlertProductDelete';
+import { FormattedMessage } from 'react-intl';
 
 const validationSchema = yup.object({
   id: yup.string().required('Bill ID is required'),
@@ -133,7 +134,7 @@ const CreateBill = () => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'invoicve item deleted successfully',
+          message: <FormattedMessage id="billItemDeleted" />,
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
