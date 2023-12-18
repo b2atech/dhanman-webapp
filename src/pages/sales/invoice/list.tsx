@@ -307,8 +307,7 @@ function ReactTable({
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
   // =============================================== Tab ================================================================
-  const selectedInvoiceRowIds: string[] = [];
-  const groups = [{ id: 0, status: 'All' }];
+  const groups = [{ id: 0, status: 'All', statusId: 0 }];
 
   const uniqueStatusSet = new Set();
 
@@ -316,7 +315,8 @@ function ReactTable({
     if (!uniqueStatusSet.has(item.invoiceStatusId)) {
       groups.push({
         id: item.invoiceStatusId,
-        status: item.invoiceStatus
+        status: item.invoiceStatus,
+        statusId: item.invoiceStatusId
       });
       uniqueStatusSet.add(item.invoiceStatusId);
     }
@@ -332,7 +332,7 @@ function ReactTable({
     {}
   );
 
-  const [selectedInvoiceIDs, setSelectedInvoiceIds] = useState<any>();
+  const [selectedInvoiceIDs, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isInvoiceIdVisible, setIsInvoiceIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const navigation = useNavigate();
@@ -371,18 +371,18 @@ function ReactTable({
     window.location.reload();
   };
 
-  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+  const [selectedStatus, setSelectedStatus] = useState<number>(0);
   const updateStatusButtons = () => {
     const buttons: React.ReactNode[] = [];
     switch (selectedStatus) {
-      case 'Draft':
+      case 1:
         buttons.push(
           <Button key="draft" variant="contained" color="primary" onClick={() => updateInvoiceStatus(2)} style={{ marginRight: '300px' }}>
             Send for Approval
           </Button>
         );
         break;
-      case 'Approved':
+      case 3:
         buttons.push(
           <Button
             key="approval"
@@ -398,7 +398,7 @@ function ReactTable({
           </Button>
         );
         break;
-      case 'Pending Approval':
+      case 2:
         buttons.push(
           <>
             <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateInvoiceStatus(6)}>
@@ -416,7 +416,7 @@ function ReactTable({
           </>
         );
         break;
-      case 'Partially Paid':
+      case 4:
         buttons.push(
           <Button
             key="paid"
@@ -432,7 +432,7 @@ function ReactTable({
           </Button>
         );
         break;
-      case 'Paid':
+      case 5:
         break;
       default:
         break;
@@ -442,7 +442,7 @@ function ReactTable({
   };
 
   useEffect(() => {
-    setFilter('invoiceStatus', selectedStatus === 'All' ? '' : selectedStatus);
+    setFilter('invoiceStatusId', selectedStatus === 0 ? '' : selectedStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStatus]);
 
@@ -451,27 +451,27 @@ function ReactTable({
       <Box sx={{ p: 3, pb: 0, width: '100%' }}>
         <Tabs
           value={selectedStatus}
-          onChange={(e: ChangeEvent<{}>, value: string) => setSelectedStatus(value)}
+          onChange={(e: ChangeEvent<{}>, value: number) => setSelectedStatus(value)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          {groups.map(({ id, status }) => (
+          {groups.map(({ id, status, statusId }) => (
             <Tab
               key={id}
               label={status}
-              value={status}
+              value={statusId}
               icon={
                 <Chip
-                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
+                  label={statusId === 0 ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
                   color={
-                    status === 'All'
+                    statusId === 0
                       ? 'primary'
-                      : status === 'Draft' || status === 'Pending Approval'
+                      : statusId === 1 || statusId === 2
                       ? 'info'
-                      : status === 'Approved' || status === 'Partially' || status === 'Paid'
+                      : statusId === 3 || statusId === 4 || statusId === 5
                       ? 'success'
-                      : status === 'Rejected'
+                      : statusId === 6
                       ? 'error'
-                      : status === 'Cancelled'
+                      : statusId === 7
                       ? 'warning'
                       : 'error'
                   }
@@ -569,14 +569,10 @@ function ReactTable({
                           row.toggleRowSelected();
                           setTimeout(() => {
                             if (row.isSelected) {
-                              selectedInvoiceRowIds.push(row.values.id);
+                              setSelectedInvoiceIds((prevIds: string[]) => [...prevIds, row.values.id]);
                             } else {
-                              const index = selectedInvoiceRowIds.indexOf(row.id);
-                              if (index !== -1) {
-                                selectedInvoiceRowIds.splice(index, 1);
-                              }
+                              setSelectedInvoiceIds((prevIds: string[]) => prevIds.filter((id) => id !== row.values.id));
                             }
-                            setSelectedInvoiceIds(selectedInvoiceRowIds);
                           }, 0);
                         }}
                       >
@@ -746,24 +742,24 @@ const List = () => {
       },
       {
         Header: 'Status',
-        accessor: 'invoiceStatus',
+        accessor: 'invoiceStatusId',
         disableFilters: true,
         Filter: ({ column }: { column: any }) => <>{column.render('Filter')}</>,
-        Cell: ({ value }: { value: string }) => {
+        Cell: ({ value }: { value: number }) => {
           switch (value) {
-            case 'Draft':
+            case 1:
               return <Chip color="primary" label="Draft" size="small" variant="light" />;
-            case 'Pending Approval':
+            case 2:
               return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
-            case 'Approved':
+            case 3:
               return <Chip color="success" label="Approval" size="small" variant="light" />;
-            case 'Partially Paid':
+            case 4:
               return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
-            case 'Paid':
+            case 5:
               return <Chip color="success" label="Paid" size="small" variant="light" />;
-            case 'Rejected':
+            case 6:
               return <Chip color="error" label="Rejected" size="small" variant="light" />;
-            case 'Cancelled':
+            case 7:
               return <Chip color="error" label="Cancelled" size="small" variant="light" />;
             default:
               return <Chip color="warning" label={value} size="small" variant="light" />;
