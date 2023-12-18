@@ -328,7 +328,8 @@ const AccountGroups = () => {
       {
         Header: 'ID',
         accessor: 'id',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
+        disableSortBy: true,
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Account Code',
@@ -419,7 +420,8 @@ const AccountGroups = () => {
       },
       {
         Header: 'Is Main Group',
-        accessor: 'isMainGroup'
+        accessor: 'isMainGroup',
+        disableSortBy: true
       },
       {
         Header: 'Created On',
@@ -435,12 +437,21 @@ const AccountGroups = () => {
       {
         Header: 'Created By',
         accessor: 'createdBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true
+      },
+      {
+        Header: 'Created On',
+        accessor: 'createdOnUtc',
+        Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>,
+        disableSortBy: true
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
       },
       {
         Header: 'Modified By',
         accessor: 'modifiedBy',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
+        disableSortBy: true
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps

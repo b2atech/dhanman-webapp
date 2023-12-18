@@ -35,6 +35,7 @@ import { createPaidPaymentRequest, getAllBills, getAllVendors } from 'api/servic
 //import AlertpaidPaymentDelete from './deleteAlert';
 import MainCard from 'components/MainCard';
 import { IBill } from 'types/bill';
+import config from 'config';
 
 // constant
 const getInitialValues = (paidPayment: FormikValues | null) => {
@@ -142,13 +143,14 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   const [vendornames, setVendorNames] = useState<any>();
   const [paymentMode, setPaymentMode] = useState('');
   const [paymentThrough, setPaymentThrough] = useState('');
-  const [selectedVendorId, setSelectedVendorId] = useState();
+  const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
   const [bills, setBills] = useState<IBill[]>();
   const [totalAmount, setTotalAmount] = useState<number>(0);
+  const companyId: string = String(config.companyId);
   //const placeholder
 
   useEffect(() => {
-    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllVendors(companyId)
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
           const vendorData = vendorList.map((vendor) => ({
@@ -161,11 +163,11 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
-  }, []);
+  }, [companyId]);
 
   useEffect(() => {
     if (selectedVendorId && selectedVendorId !== '') {
-      getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      getAllBills(companyId)
         .then((billList) => {
           if (Array.isArray(billList)) {
             var list = billList.filter(
@@ -182,7 +184,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
           console.error('Error fetching bill data:', error);
         });
     }
-  }, [selectedVendorId]);
+  }, [companyId, selectedVendorId]);
 
   const columns = useMemo(
     () => [
@@ -253,8 +255,10 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         options={(vendornames || []) as any[]}
                         getOptionLabel={(option: any) => `${option.name}`}
                         onChange={(event, newValue) => {
-                          if (newValue.id) {
+                          if (newValue && newValue.id) {
                             setSelectedVendorId(newValue.id);
+                          } else {
+                            setSelectedVendorId(null);
                           }
                           handleChange({ target: { name: 'vendorName', value: newValue ? newValue.name : '' } });
                         }}
