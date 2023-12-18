@@ -1,19 +1,12 @@
-import { useState } from 'react';
-
 // material-ui
-import { Box, Button, Stack, TableCell, Tooltip, Typography } from '@mui/material';
+import { Box, Stack, TableCell, Typography } from '@mui/material';
 
 // third-party
 import { getIn } from 'formik';
 
 // project import
 import InvoiceField from './InvoiceField';
-import { dispatch, useSelector } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-
-// assets
-import { DeleteOutlined } from '@ant-design/icons';
-import AlertProductDelete from './AlertProductDelete';
+import { useSelector } from 'store';
 
 // ==============================|| INVOICE - ITEMS ||============================== //
 
@@ -37,7 +30,9 @@ const InvoiceItem = ({
   errors,
   touched,
   setFieldValue,
-  products
+  products,
+  ratesVisibility,
+  discountFeesVisibility
 }: any) => {
   const { country } = useSelector((state) => state.invoice);
   const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -51,30 +46,42 @@ const InvoiceItem = ({
       setFieldValue(`invoice_detail[${index}].igst`, selectedProduct.igst);
     }
   };
-  const [open, setOpen] = useState(false);
-  const handleModalClose = (status: boolean) => {
-    setOpen(false);
-    if (status) {
-      onDeleteItem(index);
-      dispatch(
-        openSnackbar({
-          open: true,
-          message: 'invoicve item deleted successfully',
-          anchorOrigin: { vertical: 'top', horizontal: 'right' },
-          variant: 'alert',
-          alert: {
-            color: 'success'
-          },
-          close: false
-        })
-      );
-    }
-  };
 
   const Name = `invoice_detail[${index}].name`;
   const touchedName = getIn(touched, Name);
   const errorName = getIn(errors, Name);
+  const getTotalAmount = (qty: number, price: number, discount: number, fees: number, cgst: number, sgst: number, igst: number) => {
+    if (qty && price) {
+      var taxableAmount = getTotalTaxableAmount(qty, price, discount, fees);
+      var cgstAmount = getTaxAmount(qty, price, cgst);
+      var sgstAmount = getTaxAmount(qty, price, sgst);
+      //var igstAmount = getTaxAmount(qty, price, igst);
+      return (taxableAmount + cgstAmount + sgstAmount).toFixed(2);
+    }
+    return 0.0;
+  };
+  const getTotalTaxableAmount = (qty: number, price: number, discount: number, fees: number) => {
+    if (qty && price) {
+      var amount = price * qty;
+      var discountAmount = 0;
+      var feesAmount = 0;
+      if (discount) {
+        discountAmount = amount * (discount / 100);
+      }
+      if (fees) {
+        feesAmount = amount * (fees / 100);
+      }
+      return amount - discountAmount + feesAmount;
+    }
+    return 0.0;
+  };
 
+  const getTaxAmount = (qty: number, price: number, cgst: number) => {
+    if (cgst && price && qty) {
+      return (cgst / 100) * price * qty;
+    }
+    return 0.0;
+  };
   const textFieldItem = [
     {
       placeholder: 'SalesOrder',
@@ -82,7 +89,8 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.soNo`,
       type: 'number',
       id: id,
-      value: soNo
+      value: soNo,
+      visibility: true
     },
     {
       placeholder: 'SalesDate',
@@ -90,7 +98,9 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.soDate`,
       type: 'date',
       id: id,
-      value: soDate
+      value: soDate,
+      style: { width: '140px' },
+      visibility: true
     },
     {
       placeholder: 'Item name',
@@ -102,11 +112,13 @@ const InvoiceItem = ({
       errors: errorName,
       touched: touchedName,
       select: true,
+      style: { width: '180px' },
       selectOptions: products.map((product: any) => ({
         label: product.productName,
         value: product.productName
       })),
-      selectOnChange: handleNameChange
+      selectOnChange: handleNameChange,
+      visibility: true
     },
     {
       placeholder: 'Description',
@@ -114,17 +126,29 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.description`,
       type: 'text',
       id: id,
-      value: description
+      value: description,
+      style: { width: '150px' },
+      visibility: true
     },
-    { placeholder: '', label: 'Qty', type: 'number', name: `invoice_detail.${index}.quantity`, id: id, value: qty },
-    { placeholder: '', label: 'price', type: 'number', name: `invoice_detail.${index}.price`, id: id, value: price },
+    {
+      placeholder: 'Qty',
+      label: 'Qty',
+      type: 'number',
+      name: `invoice_detail.${index}.quantity`,
+      id: id,
+      value: qty,
+      style: { width: '70px' },
+      visibility: true
+    },
+    { placeholder: '', label: 'price', type: 'number', name: `invoice_detail.${index}.price`, id: id, value: price, visibility: true },
     {
       placeholder: 'Fees',
       label: 'Fees',
       name: `invoice_detail.${index}.fees`,
       type: 'number',
       id: id,
-      value: fees
+      value: fees,
+      visibility: discountFeesVisibility
     },
     {
       placeholder: 'Discount',
@@ -132,15 +156,29 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.discount`,
       type: 'number',
       id: id,
-      value: discount
+      value: discount,
+      style: { width: '70px' },
+      visibility: discountFeesVisibility
     },
     {
-      placeholder: 'CGSTRate',
+      placeholder: 'tax am',
+      label: 'tax am',
+      name: `invoice_detail.${index}.taxableAmount`,
+      type: '',
+      id: id,
+      value: getTotalTaxableAmount(qty, price, discount, fees),
+      style: { width: '100px' },
+      visibility: true
+    },
+    {
+      placeholder: 'CgstRate',
       label: 'Cgst Rt',
       name: `invoice_detail.${index}.cgst`,
-      type: 'number',
+      type: '',
       id: id,
-      value: cgst
+      value: cgst,
+      style: { width: '50px' },
+      visibility: ratesVisibility
     },
     {
       placeholder: 'CgstAmount',
@@ -148,15 +186,18 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.CgstAmount`,
       type: 'number',
       id: id,
-      value: (cgst / 100) * price
+      value: getTaxAmount(qty, price, cgst),
+      visibility: true
     },
     {
-      placeholder: 'SGSTRate',
+      placeholder: 'SgstRate',
       label: 'Sgst Rt',
       name: `invoice_detail.${index}.sgst`,
-      type: 'number',
+      type: '',
       id: id,
-      value: sgst
+      value: sgst,
+      style: { width: '50px' },
+      visibility: ratesVisibility
     },
     {
       placeholder: 'SgstAmount',
@@ -164,15 +205,18 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.SgstAmount`,
       type: 'number',
       id: id,
-      value: (sgst / 100) * price
+      value: getTaxAmount(qty, price, sgst),
+      visibility: true
     },
     {
-      placeholder: 'IGSTRate',
+      placeholder: 'IgstRate',
       label: 'Igst Rt',
       name: `invoice_detail.${index}.igst`,
-      type: 'number',
+      type: '',
       id: id,
-      value: igst
+      value: igst,
+      style: { width: '50px' },
+      visibility: ratesVisibility
     },
     {
       placeholder: 'IgstAmount',
@@ -180,13 +224,14 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.IgstAmount`,
       type: 'number',
       id: id,
-      value: (igst / 100) * price
+      value: getTaxAmount(qty, price, igst),
+      visibility: true
     }
   ];
 
   return (
     <>
-      {textFieldItem.map((item: any) => {
+      {textFieldItem.map((item: any, index: any) => {
         return (
           <InvoiceField
             onEditItem={(event: any) => onEditItem(event)}
@@ -201,42 +246,23 @@ const InvoiceItem = ({
               touched: item.touched,
               select: item.select,
               selectOptions: item.selectOptions,
-              selectOnChange: item.selectOnChange
+              selectOnChange: item.selectOnChange,
+              sx: item.sx,
+              style: { ...item.style },
+              visibility: item.visibility
             }}
             key={item.label}
+            style={{ marginBottom: 0 }}
           />
         );
       })}
-      <TableCell>
-        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
-          <Box sx={{ pr: 2, pl: 2 }}>
-            <Typography>
-              {country?.prefix + '' + (qty && price ? (price * qty - (discount / 100) * price * qty).toFixed(2) : '0.00')}
-            </Typography>
+      <TableCell sx={{ textAlign: 'right' }}>
+        <Stack direction="row" justifyContent="flex-end" alignItems="flex-end">
+          <Box sx={{ minWidth: 90 }}>
+            <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst)}</Typography>
           </Box>
         </Stack>
       </TableCell>
-      <TableCell>
-        <Stack direction="column" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
-          <Box sx={{ pr: 2, pl: 2 }}>
-            <Typography>
-              {!name || !price || !qty
-                ? '0.00'
-                : country?.prefix +
-                  '' +
-                  ((sgst && cgst ? (cgst / 100) * price + (sgst / 100) * price : (igst / 100) * price) + price * qty).toFixed(2)}
-            </Typography>
-          </Box>
-        </Stack>
-      </TableCell>
-      <TableCell>
-        <Tooltip title="Remove Item">
-          <Button color="error" onClick={() => setOpen(true)}>
-            <DeleteOutlined />
-          </Button>
-        </Tooltip>
-      </TableCell>
-      <AlertProductDelete title={name} open={open} handleClose={handleModalClose} />
     </>
   );
 };

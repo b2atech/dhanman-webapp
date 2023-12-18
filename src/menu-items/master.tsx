@@ -132,8 +132,8 @@ const master: NavItemType = {
           icon: icons.ProfileOutlined
         },
         {
-          id: 'makepayment',
-          title: <FormattedMessage id="makepayment" />,
+          id: 'receivepayment',
+          title: <FormattedMessage id="receivepayment" />,
           type: 'item',
           url: '/sales/payments/add',
           icon: icons.PlusSquareOutlined

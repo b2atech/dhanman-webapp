@@ -98,7 +98,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: 'orderSequence', desc: false };
   const navigation = useNavigate();
   const {
     getTableProps,
@@ -123,8 +123,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
       filterTypes,
       initialState: {
         pageIndex: 0,
-        pageSize: 10,
-        hiddenColumns: ['isMainGroup'],
+        pageSize: 1000,
+        hiddenColumns: ['isMainGroup', 'orderSequence', 'level'],
         sortBy: [sortBy]
       }
     },
@@ -205,62 +205,64 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps, showIdColumn, ha
           </Stack>
         </Stack>
         <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
-            <TableWrapper>
-              <Table {...getTableProps()} stickyHeader>
-                <TableHead>
-                  {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
-                      {headerGroup.headers.map((column: HeaderGroup) => {
-                        if (
-                          (column.id === 'id' && !isAccountGroupIdVisible) ||
-                          (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                          (column.id === 'createdBy' && !isAuditSwitchOn)
-                        ) {
-                          return null;
-                        }
-                        return (
-                          <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
-                            <HeaderSort column={column} />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHead>
-                <TableBody {...getTableBodyProps()}>
-                  {page.map((row: Row, i: number) => {
-                    prepareRow(row);
+          <TableWrapper>
+            <Table {...getTableProps()} stickyHeader>
+              <TableHead>
+                {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+                  <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    {headerGroup.headers.map((column: HeaderGroup) => {
+                      if (
+                        (column.id === 'id' && !isAccountGroupIdVisible) ||
+                        (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'createdBy' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                        (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                      ) {
+                        return null;
+                      }
+                      return (
+                        <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
+                          <HeaderSort column={column} />
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
+                {page.map((row: Row, i: number) => {
+                  prepareRow(row);
 
-                    return (
-                      <Fragment key={i}>
-                        <TableRow
-                          {...row.getRowProps()}
-                          onClick={() => {
-                            row.toggleRowSelected();
-                          }}
-                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
-                        >
-                          {row.cells.map((cell: Cell) => {
-                            if (
-                              (cell.column.id === 'id' && !isAccountGroupIdVisible) ||
-                              (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                              (cell.column.id === 'createdBy' && !isAuditSwitchOn)
-                            ) {
-                              return null;
-                            }
-                            return (
-                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      </Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableWrapper>
-          </ScrollX>
+                  return (
+                    <Fragment key={i}>
+                      <TableRow
+                        {...row.getRowProps()}
+                        onClick={() => {
+                          row.toggleRowSelected();
+                        }}
+                        sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                      >
+                        {row.cells.map((cell: Cell) => {
+                          if (
+                            (cell.column.id === 'id' && !isAccountGroupIdVisible) ||
+                            (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
+                            (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                          ) {
+                            return null;
+                          }
+                          return (
+                            <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    </Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableWrapper>
           <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
             <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
           </Box>
@@ -342,7 +344,7 @@ const AccountGroups = () => {
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Typography variant="subtitle1">
                 {' '}
-                <span style={{ whiteSpace: 'nowrap' }}>{values.name}</span>
+                <span style={{ whiteSpace: 'pre-wrap' }}>{values.name}</span>
               </Typography>
             </Stack>
           );
@@ -357,8 +359,20 @@ const AccountGroups = () => {
         accessor: 'topGroupCode'
       },
       {
+        Header: 'Parent Group Code',
+        accessor: 'parentGroupCode'
+      },
+      {
         Header: 'Schedule',
         accessor: 'schedule'
+      },
+      {
+        Header: 'Order Sequence',
+        accessor: 'orderSequence'
+      },
+      {
+        Header: 'Level',
+        accessor: 'level'
       },
       {
         Header: 'Actions',
@@ -410,6 +424,17 @@ const AccountGroups = () => {
         disableSortBy: true
       },
       {
+        Header: 'Created On',
+        accessor: 'createdOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+      {
+        Header: 'Modified On',
+        accessor: 'modifiedOnUtc',
+        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+      },
+
+      {
         Header: 'Created By',
         accessor: 'createdBy',
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
@@ -419,6 +444,13 @@ const AccountGroups = () => {
         Header: 'Created On',
         accessor: 'createdOnUtc',
         Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>,
+        disableSortBy: true
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
+      },
+      {
+        Header: 'Modified By',
+        accessor: 'modifiedBy',
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
         disableSortBy: true
       }
     ],
