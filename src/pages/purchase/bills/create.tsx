@@ -217,7 +217,7 @@ const CreateBill = () => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Bill Added successfully',
+          message: <FormattedMessage id="billItemAdded" />,
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
