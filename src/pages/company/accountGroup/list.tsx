@@ -424,11 +424,6 @@ const AccountGroups = () => {
         disableSortBy: true
       },
       {
-        Header: 'Created On',
-        accessor: 'createdOnUtc',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
-      },
-      {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
@@ -445,7 +440,6 @@ const AccountGroups = () => {
         accessor: 'createdOnUtc',
         Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>,
         disableSortBy: true
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
       },
       {
         Header: 'Modified By',
