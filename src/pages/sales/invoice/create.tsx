@@ -1,4 +1,4 @@
-import { Button, Grid, Stack } from '@mui/material';
+import { Button, Grid, Stack, Tooltip } from '@mui/material';
 
 import MainCard from 'components/MainCard';
 
@@ -49,6 +49,10 @@ import { openDrawer } from 'store/reducers/menu';
 import { getCompanyDetail } from 'api/services/CommonService';
 import Loader from 'components/Loader';
 
+// assets
+import { DeleteOutlined } from '@ant-design/icons';
+import AlertProductDelete from '../../../sections/apps/invoice/AlertProductDelete';
+
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
   invoiceNumber: yup.string().required('Invoice number is required'),
@@ -91,12 +95,20 @@ const Createinvoice = () => {
   const notesLimit: number = 500;
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
-  const [showGSTRates, setShowGSTRates] = useState(true);
-  const [discountFees, setDiscountFees] = useState(true);
+  const [showGSTRates, setShowGSTRates] = useState(false);
+  const [discountFees, setDiscountFees] = useState(false);
   //const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
   const [loading, setLoading] = useState<boolean>(true);
   const [company, setCompany] = useState<any>();
+  const [funcToDelete, setfuncToDelete] = useState<any>();
+  const [itemUnderDeletion, setItemUnderDeletion] = useState<number>();
+
+  const handelDeleteItem = (func: any, index: number) => {
+    setfuncToDelete(() => func);
+    setItemUnderDeletion(index);
+    setOpenDelete(true);
+  };
 
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
@@ -156,6 +168,26 @@ const Createinvoice = () => {
       );
       navigation('/sales/invoices/list');
     });
+  };
+
+  const [openDelete, setOpenDelete] = useState(false);
+  const handleModalClose = (status: boolean) => {
+    setOpenDelete(false);
+    if (status) {
+      funcToDelete(itemUnderDeletion);
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'invoicve item deleted successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    }
   };
 
   const productId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
@@ -244,7 +276,9 @@ const Createinvoice = () => {
               sRt: 0,
               sgstAmount: 0,
               iRt: 0,
-              igstAmount: 0
+              igstAmount: 0,
+              rateVisibility: showGSTRates,
+              discountFeesVisibility: discountFees
             }
           ],
           discount: 0,
@@ -558,7 +592,7 @@ const Createinvoice = () => {
                               <TableHead>
                                 <TableRow>
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    No
+                                    #
                                   </TableCell>
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     So No
@@ -572,7 +606,7 @@ const Createinvoice = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Description
                                   </TableCell>
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                  <TableCell align="center" sx={{ padding: '2px 0px', width: '20px' }} width={20}>
                                     Qty
                                   </TableCell>
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
@@ -588,6 +622,9 @@ const Createinvoice = () => {
                                       </TableCell>
                                     </>
                                   )}
+                                  <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                    Taxable Amt
+                                  </TableCell>
                                   {showGSTRates && (
                                     <>
                                       <TableCell align="center" sx={{ padding: '2px 0px' }}>
@@ -610,7 +647,7 @@ const Createinvoice = () => {
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '0px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                         IGST (%)
                                       </TableCell>
                                     </>
@@ -618,21 +655,28 @@ const Createinvoice = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     IGST Amt
                                   </TableCell>
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    Taxable
-                                  </TableCell>
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                     Total Amt
-                                  </TableCell>
-                                  <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                    Action
                                   </TableCell>
                                 </TableRow>
                               </TableHead>
                               <TableBody>
                                 {values.invoice_detail?.map((item: any, index: number) => (
                                   <TableRow key={item.id}>
-                                    <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
+                                    <TableCell>
+                                      <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2}>
+                                        {values.invoice_detail.indexOf(item) + 1}
+                                        <Tooltip title="Remove Item">
+                                          <Button
+                                            sx={{ minWidth: 10 }}
+                                            color="error"
+                                            onClick={() => handelDeleteItem((index: number) => remove(index), index)}
+                                          >
+                                            <DeleteOutlined />
+                                          </Button>
+                                        </Tooltip>
+                                      </Stack>
+                                    </TableCell>
                                     <InvoiceItem
                                       key={item.id}
                                       id={item.id}
@@ -649,6 +693,8 @@ const Createinvoice = () => {
                                       cgst={item.cgst}
                                       sgst={item.sgst}
                                       igst={item.igst}
+                                      ratesVisibility={showGSTRates}
+                                      discountFeesVisibility={discountFees}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
                                       Blur={handleBlur}
@@ -679,8 +725,8 @@ const Createinvoice = () => {
                                       id: UIDV4(),
                                       name: '',
                                       description: '',
-                                      quantity: 1,
-                                      price: '1.00'
+                                      quantity: 0,
+                                      price: 0
                                     })
                                   }
                                   variant="dashed"
@@ -804,12 +850,271 @@ const Createinvoice = () => {
                       />
                     </Stack>
                   </Grid>
+                  <Grid item xs={12}>
+                    <FieldArray
+                      name="invoice_detail"
+                      render={({ remove, push }) => {
+                        return (
+                          <>
+                            <TableContainer>
+                              <Table sx={{ minWidth: 650 }}>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      No
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      So No
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      So Date
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      Name
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      Description
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      Qty
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      Price
+                                    </TableCell>
+                                    {discountFees && (
+                                      <>
+                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                          Fees
+                                        </TableCell>
+                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                          Discount (%)
+                                        </TableCell>
+                                      </>
+                                    )}
+                                    {showGSTRates && (
+                                      <>
+                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                          CGST (%)
+                                        </TableCell>
+                                      </>
+                                    )}
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      CGST Amt
+                                    </TableCell>
+                                    {showGSTRates && (
+                                      <>
+                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                          SGST (%)
+                                        </TableCell>
+                                      </>
+                                    )}
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      SGST Amt
+                                    </TableCell>
+                                    {showGSTRates && (
+                                      <>
+                                        <TableCell align="center" sx={{ padding: '0px 0px' }}>
+                                          IGST (%)
+                                        </TableCell>
+                                      </>
+                                    )}
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      IGST Amt
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      Taxable
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                      Total Amt
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                      Action
+                                    </TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {values.invoice_detail?.map((item: any, index: number) => (
+                                    <TableRow key={item.id}>
+                                      <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
+                                      <InvoiceItem
+                                        key={item.id}
+                                        id={item.id}
+                                        index={index}
+                                        soNo={item.soNo}
+                                        soDate={item.soDate}
+                                        name={item.name}
+                                        description={item.description}
+                                        qty={item.quantity}
+                                        price={item.price}
+                                        fees={item.fees}
+                                        discount={item.discount}
+                                        taxableAmount={item.taxableAmount}
+                                        cgst={item.cgst}
+                                        sgst={item.sgst}
+                                        igst={item.igst}
+                                        onDeleteItem={(index: number) => remove(index)}
+                                        onEditItem={handleChange}
+                                        Blur={handleBlur}
+                                        errors={errors}
+                                        touched={touched}
+                                        products={products}
+                                        setFieldValue={setFieldValue}
+                                      />
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                            <Divider />
+                            {touched.invoice_detail && errors.invoice_detail && !Array.isArray(errors?.invoice_detail) && (
+                              <Stack direction="row" justifyContent="center" sx={{ p: 1.5 }}>
+                                <FormHelperText error={true}>{errors.invoice_detail as string}</FormHelperText>
+                              </Stack>
+                            )}
+                            <Grid container justifyContent="space-between">
+                              <Grid item xs={12} md={8}>
+                                <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
+                                  <Button
+                                    color="primary"
+                                    startIcon={<PlusOutlined />}
+                                    onClick={() =>
+                                      push({
+                                        id: UIDV4(),
+                                        name: '',
+                                        description: '',
+                                        quantity: 1,
+                                        price: '1.00'
+                                      })
+                                    }
+                                    variant="dashed"
+                                    sx={{ bgcolor: 'transparent !important' }}
+                                  >
+                                    Add Item
+                                  </Button>
+                                </Box>
+                              </Grid>
+                              <Grid item xs={12} md={4}>
+                                <Grid item xs={12}>
+                                  <Stack spacing={2} sx={{ marginTop: 3 }}>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
+                                      <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                                      <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
+                                      <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                                      <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>Fees:</Typography>
+                                      <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>Discount:</Typography>
+                                      <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography variant="subtitle1">Grand Total:</Typography>
+                                      <Typography variant="subtitle1">
+                                        {grandAmount % 1 === 0
+                                          ? country?.prefix + '' + grandAmount
+                                          : country?.prefix + '' + grandAmount.toFixed(2)}
+                                      </Typography>
+                                    </Stack>
+                                  </Stack>
+                                </Grid>
+                              </Grid>
+                            </Grid>
+                          </>
+                        );
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Stack spacing={1}>
+                      <InputLabel>Notes</InputLabel>
+                      <TextField
+                        placeholder="Address"
+                        rows={3}
+                        value={values.note}
+                        multiline
+                        name="note"
+                        onChange={handleChange}
+                        inputProps={{
+                          maxLength: notesLimit
+                        }}
+                        helperText={`${values.note.length} / ${notesLimit}`}
+                        sx={{
+                          width: '100%',
+                          '& .MuiFormHelperText-root': {
+                            mr: 0,
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                          }
+                        }}
+                      />
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Grid container justifyContent="flex-end" alignItems="flex-end">
+                      <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          sx={{ color: 'secondary.dark' }}
+                          onClick={() =>
+                            dispatch(
+                              reviewInvoicePopup({
+                                isOpen: true
+                              })
+                            )
+                          }
+                        >
+                          Preview
+                        </Button>
+                        <Button variant="outlined" color="secondary" sx={{ color: 'secondary.dark' }}>
+                          Save
+                        </Button>
+                        <Button color="primary" variant="contained" type="submit">
+                          Create & Send
+                        </Button>
+                        <InvoiceModal
+                          isOpen={isOpen}
+                          setIsOpen={(value: any) =>
+                            dispatch(
+                              reviewInvoicePopup({
+                                isOpen: value
+                              })
+                            )
+                          }
+                          key={values.invoiceNumber}
+                          invoiceInfo={{
+                            ...values,
+                            subtotal,
+                            taxRate,
+                            discountRate,
+                            grandAmount
+                          }}
+                          items={values?.invoice_detail}
+                          onAddNextInvoice={addNextInvoiceHandler}
+                        />
+                      </Stack>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Form>
           );
         }}
       </Formik>
+      <AlertProductDelete title="Item" open={openDelete} handleClose={handleModalClose} />
     </MainCard>
   );
 };
