@@ -32,7 +32,6 @@ import { Column, useTable, HeaderGroup, Cell, CellProps } from 'react-table';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { createReceivedPaymentRequest, getAllInvoices, getAllCustomers } from 'api/services/SalesService';
-//import AlertreceivedPaymentDelete from './deleteAlert';
 import MainCard from 'components/MainCard';
 import { IInvoice } from 'types/invoice';
 
@@ -130,7 +129,6 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
       }
     }
   });
-  // const isCreating = !receivedpayment;
   const {
     errors,
     touched,
@@ -142,10 +140,9 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
   const [customernames, setCustomerNames] = useState<any>();
   const [paymentMode, setPaymentMode] = useState('');
   const [paymentThrough, setPaymentThrough] = useState('');
-  const [selectedCustomerId, setSelectedCustomerId] = useState();
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<IInvoice[]>();
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  //const placeholder
 
   useEffect(() => {
     getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -172,7 +169,7 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
               (e) => e.customerId === selectedCustomerId && (e.invoiceStatus === 'Approved' || e.invoiceStatus === 'Partially Received')
             );
             setInvoices(list);
-            const total = list.reduce((acc, current) => acc + current.amount, 0);
+            const total = list.reduce((acc, current) => acc + current.totalAmount, 0);
             setTotalAmount(total);
           } else {
             console.error('API response is not an array:', invoiceList);
@@ -229,7 +226,7 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
       },
       {
         Header: 'Amount',
-        accessor: 'amount',
+        accessor: 'totalAmount',
         className: 'cell-right'
       }
     ],
@@ -240,10 +237,9 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
     <>
       <MainCard>
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          <Grid></Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <MainCard>
-              <Grid container spacing={1} direction="column">
+              <Grid container spacing={2} direction="column">
                 <Grid item xs={12}>
                   <InputLabel sx={{ mb: 1 }}>Customer Name</InputLabel>
                   <FormControl sx={{ width: '100%' }} error={Boolean(touched.customernames && errors.customernames)}>
@@ -253,8 +249,10 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
                         options={(customernames || []) as any[]}
                         getOptionLabel={(option: any) => `${option.name}`}
                         onChange={(event, newValue) => {
-                          if (newValue.id) {
+                          if (newValue && newValue.id) {
                             setSelectedCustomerId(newValue.id);
+                          } else {
+                            setSelectedCustomerId(null);
                           }
                           handleChange({ target: { name: 'customerName', value: newValue ? newValue.name : '' } });
                         }}
@@ -267,13 +265,13 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
                         )}
                       />
                     ) : (
-                      <Box display="flex" flexDirection="row" alignItems="left" justifyContent="left" height="100px">
+                      <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" height="100px">
                         <CircularProgress size={30} thickness={4} />
                         <Grid flexDirection={'column'}>
-                          <Typography variant="body1" style={{ marginTop: '32x' }}>
+                          <Typography variant="body1" style={{ marginTop: '32px' }}>
                             Loading Customer Names,
                           </Typography>
-                          <Typography variant="body1" style={{ marginTop: '32x' }}>
+                          <Typography variant="body1" style={{ marginTop: '32px' }}>
                             Please Wait...!
                           </Typography>
                         </Grid>
@@ -288,13 +286,13 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
                     id="totalAmount"
                     type="number"
                     placeholder={String(totalAmount)}
-                    {...getFieldProps('amount')}
+                    {...getFieldProps('totalAmount')}
                     error={Boolean(touched.amount && errors.amount)}
                     helperText={touched.amount && typeof errors.amount === 'string' ? errors.amount : ''}
-                  ></TextField>
-                  <InputLabel sx={{ mb: 3 }}>total payable amount : {totalAmount}</InputLabel>
+                  />
+                  <InputLabel sx={{ mb: 3 }}>Total Receivable Amount: {totalAmount}</InputLabel>
                 </Grid>
-                <Grid item xs={12} sx={{ width: '100%' }}>
+                <Grid item xs={12}>
                   <Stack spacing={2}>
                     <InputLabel sx={{ mb: 1 }}>Payment Mode</InputLabel>
                     <Select
@@ -315,9 +313,10 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
               </Grid>
             </MainCard>
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid item xs={12} sm={6}>
             <MainCard>
-              <Grid container direction="column" spacing={2}>
+              <Grid container spacing={2} direction="column">
                 <Grid item xs={12}>
                   <InputLabel sx={{ mb: 1 }}>Description</InputLabel>
                   <TextareaAutosize
@@ -335,7 +334,7 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} sx={{ width: '100%' }}>
+                <Grid item xs={12}>
                   <Stack spacing={2}>
                     <InputLabel sx={{ mb: 1 }}>Payment Through</InputLabel>
                     <Select
@@ -355,6 +354,7 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
               </Grid>
             </MainCard>
           </Grid>
+
           <Grid item xs={12}>
             <MainCard content={false} title="Invoices">
               <ReactTable columns={columns} data={invoices ?? []} striped={true} />
@@ -373,7 +373,7 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
                             Grand Total :
                           </Typography>
                           <Typography variant="subtitle1" paddingLeft={5}>
-                            {invoices?.reduce((acc, current) => acc + current.amount, 0)}
+                            {invoices?.reduce((acc, current) => acc + current.totalAmount, 0)}
                           </Typography>
                         </Stack>
                       </Stack>
