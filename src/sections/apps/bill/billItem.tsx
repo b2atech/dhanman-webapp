@@ -46,25 +46,6 @@ const BillItem = ({
       setFieldValue(`bill_detail[${index}].igst`, selectedProduct.igst);
     }
   };
-  // const [open, setOpen] = useState(false);
-  // const handleModalClose = (status: boolean) => {
-  //   setOpen(false);
-  //   if (status) {
-  //     onDeleteItem(index);
-  //     dispatch(
-  //       openSnackbar({
-  //         open: true,
-  //         message: 'Item Deleted successfully',
-  //         anchorOrigin: { vertical: 'top', horizontal: 'right' },
-  //         variant: 'alert',
-  //         alert: {
-  //           color: 'success'
-  //         },
-  //         close: false
-  //       })
-  //     );
-  //   }
-  // };
 
   const Name = `bill_detail[${index}].name`;
   const touchedName = getIn(touched, Name);
@@ -77,8 +58,9 @@ const BillItem = ({
       //var igstAmount = getTaxAmount(qty, price, igst);
       return (taxableAmount + cgstAmount + sgstAmount).toFixed(2);
     }
-    return 0.0;
+    return '0.0';
   };
+
   const getTotalTaxableAmount = (qty: number, price: number, discount: number, fees: number) => {
     if (qty && price) {
       var amount = price * qty;
