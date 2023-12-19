@@ -149,6 +149,7 @@
   "CustomerView" : "Customer View",
   "AlertCustomerDelete" : "Alert Customer Delete",
   "paymentreceived" : "Payment Received",
+  "receivepayment": "Receive Payment",
   "company": "Company",
   "paymentmade" : "Payment Made",
   "chartofaccounts": "Chart of Accounts",
@@ -167,6 +168,8 @@
   "reports": "Reports",
   "inventoryreports": "Inventory Reports",
   "closingstock": "Closing Stock",
-  "makepayment": "Make Payment",
-  "accountgroups": "Account Groups"
+  "makepayment": "Make Payment", 
+  "accountgroups": "Account Groups",
+  "billItemDeleted": "Bill item deleted successfully",
+  "billItemAdded": "Bill item added succcessfully"
 }

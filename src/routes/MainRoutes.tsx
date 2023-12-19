@@ -5,7 +5,6 @@ import MainLayout from 'layout/MainLayout';
 import CommonLayout from 'layout/CommonLayout';
 import Loadable from 'components/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
-import UnderConstruction from 'pages/maintenance/under-construction';
 import ComingSoon from 'pages/maintenance/coming-soon';
 
 // pages routing
@@ -18,7 +17,8 @@ const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/comi
 const AppInvoices = Loadable(lazy(() => import('pages/sales/invoice/list')));
 const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create')));
 const AppInvoicedetails = Loadable(lazy(() => import('pages/sales/invoice/details')));
-const AppRecievedPayment = Loadable(lazy(() => import('pages/sales/receivedpayments/list')));
+const AppReceivedPayment = Loadable(lazy(() => import('pages/sales/receivedpayments/list')));
+const AppReceivePayment = Loadable(lazy(() => import('pages/sales/receivedpayments/add')));
 const AppInvoiceEdit = Loadable(lazy(() => import('pages/sales/invoice/edit')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/index')));
@@ -157,11 +157,11 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppRecievedPayment />
+              element: <AppReceivedPayment />
             },
             {
               path: 'add',
-              element: <UnderConstruction />
+              element: <AppReceivePayment />
             }
           ]
         }

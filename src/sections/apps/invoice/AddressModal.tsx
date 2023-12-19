@@ -130,7 +130,7 @@ const Address = ({ handlerAddress }: AddressProps) => {
               {customer.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {customer.city}
+              {customer.addressLine}
             </Typography>
           </Stack>
           <Typography textAlign="left" variant="body2" color="secondary">

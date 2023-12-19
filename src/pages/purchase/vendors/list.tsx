@@ -56,12 +56,12 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import VendorDetails from '../createbills/Vendor/VendorDetails';
+import VendorDetails from './VendorDetails';
 import { getAllVendors } from 'api/services/BillService';
 import { IVendor } from 'types/bill';
 import moment from 'moment';
-import AddVendor from '../createbills/Vendor/AddVendor';
-import AlertVendorDelete from '../createbills/Vendor/AlertVendorDelete';
+import AddVendor from './AddVendor';
+import AlertVendorDelete from './AlertVendorDelete';
 import { PatternFormat } from 'react-number-format';
 import { useSticky } from 'react-table-sticky';
 import config from 'config';
@@ -346,22 +346,27 @@ const Vendors = () => {
       {
         Header: 'Vendor id',
         accessor: 'id',
+        disableSortBy: true,
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         show: false,
+        disableSortBy: true,
         accessor: 'addressLine'
       },
       {
         show: false,
+        disableSortBy: true,
         accessor: 'firstName'
       },
       {
         show: false,
+        disableSortBy: true,
         accessor: 'lastName'
       },
       {
         show: false,
+        disableSortBy: true,
         accessor: 'cityId'
       },
       {
@@ -392,6 +397,10 @@ const Vendors = () => {
             style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
           />
         )
+      },
+      {
+        Header: 'GST NO.',
+        accessor: 'gstIn'
       },
       {
         Header: 'Email',
@@ -456,20 +465,24 @@ const Vendors = () => {
       {
         Header: 'Created On',
         accessor: 'createdOnUtc',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        disableSortBy: true,
+        Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>
       },
       {
         Header: 'Modified On',
         accessor: 'modifiedOnUtc',
+        disableSortBy: true,
         Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
       },
       {
         Header: 'Created By',
         accessor: 'createdBy',
+        disableSortBy: true,
         Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Modified By',
+        disableSortBy: true,
         accessor: 'modifiedBy'
       }
     ],
