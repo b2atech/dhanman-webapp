@@ -52,6 +52,8 @@ import Loader from 'components/Loader';
 // assets
 import { DeleteOutlined } from '@ant-design/icons';
 import AlertProductDelete from '../../../sections/apps/invoice/AlertProductDelete';
+import { FormattedMessage } from 'react-intl';
+import config from 'config';
 
 const validationSchema = yup.object({
   id: yup.string().required('Invoice ID is required'),
@@ -104,6 +106,7 @@ const Createinvoice = () => {
   const [funcToDelete, setfuncToDelete] = useState<any>();
   const [itemUnderDeletion, setItemUnderDeletion] = useState<number>();
 
+  const companyId: string = String(config.companyId);
   const handelDeleteItem = (func: any, index: number) => {
     setfuncToDelete(() => func);
     setItemUnderDeletion(index);
@@ -157,7 +160,7 @@ const Createinvoice = () => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'Invoice Added successfully',
+          message: <FormattedMessage id="invoiceItemCreated" />,
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -178,7 +181,7 @@ const Createinvoice = () => {
       dispatch(
         openSnackbar({
           open: true,
-          message: 'invoicve item deleted successfully',
+          message: <FormattedMessage id="invoiceItemDeleted" />,
           anchorOrigin: { vertical: 'top', horizontal: 'right' },
           variant: 'alert',
           alert: {
@@ -190,11 +193,10 @@ const Createinvoice = () => {
     }
   };
 
-  const productId = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productList = await getAllProducts(productId);
+        const productList = await getAllProducts(companyId);
         if (Array.isArray(productList)) {
           setProducts(productList);
         }
@@ -204,28 +206,32 @@ const Createinvoice = () => {
     };
 
     fetchProducts();
-  }, [productId]);
+  }, [companyId]);
 
   useEffect(() => {
-    getInvoiceDefaultStatus('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((status) => {
+    const fetchDefaultStatus = async () => {
+      try {
+        const status = await getInvoiceDefaultStatus(companyId);
         setDefaultStatus(status.initialStatusName);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching data:', error);
-      });
-  }, []);
+      }
+    };
+    fetchDefaultStatus();
+  }, [companyId]);
 
   useEffect(() => {
-    getCompanyDetail('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((comapanyName) => {
-        setCompany(comapanyName);
+    const fetchCompanyDetails = async () => {
+      try {
+        const companyName = await getCompanyDetail(companyId);
+        setCompany(companyName);
         setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+      }
+    };
+    fetchCompanyDetails();
+  }, [companyId]);
 
   const addNextInvoiceHandler = () => {
     dispatch(
@@ -257,7 +263,8 @@ const Createinvoice = () => {
             firstName: '',
             lastName: '',
             city: '',
-            gstIn: ''
+            gstIn: '',
+            addressLine: ''
           },
           invoice_detail: [
             {
@@ -352,7 +359,7 @@ const Createinvoice = () => {
                 </Grid>
                 <Grid item xs={12} sm={5} md={2}>
                   <Stack spacing={1}>
-                    <InputLabel>Date</InputLabel>
+                    <InputLabel>Invoice Date</InputLabel>
                     <FormControl sx={{ width: '100%' }} error={Boolean(touched.invoiceDate && errors.invoiceDate)}>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
@@ -384,7 +391,7 @@ const Createinvoice = () => {
                 </Grid>
                 <Grid item xs={12} sm={5} md={4}>
                   <Stack spacing={1}>
-                    <InputLabel>Set Currency*</InputLabel>
+                    <InputLabel>Currency*</InputLabel>
                     <FormControl sx={{ width: { xs: '100%', sm: 250 } }}>
                       <Autocomplete
                         id="country-select-demo"
@@ -446,29 +453,29 @@ const Createinvoice = () => {
                 <Grid item xs={12} sm={5} md={2}>
                   <Grid container justifyContent="flex-end">
                     <Stack spacing={1}>
-                      <InputLabel sx={{ color: 'grey' }}>Status : {defaultStatus}</InputLabel>
+                      <InputLabel sx={{ color: 'grey', fontSize: '0.95rem' }}>Status : {defaultStatus}</InputLabel>
                     </Stack>
                   </Grid>
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
-                  <MainCard sx={{ minHeight: 150 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={8}>
+                  <MainCard sx={{ minHeight: 130 }}>
+                    <Grid container>
+                      <Grid item xs={12} sm={8} md={5}>
                         <Stack spacing={2}>
-                          <Typography variant="h5">From:</Typography>
-                          {loading ? (
-                            <Loader />
-                          ) : (
+                          <Typography variant="h5">
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <span style={{ paddingRight: '10px' }}>From:</span>
+                              <span>{company?.name || ''}</span>
+                            </Box>
                             <Stack sx={{ width: '100%' }}>
-                              <Typography variant="subtitle1">{company?.name || ''}</Typography>
                               <Typography color="secondary">{company?.email || ''}</Typography>
-                              <Typography color="secondary">{`${company?.addressLine || ''} \u00A0 \u00A0 ${
+                              <Typography color="secondary">{`${company?.addressLine || ''} ,\u00A0\u00A0 ${
                                 company?.phoneNumber || ''
                               }`}</Typography>
-                              <Typography color="secondary">{company?.gstIn || ''}</Typography>
+                              <Typography color="secondary">GstIn: {company?.gstIn || ''}</Typography>
                             </Stack>
-                          )}
+                          </Typography>
+                          {loading ? <Loader /> : ''}
                         </Stack>
                       </Grid>
                       <Grid item xs={12} sm={4}>
@@ -489,20 +496,28 @@ const Createinvoice = () => {
                     </Grid>
                   </MainCard>
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
-                  <MainCard sx={{ minHeight: 168 }}>
+                  <MainCard sx={{ minHeight: 130 }}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={8}>
                         <Stack spacing={2}>
-                          <Typography variant="h5">To:</Typography>
-                          <Stack sx={{ width: '100%' }}>
-                            <Typography variant="subtitle1">{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.city}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.phoneNumber}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.email}</Typography>
-                            <Typography color="secondary">{values?.customerInfo?.gstIn}</Typography>
-                          </Stack>
+                          <Typography variant="h5">
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <span style={{ paddingRight: '10px' }}>To:</span>
+                              <span>{`${values?.customerInfo?.firstName} ${values?.customerInfo?.lastName}`}</span>
+                            </Box>
+                            <Stack sx={{ width: '100%' }}>
+                              <Typography variant="subtitle1"></Typography>
+                              <Typography color="secondary">
+                                {values?.customerInfo?.addressLine && values?.customerInfo?.phoneNumber
+                                  ? `${values.customerInfo.addressLine}, \u00A0\u00A0${values.customerInfo.phoneNumber}`
+                                  : `${values?.customerInfo?.addressLine || ''} ${values?.customerInfo?.phoneNumber || ''}`}
+                              </Typography>
+                              <Typography color="secondary">{values?.customerInfo?.email}</Typography>
+                              {/* <Typography color="secondary">GstIn: {values?.customerInfo?.gstIn}</Typography> */}
+                              {values?.customerInfo?.gstIn && <Typography color="secondary">GstIn: {values.customerInfo.gstIn}</Typography>}
+                            </Stack>
+                          </Typography>
                         </Stack>
                       </Grid>
                       <Grid item xs={12} sm={4}>
@@ -545,7 +560,7 @@ const Createinvoice = () => {
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs={6} style={{ paddingRight: '0px', paddingLeft: '15px' }}>
                       <Typography variant="h5" style={{ margin: '0', padding: '15px 0' }}>
-                        Detail <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
+                        Details <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
                       </Typography>
                     </Grid>
                     <Grid item xs={6} container justifyContent="flex-end" alignItems="center" style={{ paddingLeft: '5px' }}>
@@ -738,7 +753,7 @@ const Createinvoice = () => {
                             </Grid>
                             <Grid item xs={12} md={4}>
                               <Grid item xs={12}>
-                                <Stack spacing={2} sx={{ marginTop: 3 }}>
+                                <Stack spacing={2} sx={{ marginTop: 2, paddingRight: '25px' }}>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
                                     <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
@@ -849,264 +864,6 @@ const Createinvoice = () => {
                         onAddNextInvoice={addNextInvoiceHandler}
                       />
                     </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FieldArray
-                      name="invoice_detail"
-                      render={({ remove, push }) => {
-                        return (
-                          <>
-                            <TableContainer>
-                              <Table sx={{ minWidth: 650 }}>
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      No
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      So No
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      So Date
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Name
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Description
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Qty
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Price
-                                    </TableCell>
-                                    {discountFees && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          Fees
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          Discount (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    {showGSTRates && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          CGST (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      CGST Amt
-                                    </TableCell>
-                                    {showGSTRates && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                          SGST (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      SGST Amt
-                                    </TableCell>
-                                    {showGSTRates && (
-                                      <>
-                                        <TableCell align="center" sx={{ padding: '0px 0px' }}>
-                                          IGST (%)
-                                        </TableCell>
-                                      </>
-                                    )}
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      IGST Amt
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                      Taxable
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Total Amt
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                      Action
-                                    </TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {values.invoice_detail?.map((item: any, index: number) => (
-                                    <TableRow key={item.id}>
-                                      <TableCell>{values.invoice_detail.indexOf(item) + 1}</TableCell>
-                                      <InvoiceItem
-                                        key={item.id}
-                                        id={item.id}
-                                        index={index}
-                                        soNo={item.soNo}
-                                        soDate={item.soDate}
-                                        name={item.name}
-                                        description={item.description}
-                                        qty={item.quantity}
-                                        price={item.price}
-                                        fees={item.fees}
-                                        discount={item.discount}
-                                        taxableAmount={item.taxableAmount}
-                                        cgst={item.cgst}
-                                        sgst={item.sgst}
-                                        igst={item.igst}
-                                        onDeleteItem={(index: number) => remove(index)}
-                                        onEditItem={handleChange}
-                                        Blur={handleBlur}
-                                        errors={errors}
-                                        touched={touched}
-                                        products={products}
-                                        setFieldValue={setFieldValue}
-                                      />
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
-                            <Divider />
-                            {touched.invoice_detail && errors.invoice_detail && !Array.isArray(errors?.invoice_detail) && (
-                              <Stack direction="row" justifyContent="center" sx={{ p: 1.5 }}>
-                                <FormHelperText error={true}>{errors.invoice_detail as string}</FormHelperText>
-                              </Stack>
-                            )}
-                            <Grid container justifyContent="space-between">
-                              <Grid item xs={12} md={8}>
-                                <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
-                                  <Button
-                                    color="primary"
-                                    startIcon={<PlusOutlined />}
-                                    onClick={() =>
-                                      push({
-                                        id: UIDV4(),
-                                        name: '',
-                                        description: '',
-                                        quantity: 1,
-                                        price: '1.00'
-                                      })
-                                    }
-                                    variant="dashed"
-                                    sx={{ bgcolor: 'transparent !important' }}
-                                  >
-                                    Add Item
-                                  </Button>
-                                </Box>
-                              </Grid>
-                              <Grid item xs={12} md={4}>
-                                <Grid item xs={12}>
-                                  <Stack spacing={2} sx={{ marginTop: 3 }}>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                                      <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
-                                      <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
-                                      <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
-                                      <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>Fees:</Typography>
-                                      <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography color={theme.palette.grey[500]}>Discount:</Typography>
-                                      <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
-                                    </Stack>
-                                    <Stack direction="row" justifyContent="space-between">
-                                      <Typography variant="subtitle1">Grand Total:</Typography>
-                                      <Typography variant="subtitle1">
-                                        {grandAmount % 1 === 0
-                                          ? country?.prefix + '' + grandAmount
-                                          : country?.prefix + '' + grandAmount.toFixed(2)}
-                                      </Typography>
-                                    </Stack>
-                                  </Stack>
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                          </>
-                        );
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Stack spacing={1}>
-                      <InputLabel>Notes</InputLabel>
-                      <TextField
-                        placeholder="Address"
-                        rows={3}
-                        value={values.note}
-                        multiline
-                        name="note"
-                        onChange={handleChange}
-                        inputProps={{
-                          maxLength: notesLimit
-                        }}
-                        helperText={`${values.note.length} / ${notesLimit}`}
-                        sx={{
-                          width: '100%',
-                          '& .MuiFormHelperText-root': {
-                            mr: 0,
-                            display: 'flex',
-                            justifyContent: 'flex-end'
-                          }
-                        }}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container justifyContent="flex-end" alignItems="flex-end">
-                      <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          sx={{ color: 'secondary.dark' }}
-                          onClick={() =>
-                            dispatch(
-                              reviewInvoicePopup({
-                                isOpen: true
-                              })
-                            )
-                          }
-                        >
-                          Preview
-                        </Button>
-                        <Button variant="outlined" color="secondary" sx={{ color: 'secondary.dark' }}>
-                          Save
-                        </Button>
-                        <Button color="primary" variant="contained" type="submit">
-                          Create & Send
-                        </Button>
-                        <InvoiceModal
-                          isOpen={isOpen}
-                          setIsOpen={(value: any) =>
-                            dispatch(
-                              reviewInvoicePopup({
-                                isOpen: value
-                              })
-                            )
-                          }
-                          key={values.invoiceNumber}
-                          invoiceInfo={{
-                            ...values,
-                            subtotal,
-                            taxRate,
-                            discountRate,
-                            grandAmount
-                          }}
-                          items={values?.invoice_detail}
-                          onAddNextInvoice={addNextInvoiceHandler}
-                        />
-                      </Stack>
-                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>

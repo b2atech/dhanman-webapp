@@ -169,5 +169,7 @@
   "inventoryreports": "Inventory Reports",
   "closingstock": "Closing Stock",
   "makepayment": "Make Payment", 
-  "accountgroups": "Account Groups"
+  "accountgroups": "Account Groups",
+  "invoiceItemDeleted":"Invoice item deleted successfully.",
+  "invoiceItemCreated":"Invoice created successfully."
 }
