@@ -1,5 +1,6 @@
 import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router';
+import * as billStataus from 'constants/billStatus';
 
 // material-ui
 import {
@@ -166,18 +167,18 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   // =============================================== Tab ================================================================
 
   const selectedBillRowIds: string[] = [];
-  const groups = [{ id: 0, status: 'All' }];
+  const groups = [{ id: 0, status: 'All', statusId: 0 }];
   const uniqueStatusSet = new Set();
-  const [selectedBillIDs, setSelectedBillIds] = useState<any>();
+  const [selectedBillIDs, setSelectedBillIds] = useState<string[]>([]);
   const [isBillIdVisible, setIsBillIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<string>('All');
 
   for (const item of data) {
     if (!uniqueStatusSet.has(item.billStatusId)) {
       groups.push({
         id: item.billStatusId,
-        status: item.billStatus
+        status: item.billStatus,
+        statusId: item.billStatusId
       });
       uniqueStatusSet.add(item.billStatusId);
     }
@@ -226,78 +227,67 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     }
     window.location.reload();
   };
-
+  const [selectedStatus, setSelectedStatus] = useState<number>(0);
   const updateStatusButtons = () => {
     const buttons: React.ReactNode[] = [];
     const selectedBillStatus = selectedStatus;
 
-    switch (selectedBillStatus) {
-      case 'Draft':
-        buttons.push(
-          <Button
-            key="sendForApproval"
-            variant="contained"
-            color="primary"
-            onClick={() => updateBillStatus(2)}
-            style={{ marginRight: '300px' }}
-          >
-            Send for Approval
+    if (selectedBillStatus === billStataus.DRAFT) {
+      buttons.push(
+        <Button
+          key="sendForApproval"
+          variant="contained"
+          color="primary"
+          onClick={() => updateBillStatus(2)}
+          style={{ marginRight: '10px' }}
+        >
+          Send for Approval
+        </Button>
+      );
+    } else if (selectedBillStatus === billStataus.PENDING_APPROVAL) {
+      buttons.push(
+        <>
+          <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateBillStatus(6)}>
+            Reject
           </Button>
-        );
-        break;
-      case 'Pending Approval':
-        buttons.push(
-          <>
-            <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateBillStatus(6)}>
-              Reject
-            </Button>
-            <Button key="approve" variant="contained" color="primary" onClick={() => updateBillStatus(3)} style={{ marginRight: '300px' }}>
-              Approve
-            </Button>
-          </>
-        );
-        break;
-      case 'Approved':
-        buttons.push(
-          <>
-            <Button
-              key="payNow"
-              variant="contained"
-              color="primary"
-              style={{ marginRight: '300px' }}
-              onClick={() => {
-                navigation('/purchase/payments/add');
-              }}
-            >
-              Pay Now
-            </Button>
-          </>
-        );
-        break;
-      case 'Partially Paid':
-        buttons.push(
-          <Button
-            key="paid"
-            variant="contained"
-            color="primary"
-            style={{ marginRight: '300px' }}
-            onClick={(e: any) => {
-              e.stopPropagation();
-              navigation('/purchase/payments/add');
-            }}
-          >
-            Pay Now
+          <Button key="approve" variant="contained" color="primary" onClick={() => updateBillStatus(3)} style={{ marginRight: '10px' }}>
+            Approve
           </Button>
-        );
-        break;
-      default:
-        break;
+        </>
+      );
+    } else if (selectedBillStatus === billStataus.APPROVED) {
+      buttons.push(
+        <Button
+          key="payNow"
+          variant="contained"
+          color="primary"
+          onClick={() => navigation('/purchase/payments/add')}
+          style={{ marginRight: '10px' }}
+        >
+          Pay Now
+        </Button>
+      );
+    } else if (selectedBillStatus === billStataus.PARTIALLY_PAID) {
+      buttons.push(
+        <Button
+          key="paid"
+          variant="contained"
+          color="primary"
+          onClick={(e: any) => {
+            e.stopPropagation();
+            navigation('/purchase/payments/add');
+          }}
+          style={{ marginRight: '10px' }}
+        >
+          Pay Now
+        </Button>
+      );
     }
     return buttons;
   };
 
   useEffect(() => {
-    setFilter('billStatus', selectedStatus === 'All' ? '' : selectedStatus);
+    setFilter('billStatusId', selectedStatus === billStataus.ALL ? '' : selectedStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStatus]);
   return (
@@ -305,27 +295,27 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
       <Box sx={{ p: 3, pb: 0, width: '100%' }}>
         <Tabs
           value={selectedStatus}
-          onChange={(e: ChangeEvent<{}>, value: string) => setSelectedStatus(value)}
+          onChange={(e: ChangeEvent<{}>, value: number) => setSelectedStatus(value)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          {groups.map(({ id, status }) => (
+          {groups.map(({ id, status, statusId }) => (
             <Tab
               key={id}
               label={status}
-              value={status}
+              value={statusId}
               icon={
                 <Chip
-                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
+                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : billStataus.ALL}
                   color={
-                    status === 'All'
+                    statusId === billStataus.ALL
                       ? 'primary'
-                      : status === 'Draft' || status === 'Pending Approval'
+                      : statusId === billStataus.DRAFT || statusId === billStataus.PENDING_APPROVAL
                       ? 'info'
-                      : status === 'Approved' || status === 'Partially' || status === 'Paid'
+                      : statusId === billStataus.APPROVED || statusId === billStataus.PARTIALLY_PAID || statusId === billStataus.PAID
                       ? 'success'
-                      : status === 'Rejected'
+                      : statusId === billStataus.REJECTED
                       ? 'error'
-                      : status === 'Cancelled'
+                      : statusId === billStataus.CANCELLED
                       ? 'warning'
                       : 'error'
                   }
@@ -421,14 +411,11 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
                           row.toggleRowSelected();
                           setTimeout(() => {
                             if (row.isSelected) {
+                              setSelectedBillIds((prevIds: string[]) => [...prevIds, row.values.id]);
                               selectedBillRowIds.push(row.values.id);
                             } else {
-                              const index = selectedBillRowIds.indexOf(row.id);
-                              if (index !== -1) {
-                                selectedBillRowIds.splice(index, 1);
-                              }
+                              setSelectedBillIds((prevIds: string[]) => prevIds.filter((id) => id !== row.values.id));
                             }
-                            setSelectedBillIds(selectedBillRowIds);
                           }, 0);
                         }}
                         sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
@@ -551,25 +538,25 @@ const Bills = () => {
         },
         {
           Header: 'Status',
-          accessor: 'billStatus',
+          accessor: 'billStatusId',
           className: 'cell-left',
           disableFilters: true,
           Filter: ({ column }) => <>{column.render('Filter')}</>,
-          Cell: ({ value }: { value: string }) => {
+          Cell: ({ value }: { value: number }) => {
             switch (value) {
-              case 'Draft':
+              case billStataus.DRAFT:
                 return <Chip color="primary" label="Draft" size="small" variant="light" />;
-              case 'Pending Approval':
+              case billStataus.PENDING_APPROVAL:
                 return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
-              case 'Approved':
+              case billStataus.APPROVED:
                 return <Chip color="success" label="Approval" size="small" variant="light" />;
-              case 'Partially Paid':
+              case billStataus.PARTIALLY_PAID:
                 return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
-              case 'Paid':
+              case billStataus.PAID:
                 return <Chip color="success" label="Paid" size="small" variant="light" />;
-              case 'Rejected':
+              case billStataus.REJECTED:
                 return <Chip color="error" label="Rejected" size="small" variant="light" />;
-              case 'Cancelled':
+              case billStataus.CANCELLED:
                 return <Chip color="error" label="Cancelled" size="small" variant="light" />;
               default:
                 return <Chip color="warning" label={value} size="small" variant="light" />;
