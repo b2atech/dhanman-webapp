@@ -1,8 +1,8 @@
-export const All = 0;
-export const Draft = 1;
-export const Pending_Approval = 2;
-export const Approved = 3;
-export const Partially_Paid = 4;
-export const Paid = 5;
-export const Rejected = 6;
-export const Cancelled = 7;
+export const ALL = 0;
+export const DRAFT = 1;
+export const PENDING_APPROVAL = 2;
+export const APPROVED = 3;
+export const PARTIALLY_PAID = 4;
+export const PAID = 5;
+export const REJECTED = 6;
+export const CANCELLED = 7;

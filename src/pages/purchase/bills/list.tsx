@@ -232,7 +232,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     const buttons: React.ReactNode[] = [];
     const selectedBillStatus = selectedStatus;
 
-    if (selectedBillStatus === billStataus.Draft) {
+    if (selectedBillStatus === billStataus.DRAFT) {
       buttons.push(
         <Button
           key="sendForApproval"
@@ -244,7 +244,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           Send for Approval
         </Button>
       );
-    } else if (selectedBillStatus === billStataus.Pending_Approval) {
+    } else if (selectedBillStatus === billStataus.PENDING_APPROVAL) {
       buttons.push(
         <>
           <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateBillStatus(6)}>
@@ -255,7 +255,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           </Button>
         </>
       );
-    } else if (selectedBillStatus === billStataus.Approved) {
+    } else if (selectedBillStatus === billStataus.APPROVED) {
       buttons.push(
         <Button
           key="payNow"
@@ -267,7 +267,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           Pay Now
         </Button>
       );
-    } else if (selectedBillStatus === billStataus.Partially_Paid) {
+    } else if (selectedBillStatus === billStataus.PARTIALLY_PAID) {
       buttons.push(
         <Button
           key="paid"
@@ -287,7 +287,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   };
 
   useEffect(() => {
-    setFilter('billStatusId', selectedStatus === billStataus.All ? '' : selectedStatus);
+    setFilter('billStatusId', selectedStatus === billStataus.ALL ? '' : selectedStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStatus]);
   return (
@@ -305,17 +305,17 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
               value={statusId}
               icon={
                 <Chip
-                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : billStataus.All}
+                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : billStataus.ALL}
                   color={
-                    statusId === billStataus.All
+                    statusId === billStataus.ALL
                       ? 'primary'
-                      : statusId === billStataus.Draft || statusId === billStataus.Pending_Approval
+                      : statusId === billStataus.DRAFT || statusId === billStataus.PENDING_APPROVAL
                       ? 'info'
-                      : statusId === billStataus.Approved || statusId === billStataus.Partially_Paid || statusId === billStataus.Paid
+                      : statusId === billStataus.APPROVED || statusId === billStataus.PARTIALLY_PAID || statusId === billStataus.PAID
                       ? 'success'
-                      : statusId === billStataus.Rejected
+                      : statusId === billStataus.REJECTED
                       ? 'error'
-                      : statusId === billStataus.Cancelled
+                      : statusId === billStataus.CANCELLED
                       ? 'warning'
                       : 'error'
                   }
@@ -544,19 +544,19 @@ const Bills = () => {
           Filter: ({ column }) => <>{column.render('Filter')}</>,
           Cell: ({ value }: { value: number }) => {
             switch (value) {
-              case billStataus.Draft:
+              case billStataus.DRAFT:
                 return <Chip color="primary" label="Draft" size="small" variant="light" />;
-              case billStataus.Pending_Approval:
+              case billStataus.PENDING_APPROVAL:
                 return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
-              case billStataus.Approved:
+              case billStataus.APPROVED:
                 return <Chip color="success" label="Approval" size="small" variant="light" />;
-              case billStataus.Partially_Paid:
+              case billStataus.PARTIALLY_PAID:
                 return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
-              case billStataus.Paid:
+              case billStataus.PAID:
                 return <Chip color="success" label="Paid" size="small" variant="light" />;
-              case billStataus.Rejected:
+              case billStataus.REJECTED:
                 return <Chip color="error" label="Rejected" size="small" variant="light" />;
-              case billStataus.Cancelled:
+              case billStataus.CANCELLED:
                 return <Chip color="error" label="Cancelled" size="small" variant="light" />;
               default:
                 return <Chip color="warning" label={value} size="small" variant="light" />;
