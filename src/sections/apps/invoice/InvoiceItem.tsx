@@ -49,6 +49,7 @@ const InvoiceItem = ({
   const Name = `invoice_detail[${index}].name`;
   const touchedName = getIn(touched, Name);
   const errorName = getIn(errors, Name);
+  const selectedProduct = products.find((product: any) => product.productName === name);
   const textFieldItem = [
     {
       placeholder: 'SalesOrder',
@@ -133,7 +134,9 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.taxableAmount`,
       type: '',
       id: id,
-      value: (cgst / 100) * price + (sgst / 100) * price - price * qty * (discount / 100) + price * qty + fees,
+      value: selectedProduct
+        ? (cgst / 100) * price * qty + (sgst / 100) * price * qty - price * qty * (discount / 100) + price * qty + fees
+        : '0.00',
       style: { width: '100px' },
       visibility: true
     },
@@ -232,7 +235,7 @@ const InvoiceItem = ({
                 : country?.prefix +
                   '' +
                   (
-                    (sgst && cgst ? (cgst / 100) * price + (sgst / 100) * price : (igst / 100) * price) +
+                    (sgst && cgst ? (cgst / 100) * price * qty + (sgst / 100) * price * qty : (igst / 100) * price * qty) +
                     price * qty -
                     price * qty * (discount / 100)
                   ).toFixed(2)}

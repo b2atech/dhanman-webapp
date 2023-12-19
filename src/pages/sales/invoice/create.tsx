@@ -305,8 +305,8 @@ const Createinvoice = () => {
                 prev +
                 Number(
                   (curr.sgst && curr.cgst
-                    ? (curr.cgst / 100) * curr.price + (curr.sgst / 100) * curr.price
-                    : (curr.igst / 100) * curr.price) +
+                    ? (curr.cgst / 100) * curr.price * curr.quantity + (curr.sgst / 100) * curr.price * curr.quantity
+                    : (curr.igst / 100) * curr.price * curr.quantity) +
                     curr.price * Math.floor(curr.quantity)
                 )
               );
@@ -314,15 +314,15 @@ const Createinvoice = () => {
           }, 0);
           const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
           const sgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
           const igstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
           const fees = values?.invoice_detail.reduce((prev, curr: any) => {
@@ -472,7 +472,7 @@ const Createinvoice = () => {
                               <Typography color="secondary">{`${company?.addressLine || ''} ,\u00A0\u00A0 ${
                                 company?.phoneNumber || ''
                               }`}</Typography>
-                              <Typography color="secondary">GstIn: {company?.gstIn || ''}</Typography>
+                              <Typography color="secondary">GSTIN: {company?.gstIn || ''}</Typography>
                             </Stack>
                           </Typography>
                           {loading ? <Loader /> : ''}
@@ -515,7 +515,7 @@ const Createinvoice = () => {
                               </Typography>
                               <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                               {/* <Typography color="secondary">GstIn: {values?.customerInfo?.gstIn}</Typography> */}
-                              {values?.customerInfo?.gstIn && <Typography color="secondary">GstIn: {values.customerInfo.gstIn}</Typography>}
+                              {values?.customerInfo?.gstIn && <Typography color="secondary">GSTIN: {values.customerInfo.gstIn}</Typography>}
                             </Stack>
                           </Typography>
                         </Stack>
@@ -556,7 +556,7 @@ const Createinvoice = () => {
                     <FormHelperText error={true}>{errors?.customerInfo?.firstName as string}</FormHelperText>
                   )}
                 </Grid>
-                <Grid item xs={12} sm={12}>
+                <Grid item xs={12} sm={12} sx={{ marginTop: '-25px', marginBottom: '-20px' }}>
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs={6} style={{ paddingRight: '0px', paddingLeft: '15px' }}>
                       <Typography variant="h5" style={{ margin: '0', padding: '15px 0' }}>
@@ -753,7 +753,7 @@ const Createinvoice = () => {
                             </Grid>
                             <Grid item xs={12} md={4}>
                               <Grid item xs={12}>
-                                <Stack spacing={2} sx={{ marginTop: 2, paddingRight: '25px' }}>
+                                <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '25px' }}>
                                   <Stack direction="row" justifyContent="space-between">
                                     <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
                                     <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
@@ -788,37 +788,37 @@ const Createinvoice = () => {
                                   </Stack>
                                 </Stack>
                               </Grid>
+                              <Grid item xs={12} md={10} sx={{ margineTop: '-500px' }}>
+                                <Stack spacing={1}>
+                                  <InputLabel>Notes</InputLabel>
+                                  <TextField
+                                    placeholder="Address"
+                                    rows={3}
+                                    value={values.note}
+                                    multiline
+                                    name="note"
+                                    onChange={handleChange}
+                                    inputProps={{
+                                      maxLength: notesLimit
+                                    }}
+                                    helperText={`${values.note.length} / ${notesLimit}`}
+                                    sx={{
+                                      width: '100%',
+                                      '& .MuiFormHelperText-root': {
+                                        mr: 0,
+                                        display: 'flex',
+                                        justifyContent: 'flex-end'
+                                      }
+                                    }}
+                                  />
+                                </Stack>
+                              </Grid>
                             </Grid>
                           </Grid>
                         </>
                       );
                     }}
                   />
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel>Notes</InputLabel>
-                    <TextField
-                      placeholder="Address"
-                      rows={3}
-                      value={values.note}
-                      multiline
-                      name="note"
-                      onChange={handleChange}
-                      inputProps={{
-                        maxLength: notesLimit
-                      }}
-                      helperText={`${values.note.length} / ${notesLimit}`}
-                      sx={{
-                        width: '100%',
-                        '& .MuiFormHelperText-root': {
-                          mr: 0,
-                          display: 'flex',
-                          justifyContent: 'flex-end'
-                        }
-                      }}
-                    />
-                  </Stack>
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container justifyContent="flex-end" alignItems="flex-end">
