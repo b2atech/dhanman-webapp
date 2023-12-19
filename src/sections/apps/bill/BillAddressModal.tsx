@@ -128,7 +128,7 @@ const Address = ({ handlerAddress }: AddressProps) => {
               {vendorList.phoneNumber}
             </Typography>
             <Typography textAlign="left" variant="body2" color="secondary">
-              {vendorList.city}
+              {vendorList.addressLine}
             </Typography>
           </Stack>
           <Typography textAlign="left" variant="body2" color="secondary">
