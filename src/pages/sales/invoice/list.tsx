@@ -1,5 +1,6 @@
 import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, useCallback, FC, MouseEvent } from 'react';
 import { useNavigate } from 'react-router';
+import * as invoiceStataus from 'constants/InvoiceStatus';
 
 // material-ui
 import {
@@ -65,17 +66,19 @@ import { renderFilterTypes, GlobalFilter, DateColumnFilter } from 'utils/react-t
 import { NumericFormat } from 'react-number-format';
 
 // types
-import { IInvoiceList, IUpdateInvoiceStatus } from 'types/invoice';
+import { IInvoiceList, IUpdateInvoiceNextStatus } from 'types/invoice';
 import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
-import { getAllInvoices, getInvoiceDetailsByHeaderId, updateStatus } from 'api/services/SalesService';
+import { getAllInvoices, getInvoiceDetailsByHeaderId, updateNextStatus } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import { PaletteColor } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { openSnackbar } from 'store/reducers/snackbar';
+import config from 'config';
 
 const moment = require('moment');
+const companyId: string = String(config.companyId);
 export interface InvoiceWidgets {
   title: string;
   count: string;
@@ -345,13 +348,13 @@ function ReactTable({
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
-  const updateInvoiceStatus = async (stausId: number) => {
-    const updateInvoiceStatusData: IUpdateInvoiceStatus = {
+  const updateInvoiceStatus = async () => {
+    const updateInvoiceStatusData: IUpdateInvoiceNextStatus = {
       invoiceIds: selectedInvoiceIDs,
-      invoiceStatusId: stausId
+      companyId: companyId
     };
     try {
-      await updateStatus(updateInvoiceStatusData);
+      await updateNextStatus(updateInvoiceStatusData);
 
       dispatch(
         openSnackbar({
@@ -374,70 +377,59 @@ function ReactTable({
   const [selectedStatus, setSelectedStatus] = useState<number>(0);
   const updateStatusButtons = () => {
     const buttons: React.ReactNode[] = [];
-    switch (selectedStatus) {
-      case 1:
-        buttons.push(
-          <Button key="draft" variant="contained" color="primary" onClick={() => updateInvoiceStatus(2)} style={{ marginRight: '300px' }}>
-            Send for Approval
-          </Button>
-        );
-        break;
-      case 3:
-        buttons.push(
-          <Button
-            key="approval"
-            variant="contained"
-            color="primary"
-            onClick={(e: any) => {
-              e.stopPropagation();
-              navigation('/sales/payments/add');
-            }}
-            style={{ marginRight: '300px' }}
-          >
-            Pay Now
-          </Button>
-        );
-        break;
-      case 2:
-        buttons.push(
-          <>
-            <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateInvoiceStatus(6)}>
-              Reject
-            </Button>
-            <Button
-              key="approve"
-              variant="contained"
-              color="primary"
-              onClick={() => updateInvoiceStatus(3)}
-              style={{ marginRight: '300px' }}
-            >
-              Approve
-            </Button>
-          </>
-        );
-        break;
-      case 4:
-        buttons.push(
-          <Button
-            key="paid"
-            variant="contained"
-            color="primary"
-            style={{ marginRight: '300px' }}
-            onClick={(e: any) => {
-              e.stopPropagation();
-              navigation('/sales/payments/add');
-            }}
-          >
-            Pay Now
-          </Button>
-        );
-        break;
-      case 5:
-        break;
-      default:
-        break;
-    }
+    const selectedInvoiceStatus = selectedStatus;
 
+    if (selectedInvoiceStatus === invoiceStataus.DRAFT) {
+      buttons.push(
+        <Button
+          key="sendForApproval"
+          variant="contained"
+          color="primary"
+          onClick={() => updateInvoiceStatus()}
+          style={{ marginRight: '10px' }}
+        >
+          Send for Approval
+        </Button>
+      );
+    } else if (selectedInvoiceStatus === invoiceStataus.PENDING_APPROVAL) {
+      buttons.push(
+        <>
+          <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateInvoiceStatus()}>
+            Reject
+          </Button>
+          <Button key="approve" variant="contained" color="primary" onClick={() => updateInvoiceStatus()} style={{ marginRight: '10px' }}>
+            Approve
+          </Button>
+        </>
+      );
+    } else if (selectedInvoiceStatus === invoiceStataus.APPROVED) {
+      buttons.push(
+        <Button
+          key="payNow"
+          variant="contained"
+          color="primary"
+          onClick={() => navigation('/sales/payments/add')}
+          style={{ marginRight: '10px' }}
+        >
+          Pay Now
+        </Button>
+      );
+    } else if (selectedInvoiceStatus === invoiceStataus.PARTIALLY_PAID) {
+      buttons.push(
+        <Button
+          key="paid"
+          variant="contained"
+          color="primary"
+          onClick={(e: any) => {
+            e.stopPropagation();
+            navigation('/sales/payments/add');
+          }}
+          style={{ marginRight: '10px' }}
+        >
+          Pay Now
+        </Button>
+      );
+    }
     return buttons;
   };
 
@@ -461,17 +453,19 @@ function ReactTable({
               value={statusId}
               icon={
                 <Chip
-                  label={statusId === 0 ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
+                  label={status === 'ALL' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
                   color={
-                    statusId === 0
+                    statusId === invoiceStataus.ALL
                       ? 'primary'
-                      : statusId === 1 || statusId === 2
+                      : statusId === invoiceStataus.DRAFT || statusId === invoiceStataus.PENDING_APPROVAL
                       ? 'info'
-                      : statusId === 3 || statusId === 4 || statusId === 5
+                      : statusId === invoiceStataus.APPROVED ||
+                        statusId === invoiceStataus.PARTIALLY_PAID ||
+                        statusId === invoiceStataus.PAID
                       ? 'success'
-                      : statusId === 6
+                      : statusId === invoiceStataus.REJECTED
                       ? 'error'
-                      : statusId === 7
+                      : statusId === invoiceStataus.CANCELLED
                       ? 'warning'
                       : 'error'
                   }
@@ -632,7 +626,7 @@ const List = () => {
   };
 
   useEffect(() => {
-    getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllInvoices(companyId)
       .then((invoiceList) => {
         if (Array.isArray(invoiceList)) {
           setList(invoiceList);
@@ -747,19 +741,19 @@ const List = () => {
         Filter: ({ column }: { column: any }) => <>{column.render('Filter')}</>,
         Cell: ({ value }: { value: number }) => {
           switch (value) {
-            case 1:
+            case invoiceStataus.DRAFT:
               return <Chip color="primary" label="Draft" size="small" variant="light" />;
-            case 2:
+            case invoiceStataus.PENDING_APPROVAL:
               return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
-            case 3:
+            case invoiceStataus.APPROVED:
               return <Chip color="success" label="Approval" size="small" variant="light" />;
-            case 4:
+            case invoiceStataus.PARTIALLY_PAID:
               return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
-            case 5:
+            case invoiceStataus.PAID:
               return <Chip color="success" label="Paid" size="small" variant="light" />;
-            case 6:
+            case invoiceStataus.REJECTED:
               return <Chip color="error" label="Rejected" size="small" variant="light" />;
-            case 7:
+            case invoiceStataus.CANCELLED:
               return <Chip color="error" label="Cancelled" size="small" variant="light" />;
             default:
               return <Chip color="warning" label={value} size="small" variant="light" />;
