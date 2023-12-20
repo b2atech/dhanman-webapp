@@ -171,5 +171,7 @@
   "makepayment": "Make Payment", 
   "accountgroups": "Account Groups",
   "billItemDeleted": "Bill item deleted successfully",
-  "billItemAdded": "Bill item added succcessfully"
+  "billItemAdded": "Bill item added succcessfully",
+  "invoiceItemDeleted":"Invoice item deleted successfully.",
+  "invoiceItemCreated":"Invoice created successfully."
 }

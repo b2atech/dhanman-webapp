@@ -1,5 +1,6 @@
 import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, useCallback, FC, MouseEvent } from 'react';
 import { useNavigate } from 'react-router';
+import * as invoiceStataus from 'constants/InvoiceStatus';
 
 // material-ui
 import {
@@ -65,17 +66,19 @@ import { renderFilterTypes, GlobalFilter, DateColumnFilter } from 'utils/react-t
 import { NumericFormat } from 'react-number-format';
 
 // types
-import { IInvoiceList, IUpdateInvoiceStatus } from 'types/invoice';
+import { IInvoiceList, IUpdateInvoiceNextStatus, IUpdateInvoicePreviousStatus } from 'types/invoice';
 import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
-import { getAllInvoices, getInvoiceDetailsByHeaderId, updateStatus } from 'api/services/SalesService';
+import { getAllInvoices, getInvoiceDetailsByHeaderId, updateNextStatus, updatePreviousStatuses } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import { PaletteColor } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { openSnackbar } from 'store/reducers/snackbar';
+import config from 'config';
 
 const moment = require('moment');
+const companyId: string = String(config.companyId);
 export interface InvoiceWidgets {
   title: string;
   count: string;
@@ -307,8 +310,7 @@ function ReactTable({
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
   // =============================================== Tab ================================================================
-  const selectedInvoiceRowIds: string[] = [];
-  const groups = [{ id: 0, status: 'All' }];
+  const groups = [{ id: 0, status: 'All', statusId: 0 }];
 
   const uniqueStatusSet = new Set();
 
@@ -316,7 +318,8 @@ function ReactTable({
     if (!uniqueStatusSet.has(item.invoiceStatusId)) {
       groups.push({
         id: item.invoiceStatusId,
-        status: item.invoiceStatus
+        status: item.invoiceStatus,
+        statusId: item.invoiceStatusId
       });
       uniqueStatusSet.add(item.invoiceStatusId);
     }
@@ -332,7 +335,7 @@ function ReactTable({
     {}
   );
 
-  const [selectedInvoiceIDs, setSelectedInvoiceIds] = useState<any>();
+  const [selectedInvoiceIDs, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isInvoiceIdVisible, setIsInvoiceIdVisible] = useState(false);
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const navigation = useNavigate();
@@ -345,13 +348,13 @@ function ReactTable({
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
-  const updateInvoiceStatus = async (stausId: number) => {
-    const updateInvoiceStatusData: IUpdateInvoiceStatus = {
+  const updateInvoiceDraftStatus = async () => {
+    const updateInvoiceStatusData: IUpdateInvoiceNextStatus = {
       invoiceIds: selectedInvoiceIDs,
-      invoiceStatusId: stausId
+      companyId: companyId
     };
     try {
-      await updateStatus(updateInvoiceStatusData);
+      await updateNextStatus(updateInvoiceStatusData);
 
       dispatch(
         openSnackbar({
@@ -371,78 +374,131 @@ function ReactTable({
     window.location.reload();
   };
 
-  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+  const updateInvoiceRejectStatuses = async () => {
+    const updateInvoiceStatusData: IUpdateInvoicePreviousStatus = {
+      invoiceIds: selectedInvoiceIDs,
+      companyId: companyId
+    };
+    try {
+      await updatePreviousStatuses(updateInvoiceStatusData);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
+  const updateInvoiceApproveStatus = async () => {
+    const updateInvoiceStatusData: IUpdateInvoiceNextStatus = {
+      invoiceIds: selectedInvoiceIDs,
+      companyId: companyId
+    };
+    try {
+      await updateNextStatus(updateInvoiceStatusData);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
+  const [selectedStatus, setSelectedStatus] = useState<number>(0);
   const updateStatusButtons = () => {
     const buttons: React.ReactNode[] = [];
-    switch (selectedStatus) {
-      case 'Draft':
-        buttons.push(
-          <Button key="draft" variant="contained" color="primary" onClick={() => updateInvoiceStatus(2)} style={{ marginRight: '300px' }}>
-            Send for Approval
-          </Button>
-        );
-        break;
-      case 'Approved':
-        buttons.push(
-          <Button
-            key="approval"
-            variant="contained"
-            color="primary"
-            onClick={(e: any) => {
-              e.stopPropagation();
-              navigation('/sales/payments/add');
-            }}
-            style={{ marginRight: '300px' }}
-          >
-            Pay Now
-          </Button>
-        );
-        break;
-      case 'Pending Approval':
-        buttons.push(
-          <>
-            <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateInvoiceStatus(6)}>
-              Reject
-            </Button>
-            <Button
-              key="approve"
-              variant="contained"
-              color="primary"
-              onClick={() => updateInvoiceStatus(3)}
-              style={{ marginRight: '300px' }}
-            >
-              Approve
-            </Button>
-          </>
-        );
-        break;
-      case 'Partially Paid':
-        buttons.push(
-          <Button
-            key="paid"
-            variant="contained"
-            color="primary"
-            style={{ marginRight: '300px' }}
-            onClick={(e: any) => {
-              e.stopPropagation();
-              navigation('/sales/payments/add');
-            }}
-          >
-            Pay Now
-          </Button>
-        );
-        break;
-      case 'Paid':
-        break;
-      default:
-        break;
-    }
+    const selectedInvoiceStatus = selectedStatus;
 
+    if (selectedInvoiceStatus === invoiceStataus.DRAFT) {
+      buttons.push(
+        <Button
+          key="sendForApproval"
+          variant="contained"
+          color="primary"
+          onClick={() => updateInvoiceDraftStatus()}
+          style={{ marginRight: '10px' }}
+        >
+          Send for Approval
+        </Button>
+      );
+    } else if (selectedInvoiceStatus === invoiceStataus.PENDING_APPROVAL) {
+      buttons.push(
+        <>
+          <Button
+            key="reject"
+            variant="contained"
+            color="primary"
+            style={{ marginRight: '10px' }}
+            onClick={() => updateInvoiceRejectStatuses()}
+          >
+            Reject
+          </Button>
+          <Button
+            key="approve"
+            variant="contained"
+            color="primary"
+            onClick={() => updateInvoiceApproveStatus()}
+            style={{ marginRight: '10px' }}
+          >
+            Approve
+          </Button>
+        </>
+      );
+    } else if (selectedInvoiceStatus === invoiceStataus.APPROVED) {
+      buttons.push(
+        <Button
+          key="payNow"
+          variant="contained"
+          color="primary"
+          onClick={() => navigation('/sales/payments/add')}
+          style={{ marginRight: '10px' }}
+        >
+          Pay Now
+        </Button>
+      );
+    } else if (selectedInvoiceStatus === invoiceStataus.PARTIALLY_PAID) {
+      buttons.push(
+        <Button
+          key="paid"
+          variant="contained"
+          color="primary"
+          onClick={(e: any) => {
+            e.stopPropagation();
+            navigation('/sales/payments/add');
+          }}
+          style={{ marginRight: '10px' }}
+        >
+          Pay Now
+        </Button>
+      );
+    }
     return buttons;
   };
 
   useEffect(() => {
-    setFilter('invoiceStatus', selectedStatus === 'All' ? '' : selectedStatus);
+    setFilter('invoiceStatusId', selectedStatus === 0 ? '' : selectedStatus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStatus]);
 
@@ -451,27 +507,29 @@ function ReactTable({
       <Box sx={{ p: 3, pb: 0, width: '100%' }}>
         <Tabs
           value={selectedStatus}
-          onChange={(e: ChangeEvent<{}>, value: string) => setSelectedStatus(value)}
+          onChange={(e: ChangeEvent<{}>, value: number) => setSelectedStatus(value)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          {groups.map(({ id, status }) => (
+          {groups.map(({ id, status, statusId }) => (
             <Tab
               key={id}
               label={status}
-              value={status}
+              value={statusId}
               icon={
                 <Chip
-                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
+                  label={status === 'ALL' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
                   color={
-                    status === 'All'
+                    statusId === invoiceStataus.ALL
                       ? 'primary'
-                      : status === 'Draft' || status === 'Pending Approval'
+                      : statusId === invoiceStataus.DRAFT || statusId === invoiceStataus.PENDING_APPROVAL
                       ? 'info'
-                      : status === 'Approved' || status === 'Partially' || status === 'Paid'
+                      : statusId === invoiceStataus.APPROVED ||
+                        statusId === invoiceStataus.PARTIALLY_PAID ||
+                        statusId === invoiceStataus.PAID
                       ? 'success'
-                      : status === 'Rejected'
+                      : statusId === invoiceStataus.REJECTED
                       ? 'error'
-                      : status === 'Cancelled'
+                      : statusId === invoiceStataus.CANCELLED
                       ? 'warning'
                       : 'error'
                   }
@@ -569,14 +627,10 @@ function ReactTable({
                           row.toggleRowSelected();
                           setTimeout(() => {
                             if (row.isSelected) {
-                              selectedInvoiceRowIds.push(row.values.id);
+                              setSelectedInvoiceIds((prevIds: string[]) => [...prevIds, row.values.id]);
                             } else {
-                              const index = selectedInvoiceRowIds.indexOf(row.id);
-                              if (index !== -1) {
-                                selectedInvoiceRowIds.splice(index, 1);
-                              }
+                              setSelectedInvoiceIds((prevIds: string[]) => prevIds.filter((id) => id !== row.values.id));
                             }
-                            setSelectedInvoiceIds(selectedInvoiceRowIds);
                           }, 0);
                         }}
                       >
@@ -636,7 +690,7 @@ const List = () => {
   };
 
   useEffect(() => {
-    getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllInvoices(companyId)
       .then((invoiceList) => {
         if (Array.isArray(invoiceList)) {
           setList(invoiceList);
@@ -746,24 +800,24 @@ const List = () => {
       },
       {
         Header: 'Status',
-        accessor: 'invoiceStatus',
+        accessor: 'invoiceStatusId',
         disableFilters: true,
         Filter: ({ column }: { column: any }) => <>{column.render('Filter')}</>,
-        Cell: ({ value }: { value: string }) => {
+        Cell: ({ value }: { value: number }) => {
           switch (value) {
-            case 'Draft':
+            case invoiceStataus.DRAFT:
               return <Chip color="primary" label="Draft" size="small" variant="light" />;
-            case 'Pending Approval':
+            case invoiceStataus.PENDING_APPROVAL:
               return <Chip color="secondary" label="Pending Approval" size="small" variant="light" />;
-            case 'Approved':
+            case invoiceStataus.APPROVED:
               return <Chip color="success" label="Approval" size="small" variant="light" />;
-            case 'Partially Paid':
+            case invoiceStataus.PARTIALLY_PAID:
               return <Chip color="success" label="Partially Paid" size="small" variant="light" />;
-            case 'Paid':
+            case invoiceStataus.PAID:
               return <Chip color="success" label="Paid" size="small" variant="light" />;
-            case 'Rejected':
+            case invoiceStataus.REJECTED:
               return <Chip color="error" label="Rejected" size="small" variant="light" />;
-            case 'Cancelled':
+            case invoiceStataus.CANCELLED:
               return <Chip color="error" label="Cancelled" size="small" variant="light" />;
             default:
               return <Chip color="warning" label={value} size="small" variant="light" />;
