@@ -49,7 +49,51 @@ const InvoiceItem = ({
   const Name = `invoice_detail[${index}].name`;
   const touchedName = getIn(touched, Name);
   const errorName = getIn(errors, Name);
-  const selectedProduct = products.find((product: any) => product.productName === name);
+  const getTotalAmount = (qty: number, price: number, discount: number, fees: number, cgst: number, sgst: number, igst: number) => {
+    if (qty && price) {
+      var taxableAmount = getTotalTaxableAmount(qty, price, discount, fees);
+      var cgstAmount = getCTaxAmount(qty, price, cgst);
+      var sgstAmount = getSTaxAmount(qty, price, sgst);
+      //var igstAmount = getITaxAmount(qty, price, igst);
+      return (taxableAmount + cgstAmount + sgstAmount).toFixed(2);
+    }
+    return '0.0';
+  };
+
+  const getTotalTaxableAmount = (qty: number, price: number, discount: number, fees: number) => {
+    if (qty && price) {
+      var amount = price * qty;
+      var discountAmount = 0;
+      var feesAmount = 0;
+      if (discount) {
+        discountAmount = amount * (discount / 100);
+      }
+      if (fees) {
+        feesAmount = amount * (fees / 100);
+      }
+      return amount - discountAmount + feesAmount;
+    }
+    return 0.0;
+  };
+  const getCTaxAmount = (qty: number, price: number, cgst: number) => {
+    if (cgst && price && qty) {
+      return (cgst / 100) * price * qty;
+    }
+    return 0.0;
+  };
+  const getSTaxAmount = (qty: number, price: number, sgst: number) => {
+    if (sgst && price && qty) {
+      return (sgst / 100) * price * qty;
+    }
+    return 0.0;
+  };
+
+  // const getITaxAmount = (qty: number, price: number, igst: number) => {
+  //   if (igst && price && qty) {
+  //     return (igst / 100) * price * qty;
+  //   }
+  //   return 0.0;
+  // };
   const textFieldItem = [
     {
       placeholder: 'SalesOrder',
@@ -134,9 +178,7 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.taxableAmount`,
       type: '',
       id: id,
-      value: selectedProduct
-        ? (cgst / 100) * price * qty + (sgst / 100) * price * qty - price * qty * (discount / 100) + price * qty + fees
-        : '0.00',
+      value: getTotalTaxableAmount(qty, price, discount, fees),
       style: { width: '100px' },
       visibility: true
     },
@@ -229,17 +271,7 @@ const InvoiceItem = ({
       <TableCell sx={{ textAlign: 'right' }}>
         <Stack direction="row" justifyContent="flex-end" alignItems="flex-end">
           <Box sx={{ minWidth: 90 }}>
-            <Typography>
-              {!name || !price || !qty
-                ? '0.00'
-                : country?.prefix +
-                  '' +
-                  (
-                    (sgst && cgst ? (cgst / 100) * price * qty + (sgst / 100) * price * qty : (igst / 100) * price * qty) +
-                    price * qty -
-                    price * qty * (discount / 100)
-                  ).toFixed(2)}
-            </Typography>
+            <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst)}</Typography>
           </Box>
         </Stack>
       </TableCell>

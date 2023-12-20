@@ -334,7 +334,7 @@ const Createinvoice = () => {
             else return prev;
           }, 0);
           const grandAmount = subtotal + discountRate + fees;
-          values.totalAmount = grandAmount;
+          //values.totalAmount = grandAmount;
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -465,7 +465,7 @@ const Createinvoice = () => {
                           <Typography variant="h5">
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                               <span style={{ paddingRight: '10px' }}>From:</span>
-                              <span>{company?.name || ''}</span>
+                              <span style={{ whiteSpace: 'nowrap' }}>{company?.name || ''}</span>
                             </Box>
                             <Stack sx={{ width: '100%' }}>
                               <Typography color="secondary">{company?.email || ''}</Typography>
@@ -514,7 +514,6 @@ const Createinvoice = () => {
                                   : `${values?.customerInfo?.addressLine || ''} ${values?.customerInfo?.phoneNumber || ''}`}
                               </Typography>
                               <Typography color="secondary">{values?.customerInfo?.email}</Typography>
-                              {/* <Typography color="secondary">GstIn: {values?.customerInfo?.gstIn}</Typography> */}
                               {values?.customerInfo?.gstIn && <Typography color="secondary">GSTIN: {values.customerInfo.gstIn}</Typography>}
                             </Stack>
                           </Typography>
@@ -730,7 +729,7 @@ const Createinvoice = () => {
                             </Stack>
                           )}
                           <Grid container justifyContent="space-between">
-                            <Grid item xs={12} md={8}>
+                            <Grid item xs={12} md={6}>
                               <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
                                 <Button
                                   color="primary"
@@ -751,68 +750,66 @@ const Createinvoice = () => {
                                 </Button>
                               </Box>
                             </Grid>
-                            <Grid item xs={12} md={4}>
-                              <Grid item xs={12}>
-                                <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '25px' }}>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                                    <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
-                                  </Stack>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
-                                    <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
-                                  </Stack>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>SGST TaxA mount:</Typography>
-                                    <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
-                                  </Stack>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
-                                    <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
-                                  </Stack>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>Fees:</Typography>
-                                    <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
-                                  </Stack>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography color={theme.palette.grey[500]}>Discount:</Typography>
-                                    <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
-                                  </Stack>
-                                  <Stack direction="row" justifyContent="space-between">
-                                    <Typography variant="subtitle1">Grand Total:</Typography>
-                                    <Typography variant="subtitle1">
-                                      {grandAmount % 1 === 0
-                                        ? country?.prefix + '' + grandAmount
-                                        : country?.prefix + '' + grandAmount.toFixed(2)}
-                                    </Typography>
-                                  </Stack>
+                            <Grid item xs={6} sm={6} md={8}>
+                              <Stack spacing={1}>
+                                <InputLabel>Notes</InputLabel>
+                                <TextField
+                                  placeholder="Address"
+                                  rows={3}
+                                  value={values.note}
+                                  multiline
+                                  name="note"
+                                  onChange={handleChange}
+                                  inputProps={{
+                                    maxLength: notesLimit
+                                  }}
+                                  helperText={`${values.note.length} / ${notesLimit}`}
+                                  sx={{
+                                    width: '70%',
+                                    '& .MuiFormHelperText-root': {
+                                      mr: 0,
+                                      display: 'flex',
+                                      justifyContent: 'flex-end'
+                                    }
+                                  }}
+                                />
+                              </Stack>
+                            </Grid>
+                            <Grid item xs={12} md={4} sx={{ marginTop: '-80px' }}>
+                              <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '22px' }}>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
+                                  <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
                                 </Stack>
-                              </Grid>
-                              <Grid item xs={12} md={10} sx={{ margineTop: '-500px' }}>
-                                <Stack spacing={1}>
-                                  <InputLabel>Notes</InputLabel>
-                                  <TextField
-                                    placeholder="Address"
-                                    rows={3}
-                                    value={values.note}
-                                    multiline
-                                    name="note"
-                                    onChange={handleChange}
-                                    inputProps={{
-                                      maxLength: notesLimit
-                                    }}
-                                    helperText={`${values.note.length} / ${notesLimit}`}
-                                    sx={{
-                                      width: '100%',
-                                      '& .MuiFormHelperText-root': {
-                                        mr: 0,
-                                        display: 'flex',
-                                        justifyContent: 'flex-end'
-                                      }
-                                    }}
-                                  />
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
                                 </Stack>
-                              </Grid>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}> Fees:</Typography>
+                                  <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}> Discount:</Typography>
+                                  <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography variant="subtitle1">Grand Total:</Typography>
+                                  <Typography variant="subtitle1">
+                                    {grandAmount % 1 === 0
+                                      ? country?.prefix + '' + grandAmount
+                                      : country?.prefix + '' + grandAmount.toFixed(2)}
+                                  </Typography>
+                                </Stack>
+                              </Stack>
                             </Grid>
                           </Grid>
                         </>
