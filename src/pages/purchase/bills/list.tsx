@@ -169,7 +169,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, han
   // =============================================== Tab ================================================================
 
   const selectedBillRowIds: string[] = [];
-  const groups = [{ id: 0, status: 'All', statusId: 0 }];
+  const groups = [{ id: 0, status: 'All', statusId: billStataus.ALL }];
   const uniqueStatusSet = new Set();
   const [selectedBillIDs, setSelectedBillIds] = useState<string[]>([]);
   const [isBillIdVisible, setIsBillIdVisible] = useState(false);
