@@ -1,4 +1,4 @@
-import { IUpdateBillStatus, PaidPaymentData } from 'types/bill';
+import { IUpdateBillNextStatus, IUpdateBillPreviousStatus, PaidPaymentData } from 'types/bill';
 import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { BillEdit, BillHeader } from 'types/billiingDetails';
@@ -148,11 +148,27 @@ export const BillAPI = {
     });
     return response.data;
   },
-  updateBillStatusRequest = async function (updateBillStatus: IUpdateBillStatus) {
+  getAllStatus = async function (companyId: string, cancel = false) {
     const response = await apiPurchase.request({
-      url: `v1/billStatuses/`,
+      url: `v1/billStatusesByCompany/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
+  updateBillNextStatus = async function (updateNextStatus: IUpdateBillNextStatus) {
+    const response = await apiPurchase.request({
+      url: 'v1/billNextStatuses',
       method: 'PUT',
-      data: updateBillStatus
+      data: updateNextStatus
+    });
+    return response.data;
+  },
+  updateBillPreviousStatuse = async function (updatePreviousStatus: IUpdateBillPreviousStatus) {
+    const response = await apiPurchase.request({
+      url: 'v1/billPreviousStatuses',
+      method: 'PUT',
+      data: updatePreviousStatus
     });
     return response.data;
   };

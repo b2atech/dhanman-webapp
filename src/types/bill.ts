@@ -96,7 +96,22 @@ export interface IBillType {
   lines: Items[];
 }
 
-export interface IUpdateBillStatus {
+export interface IBillStatus {
+  status: number;
+  statusName: string;
+  nextStatus: number;
+  nextStatusName: string;
+  previousStatus: number;
+  previousStatusName: string;
+  isInitial: boolean;
+}
+
+export interface IUpdateBillNextStatus {
   billIds: string[];
-  billStatusId: number;
+  companyId: string;
+}
+
+export interface IUpdateBillPreviousStatus {
+  billIds: string[];
+  companyId: string;
 }
