@@ -96,6 +96,16 @@ export interface IBillType {
   lines: Items[];
 }
 
+export interface IBillStatus {
+  status: number;
+  statusName: string;
+  nextStatus: number;
+  nextStatusName: string;
+  previousStatus: number;
+  previousStatusName: string;
+  isInitial: boolean;
+}
+
 export interface IUpdateBillStatus {
   billIds: string[];
   billStatusId: number;

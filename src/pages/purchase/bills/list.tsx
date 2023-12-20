@@ -24,7 +24,7 @@ import {
   PaletteColor,
   Grid,
   styled,
-  CircularProgress,
+  // CircularProgress,
   Button
 } from '@mui/material';
 
@@ -66,16 +66,17 @@ import {
 } from 'components/third-party/ReactTable';
 
 import { GlobalFilter, renderFilterTypes, DateColumnFilter } from 'utils/react-table';
-import { IBill, IUpdateBillNextStatus, IUpdateBillPreviousStatus } from 'types/bill';
+import { IBill, IBillStatus, IUpdateBillNextStatus, IUpdateBillPreviousStatus } from 'types/bill';
 import { alpha, useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
 import { Link } from 'react-router-dom';
-import { getAllBills, updateBillNextStatus, updateBillPreviousStatuse } from 'api/services/BillService';
+import { getAllBills, getAllStatus, updateBillNextStatus, updateBillPreviousStatuse } from 'api/services/BillService';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import config from 'config';
 
 const moment = require('moment');
+const companyId: string = String(config.companyId);
 interface BillWidgets {
   title: string;
   count: string;
@@ -101,13 +102,14 @@ const TableWrapper = styled('div')(({ theme }) => ({
 interface Props {
   columns: Column[];
   data: IBill[];
+  statuses: IBillStatus[];
   showIdColumn: boolean;
   getHeaderProps: (column: HeaderGroup) => {};
   handleSwitchChange: () => void;
   handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditColumnSwitchChange }: Props) {
+function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, handleAuditColumnSwitchChange }: Props) {
   const defaultColumn = useMemo(
     () => ({
       minWidth: 80,
@@ -164,8 +166,6 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   );
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-  const companyId: string = String(config.companyId);
-
   // =============================================== Tab ================================================================
 
   const selectedBillRowIds: string[] = [];
@@ -255,6 +255,31 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     }
     window.location.reload();
   };
+  const updateBillCancelStatuses = async () => {
+    const updatePreviousStatus: IUpdateBillPreviousStatus = {
+      billIds: selectedBillIDs,
+      companyId: companyId
+    };
+    try {
+      await updateBillPreviousStatuse(updatePreviousStatus);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Bill Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
 
   const updateBillApproveStatus = async () => {
     const updateNextStatus: IUpdateBillNextStatus = {
@@ -286,21 +311,79 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     const buttons: React.ReactNode[] = [];
     const selectedBillStatus = selectedStatus;
 
-    if (selectedBillStatus === billStataus.DRAFT) {
-      buttons.push(
-        <Button
-          key="sendForApproval"
-          variant="contained"
-          color="primary"
-          onClick={() => updateBillDraftStatus()}
-          style={{ marginRight: '10px' }}
-        >
-          Send for Approval
-        </Button>
-      );
-    } else if (selectedBillStatus === billStataus.PENDING_APPROVAL) {
-      buttons.push(
-        <>
+    const selectedStatusObject = statuses.find((status) => status.status === selectedBillStatus);
+    switch (selectedStatusObject?.nextStatus) {
+      case billStataus.PENDING_APPROVAL:
+        buttons.push(
+          <Button
+            key="sendForApproval"
+            variant="contained"
+            color="primary"
+            onClick={() => updateBillDraftStatus()}
+            style={{ marginRight: '10px' }}
+          >
+            Send for Approval
+          </Button>
+        );
+        break;
+      case billStataus.APPROVED:
+        buttons.push(
+          <>
+            <Button
+              key="approve"
+              variant="contained"
+              color="primary"
+              onClick={() => updateBillApproveStatus()}
+              style={{ marginRight: '10px' }}
+            >
+              Approve
+            </Button>
+          </>
+        );
+        break;
+      case billStataus.PARTIALLY_PAID:
+        buttons.push(
+          <Button
+            key="payNow"
+            variant="contained"
+            color="primary"
+            onClick={() => navigation('/sales/payments/add')}
+            style={{ marginRight: '10px' }}
+          >
+            Pay Now
+          </Button>
+        );
+        break;
+      case billStataus.PAID:
+        buttons.push(
+          <Button
+            key="payNow"
+            variant="contained"
+            color="primary"
+            onClick={() => navigation('/sales/payments/add')}
+            style={{ marginRight: '10px' }}
+          >
+            Pay Now
+          </Button>
+        );
+        break;
+    }
+    switch (selectedStatusObject?.previousStatus) {
+      case billStataus.CANCELLED:
+        buttons.push(
+          <Button
+            key="cancelled"
+            variant="contained"
+            color="primary"
+            onClick={() => updateBillCancelStatuses()}
+            style={{ marginRight: '10px' }}
+          >
+            Cancel
+          </Button>
+        );
+        break;
+      case billStataus.REJECTED:
+        buttons.push(
           <Button
             key="reject"
             variant="contained"
@@ -310,44 +393,8 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           >
             Reject
           </Button>
-          <Button
-            key="approve"
-            variant="contained"
-            color="primary"
-            onClick={() => updateBillApproveStatus()}
-            style={{ marginRight: '10px' }}
-          >
-            Approve
-          </Button>
-        </>
-      );
-    } else if (selectedBillStatus === billStataus.APPROVED) {
-      buttons.push(
-        <Button
-          key="payNow"
-          variant="contained"
-          color="primary"
-          onClick={() => navigation('/purchase/payments/add')}
-          style={{ marginRight: '10px' }}
-        >
-          Pay Now
-        </Button>
-      );
-    } else if (selectedBillStatus === billStataus.PARTIALLY_PAID) {
-      buttons.push(
-        <Button
-          key="paid"
-          variant="contained"
-          color="primary"
-          onClick={(e: any) => {
-            e.stopPropagation();
-            navigation('/purchase/payments/add');
-          }}
-          style={{ marginRight: '10px' }}
-        >
-          Pay Now
-        </Button>
-      );
+        );
+        break;
     }
     return buttons;
   };
@@ -522,9 +569,10 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
 
 const Bills = () => {
   const [bill, setBills] = useState([] as IBill[]);
+  const [statuses, setStatuses] = useState<IBillStatus[]>();
   const theme = useTheme();
   const navigation = useNavigate();
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
   const [billId, setBillId] = useState<string>('');
   const [getBillName, setGetBillName] = useState<any>('');
   const [open, setOpen] = useState<boolean>(false);
@@ -538,21 +586,24 @@ const Bills = () => {
   const handleAuditColumnSwitchChange = () => {
     setshowCreatedOnColumn(!showCreatedOnColumn);
   };
+  const getAllBillRelatedRequests = async () => {
+    try {
+      const [bill, statuses] = await Promise.all([getAllBills(companyId), getAllStatus(companyId)]);
+
+      if (Array.isArray(bill) && Array.isArray(statuses)) {
+        setBills(bill);
+        setStatuses(statuses);
+        // setLoading(false);
+      } else {
+        console.error('API response is not an array:', bill, statuses);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((billList) => {
-        if (Array.isArray(billList)) {
-          setBills(billList);
-          setLoading(false);
-        } else {
-          console.error('API response is not an array:', billList);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching vendor data:', error);
-        setLoading(false);
-      });
+    getAllBillRelatedRequests();
   }, []);
 
   const handleClose = () => {
@@ -835,25 +886,26 @@ const Bills = () => {
         </Grid>
       </Grid>
       <MainCard content={false}>
-        {loading ? (
+        {/* {loading ? (
           <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
             <CircularProgress size={60} thickness={4} />
             <Typography variant="body1" style={{ marginTop: '16px' }}>
               Loading, please wait...
             </Typography>
           </Box>
-        ) : (
-          <ScrollX>
-            <ReactTable
-              columns={columns}
-              data={bill}
-              showIdColumn={showIdColumn}
-              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-              handleSwitchChange={handleSwitchChange}
-              handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
-            />
-          </ScrollX>
-        )}
+        ) : ( */}
+        <ScrollX>
+          <ReactTable
+            columns={columns}
+            data={bill}
+            statuses={statuses || []}
+            showIdColumn={showIdColumn}
+            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            handleSwitchChange={handleSwitchChange}
+            handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
+          />
+        </ScrollX>
+        {/* )} */}
       </MainCard>
 
       <AlertBillDelete title={getBillName} open={open} handleClose={handleClose} id={billId} />

@@ -156,6 +156,14 @@ export const BillAPI = {
     });
     return response.data;
   },
+  getAllStatus = async function (companyId: string, cancel = false) {
+    const response = await apiPurchase.request({
+      url: `v1/billStatusesByCompany/${companyId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllStatus.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
   updateBillNextStatus = async function (updateNextStatus: IUpdateBillNextStatus) {
     const response = await apiPurchase.request({
       url: 'v1/billNextStatuses',
