@@ -66,9 +66,9 @@ import { renderFilterTypes, GlobalFilter, DateColumnFilter } from 'utils/react-t
 import { NumericFormat } from 'react-number-format';
 
 // types
-import { IInvoiceList, IUpdateInvoiceNextStatus } from 'types/invoice';
+import { IInvoiceList, IUpdateInvoiceNextStatus, IUpdateInvoicePreviousStatus } from 'types/invoice';
 import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
-import { getAllInvoices, getInvoiceDetailsByHeaderId, updateNextStatus } from 'api/services/SalesService';
+import { getAllInvoices, getInvoiceDetailsByHeaderId, updateNextStatus, updatePreviousStatuses } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
@@ -348,7 +348,59 @@ function ReactTable({
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
-  const updateInvoiceStatus = async () => {
+  const updateInvoiceDraftStatus = async () => {
+    const updateInvoiceStatusData: IUpdateInvoiceNextStatus = {
+      invoiceIds: selectedInvoiceIDs,
+      companyId: companyId
+    };
+    try {
+      await updateNextStatus(updateInvoiceStatusData);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
+  const updateInvoiceRejectStatuses = async () => {
+    const updateInvoiceStatusData: IUpdateInvoicePreviousStatus = {
+      invoiceIds: selectedInvoiceIDs,
+      companyId: companyId
+    };
+    try {
+      await updatePreviousStatuses(updateInvoiceStatusData);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
+  const updateInvoiceApproveStatus = async () => {
     const updateInvoiceStatusData: IUpdateInvoiceNextStatus = {
       invoiceIds: selectedInvoiceIDs,
       companyId: companyId
@@ -385,7 +437,7 @@ function ReactTable({
           key="sendForApproval"
           variant="contained"
           color="primary"
-          onClick={() => updateInvoiceStatus()}
+          onClick={() => updateInvoiceDraftStatus()}
           style={{ marginRight: '10px' }}
         >
           Send for Approval
@@ -394,10 +446,22 @@ function ReactTable({
     } else if (selectedInvoiceStatus === invoiceStataus.PENDING_APPROVAL) {
       buttons.push(
         <>
-          <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateInvoiceStatus()}>
+          <Button
+            key="reject"
+            variant="contained"
+            color="primary"
+            style={{ marginRight: '10px' }}
+            onClick={() => updateInvoiceRejectStatuses()}
+          >
             Reject
           </Button>
-          <Button key="approve" variant="contained" color="primary" onClick={() => updateInvoiceStatus()} style={{ marginRight: '10px' }}>
+          <Button
+            key="approve"
+            variant="contained"
+            color="primary"
+            onClick={() => updateInvoiceApproveStatus()}
+            style={{ marginRight: '10px' }}
+          >
             Approve
           </Button>
         </>

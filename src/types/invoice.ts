@@ -200,3 +200,7 @@ export interface IUpdateInvoiceNextStatus {
   invoiceIds: string[];
   companyId: string;
 }
+export interface IUpdateInvoicePreviousStatus {
+  invoiceIds: string[];
+  companyId: string;
+}
