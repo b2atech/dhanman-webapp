@@ -32,7 +32,8 @@ const BillItem = ({
   setFieldValue,
   products,
   ratesVisibility,
-  discountFeesVisibility
+  discountVisibility,
+  feesVisibility
 }: any) => {
   const { country } = useSelector((state) => state.invoice);
   const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -69,7 +70,7 @@ const BillItem = ({
         discountAmount = amount * (discount / 100);
       }
       if (fees) {
-        feesAmount = amount * (fees / 100);
+        feesAmount = fees;
       }
       return amount - discountAmount + feesAmount;
     }
@@ -167,7 +168,7 @@ const BillItem = ({
       name: `bill_detail.${index}.fees`,
       id: id,
       value: fees,
-      visibility: discountFeesVisibility,
+      visibility: feesVisibility,
       style: { textAlign: 'right' }
     },
     {
@@ -177,7 +178,7 @@ const BillItem = ({
       name: `bill_detail.${index}.discount`,
       id: id,
       value: discount,
-      visibility: discountFeesVisibility,
+      visibility: discountVisibility,
       style: { width: '70px', textAlign: 'right' }
     },
     {
