@@ -1,10 +1,8 @@
-import { ReceivedPaymentData } from 'types/invoice';
+import { IUpdateInvoiceNextStatus, IUpdateInvoicePreviousStatus, ReceivedPaymentData } from 'types/invoice';
 import { CustomerData } from 'types/customerinfo';
 import { apiSales } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { InvoiceEdit, InvoiceHeader } from 'types/invoiceDetails';
-import { IUpdateInvoiceStatus } from 'types/invoice';
-
 export const InvoiceAPI = {
     get: async function (clientId: string, cancel = false) {
       const response = await apiSales.request({
@@ -158,11 +156,19 @@ export const InvoiceAPI = {
     });
     return response.data;
   },
-  updateStatus = async function (updateInvoiceStatus: IUpdateInvoiceStatus) {
+  updateNextStatus = async function (updateInvoiceNextStatus: IUpdateInvoiceNextStatus) {
     const response = await apiSales.request({
-      url: 'v1/invoiceStatuses',
+      url: 'v1/invoiceNextStatuses',
       method: 'PUT',
-      data: updateInvoiceStatus
+      data: updateInvoiceNextStatus
+    });
+    return response.data;
+  },
+  updatePreviousStatuses = async function (updateInvoicePreviousStatus: IUpdateInvoicePreviousStatus) {
+    const response = await apiSales.request({
+      url: 'v1/invoicePreviousStatuses',
+      method: 'PUT',
+      data: updateInvoicePreviousStatus
     });
     return response.data;
   };

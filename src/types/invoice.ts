@@ -196,7 +196,11 @@ export interface IStatus {
   PreviousStatusName: string;
   isInitial: boolean;
 }
-export interface IUpdateInvoiceStatus {
+export interface IUpdateInvoiceNextStatus {
   invoiceIds: string[];
-  invoiceStatusId: number;
+  companyId: string;
+}
+export interface IUpdateInvoicePreviousStatus {
+  invoiceIds: string[];
+  companyId: string;
 }
