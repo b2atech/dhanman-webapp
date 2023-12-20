@@ -24,6 +24,14 @@ const InvoiceField = ({ onEditItem, cellData }: any) => {
           name={cellData.name}
           id={cellData.id}
           style={cellData.style}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 280,
+                overflowY: 'auto'
+              }
+            }
+          }}
         >
           {cellData.selectOptions.map((option: any) => (
             <MenuItem key={option.value} value={option.value}>

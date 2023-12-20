@@ -98,7 +98,8 @@ const Createinvoice = () => {
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
   const [showGSTRates, setShowGSTRates] = useState(false);
-  const [discountFees, setDiscountFees] = useState(false);
+  const [discount, setDiscount] = useState(false);
+  const [feesVisible, setFees] = useState(false);
   //const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
   const [loading, setLoading] = useState<boolean>(true);
@@ -112,7 +113,10 @@ const Createinvoice = () => {
     setItemUnderDeletion(index);
     setOpenDelete(true);
   };
-
+  const addCommas = (number: number) => {
+    const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+    return formattedNumber;
+  };
   const handlerCreate = (values: any) => {
     const invoice: InvoiceHeader_main = {
       id: Math.floor(Math.random() * 90000) + 10000,
@@ -285,7 +289,8 @@ const Createinvoice = () => {
               iRt: 0,
               igstAmount: 0,
               rateVisibility: showGSTRates,
-              discountFeesVisibility: discountFees
+              discountVisibility: discount,
+              feesVisibility: feesVisible
             }
           ],
           discount: 0,
@@ -312,29 +317,54 @@ const Createinvoice = () => {
               );
             else return prev;
           }, 0);
+          const formattedSubtotal = addCommas(subtotal);
+
           const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
+          const formattedCGSTAmount = addCommas(cgstAmount);
+
           const sgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
+          const formattedSGSTAmount = addCommas(sgstAmount);
+
           const igstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
+          const formattedIGSTAmount = addCommas(igstAmount);
+
           const fees = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.fees);
+            const feeValue = Number(curr.fees) || 0;
+            if (curr.name.trim().length > 0) return prev + feeValue;
             else return prev;
           }, 0);
+          const formattedFees = addCommas(fees);
+
           const discountRate = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(-(curr.discount / 100) * curr.price * Math.floor(curr.quantity));
-            else return prev;
+            const hasValidDiscount = curr.discount !== undefined && curr.discount !== null && !isNaN(curr.discount);
+            const hasValidPrice = curr.price !== undefined && curr.price !== null && !isNaN(curr.price);
+            const hasValidQuantity = curr.quantity !== undefined && curr.quantity !== null && !isNaN(curr.quantity);
+
+            if (curr.name.trim().length > 0 && hasValidDiscount && hasValidPrice && hasValidQuantity) {
+              const discount = -(curr.discount / 100) * curr.price * Math.floor(curr.quantity);
+              return prev + Number(discount);
+            } else {
+              return prev;
+            }
           }, 0);
+          const formattedDiscount = addCommas(discountRate);
+
           const grandAmount = subtotal + discountRate + fees;
+          const formattedGrandAmount = addCommas(grandAmount);
           //values.totalAmount = grandAmount;
+          const discountStyle = {
+            color: '#3EB489'
+          };
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -572,8 +602,15 @@ const Createinvoice = () => {
                       </Grid>
                       <Grid item style={{ marginLeft: '5px' }}>
                         <FormControlLabel
-                          control={<Switch checked={discountFees} onChange={() => setDiscountFees(!discountFees)} name="discountFees" />}
-                          label="Discount/Fees"
+                          control={<Switch color="success" checked={discount} onChange={() => setDiscount(!discount)} name="discount" />}
+                          label="Discount"
+                          style={{ margin: '0' }}
+                        />
+                      </Grid>
+                      <Grid item style={{ marginLeft: '5px' }}>
+                        <FormControlLabel
+                          control={<Switch color="error" checked={feesVisible} onChange={() => setFees(!feesVisible)} name="fees" />}
+                          label="Fees"
                           style={{ margin: '0' }}
                         />
                       </Grid>
@@ -626,22 +663,22 @@ const Createinvoice = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Price
                                   </TableCell>
-                                  {discountFees && (
-                                    <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                        Fees
-                                      </TableCell>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                        Discount (%)
-                                      </TableCell>
-                                    </>
+                                  {feesVisible && (
+                                    <TableCell align="center" sx={{ padding: '2px 0px', color: 'red' }}>
+                                      Fees
+                                    </TableCell>
+                                  )}
+                                  {discount && (
+                                    <TableCell align="center" sx={{ padding: '2px 0px', color: '#008F0D' }}>
+                                      Discount (%)
+                                    </TableCell>
                                   )}
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                     Taxable Amt
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
                                         CGST (%)
                                       </TableCell>
                                     </>
@@ -651,7 +688,7 @@ const Createinvoice = () => {
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
                                         SGST (%)
                                       </TableCell>
                                     </>
@@ -661,7 +698,7 @@ const Createinvoice = () => {
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
                                         IGST (%)
                                       </TableCell>
                                     </>
@@ -708,7 +745,8 @@ const Createinvoice = () => {
                                       sgst={item.sgst}
                                       igst={item.igst}
                                       ratesVisibility={showGSTRates}
-                                      discountFeesVisibility={discountFees}
+                                      feesVisibility={feesVisible}
+                                      discountVisibility={discount}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
                                       Blur={handleBlur}
@@ -779,34 +817,34 @@ const Createinvoice = () => {
                               <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '22px' }}>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                                  <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedSubtotal}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedCGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedSGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedIGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}> Fees:</Typography>
-                                  <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedFees}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}> Discount:</Typography>
-                                  <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
+                                  <Typography style={discountStyle}>{country?.prefix + '' + formattedDiscount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography variant="subtitle1">Grand Total:</Typography>
                                   <Typography variant="subtitle1">
                                     {grandAmount % 1 === 0
-                                      ? country?.prefix + '' + grandAmount
-                                      : country?.prefix + '' + grandAmount.toFixed(2)}
+                                      ? country?.prefix + '' + formattedGrandAmount
+                                      : country?.prefix + '' + formattedGrandAmount}
                                   </Typography>
                                 </Stack>
                               </Stack>
