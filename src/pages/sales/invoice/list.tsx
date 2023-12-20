@@ -66,9 +66,15 @@ import { renderFilterTypes, GlobalFilter, DateColumnFilter } from 'utils/react-t
 import { NumericFormat } from 'react-number-format';
 
 // types
-import { IInvoiceList, IUpdateInvoiceNextStatus, IUpdateInvoicePreviousStatus } from 'types/invoice';
+import { IInvoiceList, IStatus, IUpdateInvoiceNextStatus, IUpdateInvoicePreviousStatus } from 'types/invoice';
 import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
-import { getAllInvoices, getInvoiceDetailsByHeaderId, updateNextStatus, updatePreviousStatuses } from 'api/services/SalesService';
+import {
+  getAllInvoices,
+  getAllStatus,
+  getInvoiceDetailsByHeaderId,
+  updateNextStatus,
+  updatePreviousStatuses
+} from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
@@ -236,6 +242,7 @@ const TableWrapper = styled('div')(({ theme }) => ({
 interface Props {
   columns: Column[];
   data: IInvoiceList[];
+  statuses: IStatus[];
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
@@ -246,6 +253,7 @@ interface Props {
 function ReactTable({
   columns: userColumns,
   data,
+  statuses,
   renderRowSubComponent,
   getHeaderProps,
   showIdColumn,
@@ -400,6 +408,32 @@ function ReactTable({
     window.location.reload();
   };
 
+  const updateInvoiceCancelStatuses = async () => {
+    const updateInvoiceStatusData: IUpdateInvoicePreviousStatus = {
+      invoiceIds: selectedInvoiceIDs,
+      companyId: companyId
+    };
+    try {
+      await updatePreviousStatuses(updateInvoiceStatusData);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Invoice Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
   const updateInvoiceApproveStatus = async () => {
     const updateInvoiceStatusData: IUpdateInvoiceNextStatus = {
       invoiceIds: selectedInvoiceIDs,
@@ -431,21 +465,80 @@ function ReactTable({
     const buttons: React.ReactNode[] = [];
     const selectedInvoiceStatus = selectedStatus;
 
-    if (selectedInvoiceStatus === invoiceStataus.DRAFT) {
-      buttons.push(
-        <Button
-          key="sendForApproval"
-          variant="contained"
-          color="primary"
-          onClick={() => updateInvoiceDraftStatus()}
-          style={{ marginRight: '10px' }}
-        >
-          Send for Approval
-        </Button>
-      );
-    } else if (selectedInvoiceStatus === invoiceStataus.PENDING_APPROVAL) {
-      buttons.push(
-        <>
+    // Find the selected status object from the statuses list
+    const selectedStatusObject = statuses.find((status) => status.status === selectedInvoiceStatus);
+    switch (selectedStatusObject?.nextStatus) {
+      case invoiceStataus.PENDING_APPROVAL:
+        buttons.push(
+          <Button
+            key="sendForApproval"
+            variant="contained"
+            color="primary"
+            onClick={() => updateInvoiceDraftStatus()}
+            style={{ marginRight: '10px' }}
+          >
+            Send for Approval
+          </Button>
+        );
+        break;
+      case invoiceStataus.APPROVED:
+        buttons.push(
+          <>
+            <Button
+              key="approve"
+              variant="contained"
+              color="primary"
+              onClick={() => updateInvoiceApproveStatus()}
+              style={{ marginRight: '10px' }}
+            >
+              Approve
+            </Button>
+          </>
+        );
+        break;
+      case invoiceStataus.PARTIALLY_PAID:
+        buttons.push(
+          <Button
+            key="payNow"
+            variant="contained"
+            color="primary"
+            onClick={() => navigation('/sales/payments/add')}
+            style={{ marginRight: '10px' }}
+          >
+            Pay Now
+          </Button>
+        );
+        break;
+      case invoiceStataus.PAID:
+        buttons.push(
+          <Button
+            key="payNow"
+            variant="contained"
+            color="primary"
+            onClick={() => navigation('/sales/payments/add')}
+            style={{ marginRight: '10px' }}
+          >
+            Pay Now
+          </Button>
+        );
+        break;
+    }
+    switch (selectedStatusObject?.previousStatus) {
+      case invoiceStataus.CANCELLED:
+        buttons.push(
+          <Button
+            key="cancelled"
+            variant="contained"
+            color="primary"
+            onClick={() => updateInvoiceCancelStatuses()}
+            style={{ marginRight: '10px' }}
+          >
+            Cancel
+          </Button>
+        );
+        break;
+      case invoiceStataus.REJECTED:
+        buttons.push(
           <Button
             key="reject"
             variant="contained"
@@ -455,44 +548,8 @@ function ReactTable({
           >
             Reject
           </Button>
-          <Button
-            key="approve"
-            variant="contained"
-            color="primary"
-            onClick={() => updateInvoiceApproveStatus()}
-            style={{ marginRight: '10px' }}
-          >
-            Approve
-          </Button>
-        </>
-      );
-    } else if (selectedInvoiceStatus === invoiceStataus.APPROVED) {
-      buttons.push(
-        <Button
-          key="payNow"
-          variant="contained"
-          color="primary"
-          onClick={() => navigation('/sales/payments/add')}
-          style={{ marginRight: '10px' }}
-        >
-          Pay Now
-        </Button>
-      );
-    } else if (selectedInvoiceStatus === invoiceStataus.PARTIALLY_PAID) {
-      buttons.push(
-        <Button
-          key="paid"
-          variant="contained"
-          color="primary"
-          onClick={(e: any) => {
-            e.stopPropagation();
-            navigation('/sales/payments/add');
-          }}
-          style={{ marginRight: '10px' }}
-        >
-          Pay Now
-        </Button>
-      );
+        );
+        break;
     }
     return buttons;
   };
@@ -517,7 +574,7 @@ function ReactTable({
               value={statusId}
               icon={
                 <Chip
-                  label={status === 'ALL' ? data.length : counts.hasOwnProperty(status) ? counts[status] : 0}
+                  label={status === 'All' ? data.length : counts.hasOwnProperty(status) ? counts[status] : invoiceStataus.ALL}
                   color={
                     statusId === invoiceStataus.ALL
                       ? 'primary'
@@ -671,6 +728,7 @@ function ReactTable({
 
 const List = () => {
   const [invoice, setList] = useState<IInvoiceList[]>([]);
+  const [statuses, setStatuses] = useState<IStatus[]>();
   const [open, setOpen] = useState<boolean>(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [getInvoiceName, setGetInvoiceName] = useState<any>('');
@@ -689,18 +747,23 @@ const List = () => {
     setshowCreatedOnColumn(!showCreatedOnColumn);
   };
 
+  const getAllInvoicesRelatedRequests = async () => {
+    try {
+      const [invoices, statuses] = await Promise.all([getAllInvoices(companyId), getAllStatus(companyId)]);
+
+      if (Array.isArray(invoices) && Array.isArray(statuses)) {
+        setList(invoices);
+        setStatuses(statuses);
+      } else {
+        console.error('API response is not an array:', invoices, statuses);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
-    getAllInvoices(companyId)
-      .then((invoiceList) => {
-        if (Array.isArray(invoiceList)) {
-          setList(invoiceList);
-        } else {
-          console.error('API response is not an array:', invoiceList);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
+    getAllInvoicesRelatedRequests();
   }, []);
 
   const navigation = useNavigate();
@@ -1014,6 +1077,7 @@ const List = () => {
           <ReactTable
             columns={columns}
             data={invoice}
+            statuses={statuses || []}
             renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             showIdColumn={showIdColumn}

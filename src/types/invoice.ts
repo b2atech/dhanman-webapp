@@ -192,8 +192,8 @@ export interface IStatus {
   statusName: string;
   nextStatus: number;
   nextStatusName: string;
-  PreviousStatus: number;
-  PreviousStatusName: string;
+  previousStatus: number;
+  previousStatusName: string;
   isInitial: boolean;
 }
 export interface IUpdateInvoiceNextStatus {
