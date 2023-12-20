@@ -300,24 +300,24 @@ const CreateBill = () => {
                 prev +
                 Number(
                   (curr.sgst && curr.cgst
-                    ? (curr.cgst / 100) * curr.price + (curr.sgst / 100) * curr.price
-                    : (curr.igst / 100) * curr.price) +
+                    ? (curr.cgst / 100) * curr.price * curr.quantity + (curr.sgst / 100) * curr.price * curr.quantity
+                    : (curr.igst / 100) * curr.price * curr.quantity) +
                     curr.price * Math.floor(curr.quantity)
                 )
               );
             else return prev;
           }, 0);
-          const taxRate = (values.tax * subtotal) / 100;
+          //const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
           const sgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
           const igstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
           const fees = values?.bill_detail.reduce((prev, curr: any) => {
@@ -328,7 +328,7 @@ const CreateBill = () => {
             if (curr.name.trim().length > 0) return prev + Number(-(curr.discount / 100) * curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
-          const grandAmount = subtotal + taxRate + discountRate + fees;
+          const grandAmount = subtotal + discountRate + fees;
           values.totalAmount = grandAmount;
 
           return (
@@ -714,7 +714,7 @@ const CreateBill = () => {
                             </Stack>
                           )}
                           <Grid container justifyContent="space-between">
-                            <Grid item xs={12} md={8}>
+                            <Grid item xs={12} md={6}>
                               <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
                                 <Button
                                   color="primary"
@@ -735,22 +735,47 @@ const CreateBill = () => {
                                 </Button>
                               </Box>
                             </Grid>
-                            <Grid item xs={8} md={3}>
-                              <Stack spacing={2} sx={{ marginTop: 2, paddingRight: '25px' }}>
+                            <Grid item xs={6} sm={6} md={8}>
+                              <Stack spacing={1}>
+                                <InputLabel>Notes</InputLabel>
+                                <TextField
+                                  placeholder="Address"
+                                  rows={3}
+                                  value={values.note}
+                                  multiline
+                                  name="note"
+                                  onChange={handleChange}
+                                  inputProps={{
+                                    maxLength: notesLimit
+                                  }}
+                                  helperText={`${values.note.length} / ${notesLimit}`}
+                                  sx={{
+                                    width: '70%',
+                                    '& .MuiFormHelperText-root': {
+                                      mr: 0,
+                                      display: 'flex',
+                                      justifyContent: 'flex-end'
+                                    }
+                                  }}
+                                />
+                              </Stack>
+                            </Grid>
+                            <Grid item xs={12} md={4} sx={{ marginTop: '-80px' }}>
+                              <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '22px' }}>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
                                   <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>C GST Tax Amount:</Typography>
+                                  <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
                                   <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>S GST Tax Amount:</Typography>
+                                  <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
                                   <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>I GST Tax Amount:</Typography>
+                                  <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
                                   <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
@@ -776,31 +801,6 @@ const CreateBill = () => {
                       );
                     }}
                   />
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel>Notes</InputLabel>
-                    <TextField
-                      placeholder="Address"
-                      rows={3}
-                      value={values.note}
-                      multiline
-                      name="note"
-                      onChange={handleChange}
-                      inputProps={{
-                        maxLength: notesLimit
-                      }}
-                      helperText={`${values.note.length} / ${notesLimit}`}
-                      sx={{
-                        width: '100%',
-                        '& .MuiFormHelperText-root': {
-                          mr: 0,
-                          display: 'flex',
-                          justifyContent: 'flex-end'
-                        }
-                      }}
-                    />
-                  </Stack>
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container justifyContent="flex-end" alignItems="flex-end">
