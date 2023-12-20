@@ -100,3 +100,13 @@ export interface IUpdateBillStatus {
   billIds: string[];
   billStatusId: number;
 }
+
+export interface IUpdateBillNextStatus {
+  billIds: string[];
+  companyId: string;
+}
+
+export interface IUpdateBillPreviousStatus {
+  billIds: string[];
+  companyId: string;
+}

@@ -1,4 +1,4 @@
-import { IUpdateBillStatus, PaidPaymentData } from 'types/bill';
+import { IUpdateBillNextStatus, IUpdateBillPreviousStatus, IUpdateBillStatus, PaidPaymentData } from 'types/bill';
 import { apiPurchase } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 import { BillEdit, BillHeader } from 'types/billiingDetails';
@@ -153,6 +153,22 @@ export const BillAPI = {
       url: `v1/billStatuses/`,
       method: 'PUT',
       data: updateBillStatus
+    });
+    return response.data;
+  },
+  updateBillNextStatus = async function (updateNextStatus: IUpdateBillNextStatus) {
+    const response = await apiPurchase.request({
+      url: 'v1/billNextStatuses',
+      method: 'PUT',
+      data: updateNextStatus
+    });
+    return response.data;
+  },
+  updateBillPreviousStatuse = async function (updatePreviousStatus: IUpdateBillPreviousStatus) {
+    const response = await apiPurchase.request({
+      url: 'v1/billPreviousStatuses',
+      method: 'PUT',
+      data: updatePreviousStatus
     });
     return response.data;
   };

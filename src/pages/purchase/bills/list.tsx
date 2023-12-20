@@ -66,13 +66,14 @@ import {
 } from 'components/third-party/ReactTable';
 
 import { GlobalFilter, renderFilterTypes, DateColumnFilter } from 'utils/react-table';
-import { IBill, IUpdateBillStatus } from 'types/bill';
+import { IBill, IUpdateBillNextStatus, IUpdateBillPreviousStatus } from 'types/bill';
 import { alpha, useTheme } from '@mui/material/styles';
 import { NumericFormat } from 'react-number-format';
 import { Link } from 'react-router-dom';
-import { getAllBills, updateBillStatusRequest } from 'api/services/BillService';
+import { getAllBills, updateBillNextStatus, updateBillPreviousStatuse } from 'api/services/BillService';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
+import config from 'config';
 
 const moment = require('moment');
 interface BillWidgets {
@@ -163,6 +164,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
   );
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+  const companyId: string = String(config.companyId);
 
   // =============================================== Tab ================================================================
 
@@ -202,13 +204,65 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
-  const updateBillStatus = async (stausId: number) => {
-    const updateBillStatusData: IUpdateBillStatus = {
+  const updateBillDraftStatus = async () => {
+    const updateNextStatus: IUpdateBillNextStatus = {
       billIds: selectedBillIDs,
-      billStatusId: stausId
+      companyId: companyId
     };
     try {
-      await updateBillStatusRequest(updateBillStatusData);
+      await updateBillNextStatus(updateNextStatus);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Bill Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
+  const updateBillRejectStatuses = async () => {
+    const updatePreviousStatus: IUpdateBillPreviousStatus = {
+      billIds: selectedBillIDs,
+      companyId: companyId
+    };
+    try {
+      await updateBillPreviousStatuse(updatePreviousStatus);
+
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'Bill Status updated successfully',
+          anchorOrigin: { vertical: 'top', horizontal: 'right' },
+          variant: 'alert',
+          alert: {
+            color: 'success'
+          },
+          close: false
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.reload();
+  };
+
+  const updateBillApproveStatus = async () => {
+    const updateNextStatus: IUpdateBillNextStatus = {
+      billIds: selectedBillIDs,
+      companyId: companyId
+    };
+    try {
+      await updateBillNextStatus(updateNextStatus);
 
       dispatch(
         openSnackbar({
@@ -238,7 +292,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
           key="sendForApproval"
           variant="contained"
           color="primary"
-          onClick={() => updateBillStatus(2)}
+          onClick={() => updateBillDraftStatus()}
           style={{ marginRight: '10px' }}
         >
           Send for Approval
@@ -247,10 +301,22 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, handleAuditCo
     } else if (selectedBillStatus === billStataus.PENDING_APPROVAL) {
       buttons.push(
         <>
-          <Button key="reject" variant="contained" color="primary" style={{ marginRight: '10px' }} onClick={() => updateBillStatus(6)}>
+          <Button
+            key="reject"
+            variant="contained"
+            color="primary"
+            style={{ marginRight: '10px' }}
+            onClick={() => updateBillRejectStatuses()}
+          >
             Reject
           </Button>
-          <Button key="approve" variant="contained" color="primary" onClick={() => updateBillStatus(3)} style={{ marginRight: '10px' }}>
+          <Button
+            key="approve"
+            variant="contained"
+            color="primary"
+            onClick={() => updateBillApproveStatus()}
+            style={{ marginRight: '10px' }}
+          >
             Approve
           </Button>
         </>
