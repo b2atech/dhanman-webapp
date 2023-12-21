@@ -133,19 +133,19 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
         <Stack
           direction={matchDownSM ? 'column' : 'row'}
           spacing={1}
-          justifyContent="space-between"
-          alignItems="center"
+          justifyContent='space-between'
+          alignItems='center'
           sx={{ p: 3, pb: 0 }}
         >
           <GlobalFilter
             preGlobalFilteredRows={preGlobalFilteredRows}
             globalFilter={globalFilter}
             setGlobalFilter={setGlobalFilter}
-            size="small"
+            size='small'
           />
           <Stack
             direction={matchDownSM ? 'column' : 'row'}
-            alignItems="center"
+            alignItems='center'
             spacing={1}
           >
             <SortingSelect
@@ -154,10 +154,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
               allColumns={allColumns}
             />
             <Button
-              variant="contained"
+              variant='contained'
               startIcon={<PlusOutlined />}
               onClick={handleAdd}
-              size="small"
+              size='small'
             >
               Add Project
             </Button>
@@ -305,14 +305,14 @@ const ProjectListPage = () => {
       <ScrollX>
         {loading ? (
           <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            height="500px"
+            display='flex'
+            flexDirection='column'
+            alignItems='center'
+            justifyContent='center'
+            height='500px'
           >
             <CircularProgress size={60} thickness={4} />
-            <Typography variant="body1" style={{ marginTop: '32x' }}>
+            <Typography variant='body1' style={{ marginTop: '32x' }}>
               Loading, please wait...
             </Typography>
           </Box>
