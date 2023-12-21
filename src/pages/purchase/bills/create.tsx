@@ -101,7 +101,8 @@ const CreateBill = () => {
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
   const [showGSTRates, setShowGSTRates] = useState(false);
-  const [discountFees, setDiscountFees] = useState(false);
+  const [discount, setDiscount] = useState(false);
+  const [feesVisible, setFees] = useState(false);
   // const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
   const [loading, setLoading] = useState<boolean>(true);
@@ -113,6 +114,11 @@ const CreateBill = () => {
     setfuncToDelete(() => func);
     setItemUnderDeletion(index);
     setOpenDelete(true);
+  };
+
+  const addCommas = (number: number) => {
+    const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+    return formattedNumber;
   };
 
   useEffect(() => {
@@ -280,7 +286,8 @@ const CreateBill = () => {
               igst: 0,
               IGSTAmount: 0,
               rateVisibility: showGSTRates,
-              discountFeesVisibility: discountFees
+              discountVisibility: discount,
+              feesVisibility: feesVisible
             }
           ],
           discount: 0,
@@ -300,36 +307,62 @@ const CreateBill = () => {
                 prev +
                 Number(
                   (curr.sgst && curr.cgst
-                    ? (curr.cgst / 100) * curr.price + (curr.sgst / 100) * curr.price
-                    : (curr.igst / 100) * curr.price) +
+                    ? (curr.cgst / 100) * curr.price * curr.quantity + (curr.sgst / 100) * curr.price * curr.quantity
+                    : (curr.igst / 100) * curr.price * curr.quantity) +
                     curr.price * Math.floor(curr.quantity)
                 )
               );
             else return prev;
           }, 0);
-          const taxRate = (values.tax * subtotal) / 100;
+          const formattedSubtotal = addCommas(subtotal);
+
+          //const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
+          const formattedCGSTAmount = addCommas(cgstAmount);
+
           const sgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
+          const formattedSGSTAmount = addCommas(sgstAmount);
+
           const igstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price);
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
             else return prev;
           }, 0);
+          const formattedIGSTAmount = addCommas(igstAmount);
+
           const fees = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.fees);
+            const feeValue = Number(curr.fees) || 0;
+            if (curr.name.trim().length > 0) return prev + feeValue;
             else return prev;
           }, 0);
+          const formattedFees = addCommas(fees);
+
           const discountRate = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(-(curr.discount / 100) * curr.price * Math.floor(curr.quantity));
-            else return prev;
+            const hasValidDiscount = curr.discount !== undefined && curr.discount !== null && !isNaN(curr.discount);
+            const hasValidPrice = curr.price !== undefined && curr.price !== null && !isNaN(curr.price);
+            const hasValidQuantity = curr.quantity !== undefined && curr.quantity !== null && !isNaN(curr.quantity);
+
+            if (curr.name.trim().length > 0 && hasValidDiscount && hasValidPrice && hasValidQuantity) {
+              const discount = -(curr.discount / 100) * curr.price * Math.floor(curr.quantity);
+              return prev + Number(discount);
+            } else {
+              return prev;
+            }
           }, 0);
-          const grandAmount = subtotal + taxRate + discountRate + fees;
-          values.totalAmount = grandAmount;
+          const formattedDiscount = addCommas(discountRate);
+
+          const grandAmount = subtotal + discountRate + fees;
+          const formattedGrandAmount = addCommas(grandAmount);
+
+          // values.totalAmount = grandAmount;
+          const discountStyle = {
+            color: '#3EB489'
+          };
 
           return (
             <Form onSubmit={handleSubmit}>
@@ -558,9 +591,14 @@ const CreateBill = () => {
                       label="GST Rates"
                     />
                     <FormControlLabel
-                      control={<Switch checked={discountFees} onChange={() => setDiscountFees(!discountFees)} name="discountFees" />}
-                      label="Discount/Fees"
+                      control={<Switch color="success" checked={discount} onChange={() => setDiscount(!discount)} name="discount" />}
+                      label="Discount"
                     />
+                    <FormControlLabel
+                      control={<Switch color="error" checked={feesVisible} onChange={() => setFees(!feesVisible)} name="fees" />}
+                      label="Fees"
+                    />
+
                     {/* <Tooltip title="Default GST Rates">
                         <FormControlLabel
                           control={
@@ -607,22 +645,22 @@ const CreateBill = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Price
                                   </TableCell>
-                                  {discountFees && (
-                                    <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                        Fees
-                                      </TableCell>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                        Discount (%)
-                                      </TableCell>
-                                    </>
+                                  {feesVisible && (
+                                    <TableCell align="center" sx={{ padding: '2px 0px', color: 'red' }}>
+                                      Fees
+                                    </TableCell>
+                                  )}
+                                  {discount && (
+                                    <TableCell align="center" sx={{ padding: '2px 0px', color: '#008F0D' }}>
+                                      Discount (%)
+                                    </TableCell>
                                   )}
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                     Taxable Amt
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
                                         CGST (%)
                                       </TableCell>
                                     </>
@@ -633,7 +671,7 @@ const CreateBill = () => {
 
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
                                         SGST (%)
                                       </TableCell>
                                     </>
@@ -645,7 +683,7 @@ const CreateBill = () => {
 
                                   {showGSTRates && (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
                                         IGST (%)
                                       </TableCell>
                                     </>
@@ -693,7 +731,8 @@ const CreateBill = () => {
                                       sgst={item.sgst}
                                       igst={item.igst}
                                       ratesVisibility={showGSTRates}
-                                      discountFeesVisibility={discountFees}
+                                      feesVisibility={feesVisible}
+                                      discountVisibility={discount}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
                                       Blur={handleBlur}
@@ -714,7 +753,7 @@ const CreateBill = () => {
                             </Stack>
                           )}
                           <Grid container justifyContent="space-between">
-                            <Grid item xs={12} md={8}>
+                            <Grid item xs={12} md={6}>
                               <Box sx={{ pt: 2.5, pr: 2.5, pb: 2.5, pl: 0 }}>
                                 <Button
                                   color="primary"
@@ -735,38 +774,63 @@ const CreateBill = () => {
                                 </Button>
                               </Box>
                             </Grid>
-                            <Grid item xs={8} md={3}>
-                              <Stack spacing={2} sx={{ marginTop: 2, paddingRight: '25px' }}>
+                            <Grid item xs={6} sm={6} md={8}>
+                              <Stack spacing={1}>
+                                <InputLabel>Notes</InputLabel>
+                                <TextField
+                                  placeholder="Address"
+                                  rows={3}
+                                  value={values.note}
+                                  multiline
+                                  name="note"
+                                  onChange={handleChange}
+                                  inputProps={{
+                                    maxLength: notesLimit
+                                  }}
+                                  helperText={`${values.note.length} / ${notesLimit}`}
+                                  sx={{
+                                    width: '70%',
+                                    '& .MuiFormHelperText-root': {
+                                      mr: 0,
+                                      display: 'flex',
+                                      justifyContent: 'flex-end'
+                                    }
+                                  }}
+                                />
+                              </Stack>
+                            </Grid>
+                            <Grid item xs={12} md={4} sx={{ marginTop: '-80px' }}>
+                              <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '22px' }}>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                                  <Typography>{country?.prefix + '' + subtotal.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedSubtotal}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>C GST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + cgstAmount.toFixed(2)}</Typography>
+                                  <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedCGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>S GST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + sgstAmount.toFixed(2)}</Typography>
+                                  <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedSGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>I GST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + igstAmount.toFixed(2)}</Typography>
+                                  <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedIGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}> Fees:</Typography>
-                                  <Typography>{country?.prefix + '' + fees.toFixed(2)}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedFees}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}> Discount:</Typography>
-                                  <Typography>{country?.prefix + '' + discountRate.toFixed(2)}</Typography>
+                                  <Typography style={discountStyle}>{country?.prefix + '' + formattedDiscount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography variant="subtitle1">Grand Total:</Typography>
                                   <Typography variant="subtitle1">
                                     {grandAmount % 1 === 0
-                                      ? country?.prefix + '' + grandAmount
-                                      : country?.prefix + '' + grandAmount.toFixed(2)}
+                                      ? country?.prefix + '' + formattedGrandAmount
+                                      : country?.prefix + '' + formattedGrandAmount}
                                   </Typography>
                                 </Stack>
                               </Stack>
@@ -776,31 +840,6 @@ const CreateBill = () => {
                       );
                     }}
                   />
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel>Notes</InputLabel>
-                    <TextField
-                      placeholder="Address"
-                      rows={3}
-                      value={values.note}
-                      multiline
-                      name="note"
-                      onChange={handleChange}
-                      inputProps={{
-                        maxLength: notesLimit
-                      }}
-                      helperText={`${values.note.length} / ${notesLimit}`}
-                      sx={{
-                        width: '100%',
-                        '& .MuiFormHelperText-root': {
-                          mr: 0,
-                          display: 'flex',
-                          justifyContent: 'flex-end'
-                        }
-                      }}
-                    />
-                  </Stack>
                 </Grid>
                 <Grid item xs={12}>
                   <Grid container justifyContent="flex-end" alignItems="flex-end">
