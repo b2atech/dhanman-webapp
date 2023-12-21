@@ -14,7 +14,7 @@ import {
   Typography,
   useMediaQuery,
   CircularProgress,
-  styled,
+  styled
 } from '@mui/material';
 
 // third-party
@@ -30,19 +30,13 @@ import {
   HeaderGroup,
   Row,
   HeaderProps,
-  Cell,
+  Cell
 } from 'react-table';
 
 // project import
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
-import {
-  CSVExport,
-  IndeterminateCheckbox,
-  SortingSelect,
-  TablePagination,
-  TableRowSelection,
-} from 'components/third-party/ReactTable';
+import { CSVExport, IndeterminateCheckbox, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
@@ -56,12 +50,12 @@ const TableWrapper = styled('div')(({ theme }) => ({
   '.header': {
     position: 'sticky',
     zIndex: 1,
-    width: 'fit-content',
+    width: 'fit-content'
   },
   '& th[data-sticky-td]': {
     position: 'sticky',
-    zIndex: '5 !important',
-  },
+    zIndex: '5 !important'
+  }
 }));
 
 interface Props {
@@ -77,7 +71,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       minWidth: 80,
       width: 200,
       maxWidth: 400,
-      margin: 20,
+      margin: 20
     }),
     []
   );
@@ -98,7 +92,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
-    selectedFlatRows,
+    selectedFlatRows
   } = useTable(
     {
       columns,
@@ -109,8 +103,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
         pageIndex: 0,
         pageSize: 10,
         hiddenColumns: [],
-        sortBy: [sortBy],
-      },
+        sortBy: [sortBy]
+      }
     },
     useGlobalFilter,
     useFilters,
@@ -124,8 +118,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
   const moment = require('moment');
   const now = new Date();
-  const formatedFilename =
-    'ProjectList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename = 'ProjectList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -133,40 +126,23 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
         <Stack
           direction={matchDownSM ? 'column' : 'row'}
           spacing={1}
-          justifyContent='space-between'
-          alignItems='center'
+          justifyContent="space-between"
+          alignItems="center"
           sx={{ p: 3, pb: 0 }}
         >
           <GlobalFilter
             preGlobalFilteredRows={preGlobalFilteredRows}
             globalFilter={globalFilter}
             setGlobalFilter={setGlobalFilter}
-            size='small'
+            size="small"
           />
-          <Stack
-            direction={matchDownSM ? 'column' : 'row'}
-            alignItems='center'
-            spacing={1}
-          >
-            <SortingSelect
-              sortBy={sortBy.id}
-              setSortBy={setSortBy}
-              allColumns={allColumns}
-            />
-            <Button
-              variant='contained'
-              startIcon={<PlusOutlined />}
-              onClick={handleAdd}
-              size='small'
-            >
+          <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
+            <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
               Add Project
             </Button>
             <CSVExport
-              data={
-                selectedFlatRows.length > 0
-                  ? selectedFlatRows.map((d: Row) => d.original)
-                  : data
-              }
+              data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
               filename={formatedFilename}
             />
           </Stack>
@@ -179,33 +155,18 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
                     <TableRow {...headerGroup.getHeaderGroupProps()}>
                       {headerGroup.headers.map((column: HeaderGroup<{}>) => (
-                        <TableCell
-                          {...column.getHeaderProps([
-                            { className: column.className },
-                          ])}
-                        >
-                          {column.render('Header')}
-                        </TableCell>
+                        <TableCell {...column.getHeaderProps([{ className: column.className }])}>{column.render('Header')}</TableCell>
                       ))}
                     </TableRow>
                   ))}
                 </TableHead>
-                <TableBody
-                  {...getTableBodyProps()}
-                  {...{ className: 'striped' }}
-                >
+                <TableBody {...getTableBodyProps()} {...{ className: 'striped' }}>
                   {rows.map((row, i) => {
                     prepareRow(row);
                     return (
                       <TableRow {...row.getRowProps()}>
                         {row.cells.map((cell: Cell<{}>) => (
-                          <TableCell
-                            {...cell.getCellProps([
-                              { className: cell.column.className },
-                            ])}
-                          >
-                            {cell.render('Cell')}
-                          </TableCell>
+                          <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                         ))}
                       </TableRow>
                     );
@@ -218,16 +179,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
             sx={{
               '&:hover': { bgcolor: 'transparent !important' },
               p: 2,
-              py: 1,
+              py: 1
             }}
           >
-            <TablePagination
-              gotoPage={gotoPage}
-              rows={rows}
-              setPageSize={setPageSize}
-              pageSize={pageSize}
-              pageIndex={pageIndex}
-            />
+            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
           </Box>
         </Box>
       </Stack>
@@ -270,32 +225,25 @@ const ProjectListPage = () => {
       {
         title: 'Row Selection',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-          <IndeterminateCheckbox
-            indeterminate
-            {...getToggleAllPageRowsSelectedProps()}
-          />
+          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
         ),
         accessor: 'selection',
-        Cell: ({ row }: any) => (
-          <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-        ),
-        disableSortBy: true,
+        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
+        disableSortBy: true
       },
       {
         Header: 'Project id',
         accessor: 'id',
-        Cell: ({ value }: { value: string }) => (
-          <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
-        ),
+        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
       },
       {
         Header: 'Project Name',
-        accessor: 'name',
+        accessor: 'name'
       },
       {
         Header: 'Description',
-        accessor: 'description',
-      },
+        accessor: 'description'
+      }
     ],
     []
   );
@@ -304,15 +252,9 @@ const ProjectListPage = () => {
     <MainCard content={false}>
       <ScrollX>
         {loading ? (
-          <Box
-            display='flex'
-            flexDirection='column'
-            alignItems='center'
-            justifyContent='center'
-            height='500px'
-          >
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
             <CircularProgress size={60} thickness={4} />
-            <Typography variant='body1' style={{ marginTop: '32x' }}>
+            <Typography variant="body1" style={{ marginTop: '32x' }}>
               Loading, please wait...
             </Typography>
           </Box>
@@ -321,9 +263,7 @@ const ProjectListPage = () => {
             columns={columns}
             data={memoizedProjects}
             handleAdd={handleAdd}
-            getHeaderProps={(column: HeaderGroup) =>
-              column.getSortByToggleProps()
-            }
+            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
           />
         )}
       </ScrollX>
