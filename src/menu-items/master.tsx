@@ -274,6 +274,13 @@ const master: NavItemType = {
           type: 'item',
           url: '/timesheet/logtime',
           icon: icons.HourglassOutlined
+        },
+        {
+          id: 'fillTimesheet',
+          title: <FormattedMessage id="fillTimesheet" />,
+          type: 'item',
+          url: '/timesheet/filltimesheet',
+          icon: icons.HourglassOutlined
         }
       ]
     },
