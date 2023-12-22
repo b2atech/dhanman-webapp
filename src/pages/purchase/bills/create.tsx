@@ -359,6 +359,19 @@ const CreateBill = () => {
           const grandAmount = subtotal + discountRate + fees;
           const formattedGrandAmount = addCommas(grandAmount);
 
+          const cgstRate = values?.bill_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.cgst);
+            else return prev;
+          }, 0);
+          const sgstRate = values?.bill_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.sgst);
+            else return prev;
+          }, 0);
+          const igstRate = values?.bill_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.igst);
+            else return prev;
+          }, 0);
+
           // values.totalAmount = grandAmount;
           const discountStyle = {
             color: '#3EB489'
@@ -666,7 +679,9 @@ const CreateBill = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    CGST Amt
+                                    <Tooltip title={`CGST Rate : ${cgstRate} (%)`} placement="top">
+                                      <span>CGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
 
                                   {showGSTRates && (
@@ -678,7 +693,9 @@ const CreateBill = () => {
                                   )}
 
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    SGST Amt
+                                    <Tooltip title={`SGST Rate : ${sgstRate} (%)`} placement="top">
+                                      <span>SGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
 
                                   {showGSTRates && (
@@ -689,7 +706,9 @@ const CreateBill = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    IGST Amt
+                                    <Tooltip title={`IGST Rate : ${igstRate} (%)`} placement="top">
+                                      <span>IGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
 
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
