@@ -49,6 +49,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { PlusOutlined } from '@ant-design/icons';
 import { getAllTasks } from 'api/services/TimeSheetService';
 import { useSticky } from 'react-table-sticky';
+import { useNavigate } from 'react-router';
 import { ITask } from 'types/timeSheet';
 
 // ==============================|| REACT TABLE ||============================== //
@@ -82,6 +83,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     []
   );
   const theme = useTheme();
+  const navigation = useNavigate();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: '', desc: false };
@@ -156,7 +158,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
             <Button
               variant='contained'
               startIcon={<PlusOutlined />}
-              onClick={handleAdd}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                navigation('/timesheet/tasks/create');
+              }}
               size='small'
             >
               Add Task
@@ -284,13 +289,6 @@ const ProjectListPage = () => {
       {
         Header: 'Project Name',
         accessor: 'projectName',
-        Cell: ({ value }: { value: string }) => (
-          <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
-        ),
-      },
-      {
-        Header: 'Project Id',
-        accessor: 'projectId',
         Cell: ({ value }: { value: string }) => (
           <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
         ),
