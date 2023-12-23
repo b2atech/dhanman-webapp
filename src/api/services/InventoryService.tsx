@@ -42,7 +42,7 @@ export const InvetoryAPI = {
   },
   getAllProducts = async function (clientId: string, cancel = false) {
     const response = await apiInventory.request({
-      url: `/v1/GetAllProducts/${clientId}`,
+      url: `/v1/products/${clientId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllProducts.name].handleRequestCancellation().signal : undefined
     });
