@@ -913,6 +913,7 @@ const Createinvoice = () => {
                           discountRate,
                           grandAmount
                         }}
+                        company={company}
                         items={values?.invoice_detail}
                         onAddNextInvoice={addNextInvoiceHandler}
                       />
