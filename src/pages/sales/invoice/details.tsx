@@ -8,7 +8,6 @@ import {
   Grid,
   IconButton,
   Chip,
-  FormControl,
   Button,
   Stack,
   Table,
@@ -37,6 +36,8 @@ import { useSelector } from 'store';
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
 import { getInvoice } from 'api/services/SalesService';
+import { getCompanyDetail } from 'api/services/CommonService';
+import config from 'config';
 import { IInvoiceType } from 'types/invoice';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
@@ -45,39 +46,51 @@ const Invoicedetails = () => {
   const theme = useTheme();
   const { id } = useParams();
   const navigation = useNavigate();
+  const [company, setCompany] = useState<any>();
 
   const { list } = useSelector((state) => state.invoice);
-  const [list1, setList] = useState<IInvoiceType>();
+  const [Invoice, setInvoice] = useState<IInvoiceType>();
   const [loading, setLoading] = useState<boolean>(false);
+  const companyId: string = String(config.companyId);
+
+  useEffect(() => {
+    if (companyId) {
+      getCompanyDetail(companyId).then((companyInfo) => {
+        setCompany(companyInfo);
+      });
+    }
+  }, [companyId]);
 
   useEffect(() => {
     if (id) {
       getInvoice(id).then((InvoiceHeader) => {
-        setList(InvoiceHeader);
+        setInvoice(InvoiceHeader);
         setLoading(false);
       });
     }
   }, [id]);
 
-  const today = new Date(`${list1?.invoiceDate}`).toLocaleDateString('en-GB', {
+  const today = new Date(`${Invoice?.invoiceDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const due_dates = new Date(`${list1?.dueDate}`).toLocaleDateString('en-GB', {
+  const due_dates = new Date(`${Invoice?.dueDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-  const subTotal = (list1?.lines ?? []).reduce((total, row) => {
+  const subTotal = (Invoice?.lines ?? []).reduce((total, row) => {
     return total + row.amount;
   }, 0);
-  const taxRate = (Number(list1?.tax) * subTotal) / 100;
-  const discountRate = (Number(list1?.discount) * subTotal) / 100;
-
+  const taxRate = (Number(Invoice?.tax) * subTotal) / 100;
+  const discountRate = (Number(Invoice?.discount) * subTotal) / 100;
+  const discountStyle = {
+    color: '#3EB489'
+  };
   if (loading) return <Loader />;
 
   return (
@@ -90,8 +103,8 @@ const Invoicedetails = () => {
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>
               <PDFDownloadLink
-                document={<ExportPDFView list={list1} />}
-                fileName={`${list1?.invoiceNumber}-${list1?.customer.firstName}.pdf`}
+                document={<ExportPDFView list={Invoice} company={company} />}
+                fileName={`${Invoice?.invoiceNumber}-${Invoice?.customer.firstName}.pdf`}
               >
                 <IconButton>
                   <DownloadOutlined style={{ color: theme.palette.grey[900] }} />
@@ -113,23 +126,23 @@ const Invoicedetails = () => {
         </Box>
         <Box sx={{ p: 2.5 }} id="print" ref={componentRef}>
           <Grid container spacing={2.5}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={{ marginTop: '-30px' }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between">
                 <Box>
                   <Stack direction="row" spacing={2}>
                     <LogoSection />
-                    <Chip
-                      label={list1?.invoiceStatus}
-                      variant="light"
-                      size="small"
-                      color={list1?.invoiceStatus === 'Closed' ? 'error' : list1?.invoiceStatus === 'Paid' ? 'success' : 'info'}
-                    />
                   </Stack>
                   <Typography color="secondary">{list?.invoice_id}</Typography>
                 </Box>
                 <Box>
                   <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Typography variant="subtitle1">Date</Typography>
+                    <Chip
+                      label={Invoice?.invoiceStatus}
+                      variant="light"
+                      size="small"
+                      color={Invoice?.invoiceStatus === 'Closed' ? 'error' : Invoice?.invoiceStatus === 'Paid' ? 'success' : 'info'}
+                    />
+                    <Typography variant="subtitle1">Invoice Date</Typography>
                     <Typography color="secondary">{today}</Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -141,29 +154,44 @@ const Invoicedetails = () => {
                 </Box>
               </Stack>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} sx={{ marginTop: '-10px' }}>
               <MainCard>
                 <Stack spacing={1}>
-                  <Typography variant="h5">From:</Typography>
-                  <FormControl sx={{ width: '100%' }}>
-                    <Typography color="secondary">Belle J. Richter</Typography>
-                    <Typography color="secondary">1300 Cooks Mine, NM 87829</Typography>
-                    <Typography color="secondary">305-829-7809</Typography>
-                    <Typography color="secondary">belljrc23@gmail.com</Typography>
-                  </FormControl>
+                  <Typography variant="h5">
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{ paddingRight: '10px' }}>From:</span>
+                      <span style={{ whiteSpace: 'nowrap' }}>{company?.name || ''}</span>
+                    </Box>
+                    <Stack sx={{ width: '100%' }}>
+                      <Typography color="secondary">{company?.email || ''}</Typography>
+                      <Typography color="secondary">{`${company?.addressLine || ''} ,\u00A0\u00A0 ${
+                        company?.phoneNumber || ''
+                      }`}</Typography>
+                      <Typography color="secondary">GSTIN: {company?.gstIn || ''}</Typography>
+                    </Stack>
+                  </Typography>
                 </Stack>
               </MainCard>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} sx={{ marginTop: '-10px' }}>
               <MainCard>
                 <Stack spacing={1}>
-                  <Typography variant="h5">To:</Typography>
-                  <FormControl sx={{ width: '100%' }}>
-                    <Typography color="secondary">{`${list1?.customer.firstName} ${list1?.customer.lastName}`}</Typography>
-                    <Typography color="secondary">{list1?.customer.city}</Typography>
-                    <Typography color="secondary">{list1?.customer.phoneNumber}</Typography>
-                    <Typography color="secondary">{list1?.customer.email}</Typography>
-                  </FormControl>
+                  <Typography variant="h5">
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{ paddingRight: '10px' }}>To:</span>
+                      <span>{`${Invoice?.customer?.firstName} ${Invoice?.customer?.lastName}`}</span>
+                    </Box>
+                    <Stack sx={{ width: '100%' }}>
+                      <Typography variant="subtitle1"></Typography>
+                      <Typography color="secondary">
+                        {Invoice?.customer?.addressLine && Invoice?.customer?.phoneNumber
+                          ? `${Invoice.customer.addressLine}, \u00A0\u00A0${Invoice.customer.phoneNumber}`
+                          : `${Invoice?.customer?.addressLine || ''} ${Invoice?.customer?.phoneNumber || ''}`}
+                      </Typography>
+                      <Typography color="secondary">{Invoice?.customer?.email}</Typography>
+                      {Invoice?.customer?.gstIn && <Typography color="secondary">GSTIN: {Invoice.customer.gstIn}</Typography>}
+                    </Stack>
+                  </Typography>
                 </Stack>
               </MainCard>
             </Grid>
@@ -173,21 +201,37 @@ const Invoicedetails = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>#</TableCell>
+                      <TableCell>SO No</TableCell>
+                      <TableCell>SO Date</TableCell>
                       <TableCell>Name</TableCell>
                       <TableCell>Description</TableCell>
                       <TableCell align="right">Quantity</TableCell>
                       <TableCell align="right">Price</TableCell>
-                      <TableCell align="right">Amount</TableCell>
+                      <TableCell align="right">Fees</TableCell>
+                      <TableCell align="right">Discount</TableCell>
+                      <TableCell align="right">Taxable Amount</TableCell>
+                      <TableCell align="right">Cgst Amount</TableCell>
+                      <TableCell align="right">Sgst Amount</TableCell>
+                      <TableCell align="right">Igst Amount</TableCell>
+                      <TableCell align="right">Total Amount</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {list1?.lines?.map((row: any, index) => (
+                    {Invoice?.lines?.map((row: any, index) => (
                       <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>{index + 1}</TableCell>
+                        <TableCell>{}</TableCell>
+                        <TableCell>{}</TableCell>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>
                         <TableCell align="right">{row.quantity}</TableCell>
                         <TableCell align="right">₹ {Number(row.price).toFixed(2)}</TableCell>
+                        <TableCell align="right">{row.fees}</TableCell>
+                        <TableCell align="right">{row.discount}</TableCell>
+                        <TableCell align="right">{row.taxableAmount}</TableCell>
+                        <TableCell align="right">{row.cgstTaxAmount}</TableCell>
+                        <TableCell align="right">{row.sgstTaxAmount}</TableCell>
+                        <TableCell align="right">{row.igstTaxAmount}</TableCell>
                         <TableCell align="right">₹ {Number(row.price * row.quantity).toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
@@ -199,15 +243,21 @@ const Invoicedetails = () => {
               <Divider sx={{ borderWidth: 1 }} />
             </Grid>
             <Grid item xs={12} sm={6} md={8}></Grid>
+            <Grid item xs={12} sm={6} md={8}>
+              <Stack direction="row" spacing={1}>
+                <Typography color="secondary">Note: </Typography>
+                <Typography>{Invoice?.note}</Typography>
+              </Stack>
+            </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <Stack spacing={2}>
+              <Stack spacing={1} sx={{ paddingRight: '22px', marginTop: '-20px' }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
                   <Typography variant="subtitle1">₹ {subTotal}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.success[500]}>Discount:</Typography>
-                  <Typography>₹ {discountRate}</Typography>
+                  <Typography style={discountStyle}>₹ {discountRate}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Tax:</Typography>
@@ -215,20 +265,17 @@ const Invoicedetails = () => {
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="subtitle1">Grand Total:</Typography>
-                  <Typography variant="subtitle1">₹ {list1?.totalAmount}</Typography>
+                  <Typography variant="subtitle1">₹ {Invoice?.totalAmount}</Typography>
                 </Stack>
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
-              <Stack direction="row" spacing={1}>
-                <Typography color="secondary">Note: </Typography>
-                <Typography>{list1?.note}</Typography>
               </Stack>
             </Grid>
           </Grid>
         </Box>
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ p: 2.5, a: { textDecoration: 'none', color: 'inherit' } }}>
-          <PDFDownloadLink document={<ExportPDFView list={list1} />} fileName={`${list1?.invoiceNumber}-${list1?.customer.firstName}.pdf`}>
+          <PDFDownloadLink
+            document={<ExportPDFView list={Invoice} company={company} />}
+            fileName={`${Invoice?.invoiceNumber}-${Invoice?.customer.firstName}.pdf`}
+          >
             <Button variant="contained" color="primary">
               Download
             </Button>

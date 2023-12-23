@@ -6,21 +6,16 @@ export const TimeSheetAPI = {
       const response = await apiTimeSheet.request({
         url: '/',
         method: 'GET',
-        signal: cancel
-          ? cancelApiObject[this.get.name].handleRequestCancellation().signal
-          : undefined,
+        signal: cancel ? cancelApiObject[this.get.name].handleRequestCancellation().signal : undefined
       });
       return response.data;
-    },
+    }
   },
   getAllProjects = async function (cancel = false) {
     const response = await apiTimeSheet.request({
       url: `v1/getAllProjects`,
       method: 'GET',
-      signal: cancel
-        ? cancelApiObject[getAllProjects.name].handleRequestCancellation()
-            .signal
-        : undefined,
+      signal: cancel ? cancelApiObject[getAllProjects.name].handleRequestCancellation().signal : undefined
     });
 
     return response.data.items;
@@ -29,9 +24,7 @@ export const TimeSheetAPI = {
     const response = await apiTimeSheet.request({
       url: `v1/getAllTasks`,
       method: 'GET',
-      signal: cancel
-        ? cancelApiObject[getAllTasks.name].handleRequestCancellation().signal
-        : undefined,
+      signal: cancel ? cancelApiObject[getAllTasks.name].handleRequestCancellation().signal : undefined
     });
 
     return response.data.items;

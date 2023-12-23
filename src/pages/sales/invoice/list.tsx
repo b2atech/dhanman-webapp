@@ -181,6 +181,14 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
   const columns = useMemo(
     () => [
       {
+        Header: 'So No',
+        accessor: 'soNo'
+      },
+      {
+        Header: 'So Date',
+        accessor: 'soDate'
+      },
+      {
         Header: 'Name',
         accessor: 'name'
       },
@@ -192,22 +200,68 @@ function SubRowAsync({ invoiceId }: { invoiceId: string }) {
         )
       },
       {
+        Header: 'Quantity',
+        accessor: 'quantity'
+      },
+      {
         Header: 'Price',
         accessor: 'price',
+        Cell: ({ value }: { value: number }) => (
+          <div style={{ textAlign: 'right' }}>
+            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          </div>
+        )
+      },
+      {
+        Header: 'Fees',
+        accessor: 'fees',
         Cell: ({ value }: { value: number }) => (
           <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
         )
       },
       {
-        Header: 'Quantity',
-        accessor: 'quantity'
+        Header: 'Discount',
+        accessor: 'discount',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+        )
       },
       {
-        Header: 'Amount',
+        Header: 'Taxable Amt',
+        accessor: 'taxableAmount',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+        )
+      },
+      {
+        Header: 'CGST Amt',
+        accessor: 'cgstAmount',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+        )
+      },
+      {
+        Header: 'SGST Amt',
+        accessor: 'sgstAmount',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+        )
+      },
+      {
+        Header: 'IGST Amt',
+        accessor: 'igstAmount',
+        Cell: ({ value }: { value: number }) => (
+          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+        )
+      },
+      {
+        Header: 'Total Amount',
         accessor: 'amount',
         disableFilters: true,
         Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          <div style={{ textAlign: 'center' }}>
+            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
+          </div>
         )
       }
     ],
