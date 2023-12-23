@@ -25,7 +25,8 @@ import {
   Grid,
   styled,
   // CircularProgress,
-  Button
+  Button,
+  CircularProgress
 } from '@mui/material';
 
 // third-party
@@ -374,7 +375,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, han
           <Button
             key="cancelled"
             variant="contained"
-            color="primary"
+            color="error"
             onClick={() => updateBillCancelStatuses()}
             style={{ marginRight: '10px' }}
           >
@@ -384,13 +385,7 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, han
         break;
       case billStataus.REJECTED:
         buttons.push(
-          <Button
-            key="reject"
-            variant="contained"
-            color="primary"
-            style={{ marginRight: '10px' }}
-            onClick={() => updateBillRejectStatuses()}
-          >
+          <Button key="reject" variant="contained" color="error" style={{ marginRight: '10px' }} onClick={() => updateBillRejectStatuses()}>
             Reject
           </Button>
         );
@@ -572,7 +567,7 @@ const Bills = () => {
   const [statuses, setStatuses] = useState<IBillStatus[]>();
   const theme = useTheme();
   const navigation = useNavigate();
-  //const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [billId, setBillId] = useState<string>('');
   const [getBillName, setGetBillName] = useState<any>('');
   const [open, setOpen] = useState<boolean>(false);
@@ -593,7 +588,7 @@ const Bills = () => {
       if (Array.isArray(bill) && Array.isArray(statuses)) {
         setBills(bill);
         setStatuses(statuses);
-        // setLoading(false);
+        setLoading(false);
       } else {
         console.error('API response is not an array:', bill, statuses);
       }
@@ -886,26 +881,26 @@ const Bills = () => {
         </Grid>
       </Grid>
       <MainCard content={false}>
-        {/* {loading ? (
+        {loading ? (
           <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
             <CircularProgress size={60} thickness={4} />
             <Typography variant="body1" style={{ marginTop: '16px' }}>
               Loading, please wait...
             </Typography>
           </Box>
-        ) : ( */}
-        <ScrollX>
-          <ReactTable
-            columns={columns}
-            data={bill}
-            statuses={statuses || []}
-            showIdColumn={showIdColumn}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-            handleSwitchChange={handleSwitchChange}
-            handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
-          />
-        </ScrollX>
-        {/* )} */}
+        ) : (
+          <ScrollX>
+            <ReactTable
+              columns={columns}
+              data={bill}
+              statuses={statuses || []}
+              showIdColumn={showIdColumn}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+              handleSwitchChange={handleSwitchChange}
+              handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
+            />
+          </ScrollX>
+        )}
       </MainCard>
 
       <AlertBillDelete title={getBillName} open={open} handleClose={handleClose} id={billId} />

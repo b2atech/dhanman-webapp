@@ -43,7 +43,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { PlusOutlined } from '@ant-design/icons';
 import { getAllProjects } from 'api/services/TimeSheetService';
 import { useSticky } from 'react-table-sticky';
-import { IProject } from 'types/overrides/timeSheet';
+import { IProject } from 'types/timeSheet';
 
 // ==============================|| REACT TABLE ||============================== //
 const TableWrapper = styled('div')(({ theme }) => ({
