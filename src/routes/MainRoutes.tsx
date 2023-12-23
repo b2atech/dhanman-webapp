@@ -9,66 +9,32 @@ import ComingSoon from 'pages/maintenance/coming-soon';
 
 // pages routing
 const MaintenanceError = Loadable(lazy(() => import('pages/maintenance/404')));
-const MaintenanceError500 = Loadable(
-  lazy(() => import('pages/maintenance/500'))
-);
-const MaintenanceUnderConstruction = Loadable(
-  lazy(() => import('pages/maintenance/under-construction'))
-);
-const MaintenanceComingSoon = Loadable(
-  lazy(() => import('pages/maintenance/coming-soon'))
-);
+const MaintenanceError500 = Loadable(lazy(() => import('pages/maintenance/500')));
+const MaintenanceUnderConstruction = Loadable(lazy(() => import('pages/maintenance/under-construction')));
+const MaintenanceComingSoon = Loadable(lazy(() => import('pages/maintenance/coming-soon')));
 
 //Render Applications
 const AppInvoices = Loadable(lazy(() => import('pages/sales/invoice/list')));
-const AppCreateInvoice = Loadable(
-  lazy(() => import('pages/sales/invoice/create'))
-);
-const AppInvoicedetails = Loadable(
-  lazy(() => import('pages/sales/invoice/details'))
-);
-const AppReceivedPayment = Loadable(
-  lazy(() => import('pages/sales/receivedpayments/list'))
-);
-const AppReceivePayment = Loadable(
-  lazy(() => import('pages/sales/receivedpayments/add'))
-);
+const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create')));
+const AppInvoicedetails = Loadable(lazy(() => import('pages/sales/invoice/details')));
+const AppReceivedPayment = Loadable(lazy(() => import('pages/sales/receivedpayments/list')));
+const AppReceivePayment = Loadable(lazy(() => import('pages/sales/receivedpayments/add')));
 const AppInvoiceEdit = Loadable(lazy(() => import('pages/sales/invoice/edit')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
-const AppChartOfAccounts = Loadable(
-  lazy(() => import('pages/company/chartOfAccounts/index'))
-);
-const AppCoaContainer = Loadable(
-  lazy(() => import('pages/company/chartOfAccounts/coaContainer'))
-);
+const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/index')));
+const AppCoaContainer = Loadable(lazy(() => import('pages/company/chartOfAccounts/coaContainer')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
-const AppCreateBill = Loadable(
-  lazy(() => import('pages/purchase/bills/create'))
-);
+const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
 const AppBillEdit = Loadable(lazy(() => import('pages/purchase/bills/edit')));
 const AppVendors = Loadable(lazy(() => import('pages/purchase/vendors/list')));
 const AppPullRequests = Loadable(lazy(() => import('pages/dev/pr')));
-const AppBilldetails = Loadable(
-  lazy(() => import('pages/purchase/bills/details'))
-);
-const AppProducts = Loadable(
-  lazy(() => import('pages/inventory/products/list'))
-);
-const AppAddProduct = Loadable(
-  lazy(() => import('pages/inventory/products/addproduct'))
-);
-const AppPaidPayments = Loadable(
-  lazy(() => import('pages/purchase/paidpayments/list'))
-);
-const AppAccountGroups = Loadable(
-  lazy(() => import('pages/company/accountGroup/list'))
-);
-const AppMakePayment = Loadable(
-  lazy(() => import('pages/purchase/paidpayments/add'))
-);
-const AppProjects = Loadable(
-  lazy(() => import('pages/timesheet/projects/list'))
-);
+const AppBilldetails = Loadable(lazy(() => import('pages/purchase/bills/details')));
+const AppProducts = Loadable(lazy(() => import('pages/inventory/products/list')));
+const AppAddProduct = Loadable(lazy(() => import('pages/inventory/products/addproduct')));
+const AppPaidPayments = Loadable(lazy(() => import('pages/purchase/paidpayments/list')));
+const AppAccountGroups = Loadable(lazy(() => import('pages/company/accountGroup/list')));
+const AppMakePayment = Loadable(lazy(() => import('pages/purchase/paidpayments/add')));
+const AppProjects = Loadable(lazy(() => import('pages/timesheet/projects/list')));
 const AppTasks = Loadable(lazy(() => import('pages/timesheet/tasks/list')));
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -85,9 +51,9 @@ const MainRoutes = {
       children: [
         {
           path: 'customers',
-          element: <AppCustomers />,
-        },
-      ],
+          element: <AppCustomers />
+        }
+      ]
     },
     {
       path: '/company',
@@ -103,13 +69,13 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppChartOfAccounts />,
+              element: <AppChartOfAccounts />
             },
             {
               path: 'coaContainer',
-              element: <AppCoaContainer />,
-            },
-          ],
+              element: <AppCoaContainer />
+            }
+          ]
         },
         {
           path: 'accountgroup',
@@ -117,15 +83,15 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppAccountGroups />,
+              element: <AppAccountGroups />
             },
             {
               path: 'add',
-              element: <ComingSoon />,
-            },
-          ],
-        },
-      ],
+              element: <ComingSoon />
+            }
+          ]
+        }
+      ]
     },
     {
       path: '/maintenance',
@@ -133,21 +99,21 @@ const MainRoutes = {
       children: [
         {
           path: '404',
-          element: <MaintenanceError />,
+          element: <MaintenanceError />
         },
         {
           path: '500',
-          element: <MaintenanceError500 />,
+          element: <MaintenanceError500 />
         },
         {
           path: 'under-construction',
-          element: <MaintenanceUnderConstruction />,
+          element: <MaintenanceUnderConstruction />
         },
         {
           path: 'coming-soon',
-          element: <MaintenanceComingSoon />,
-        },
-      ],
+          element: <MaintenanceComingSoon />
+        }
+      ]
     },
     {
       path: '/sales',
@@ -163,45 +129,45 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppCustomers />,
-            },
-          ],
+              element: <AppCustomers />
+            }
+          ]
         },
         {
           path: 'invoices',
           children: [
             {
               path: 'list',
-              element: <AppInvoices />,
+              element: <AppInvoices />
             },
             {
               path: 'create',
-              element: <AppCreateInvoice />,
+              element: <AppCreateInvoice />
             },
             {
               path: 'details/:id',
-              element: <AppInvoicedetails />,
+              element: <AppInvoicedetails />
             },
             {
               path: 'edit/:id',
-              element: <AppInvoiceEdit />,
-            },
-          ],
+              element: <AppInvoiceEdit />
+            }
+          ]
         },
         {
           path: 'payments',
           children: [
             {
               path: 'list',
-              element: <AppReceivedPayment />,
+              element: <AppReceivedPayment />
             },
             {
               path: 'add',
-              element: <AppReceivePayment />,
-            },
-          ],
-        },
-      ],
+              element: <AppReceivePayment />
+            }
+          ]
+        }
+      ]
     },
     {
       path: '/purchase',
@@ -217,45 +183,45 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppVendors />,
-            },
-          ],
+              element: <AppVendors />
+            }
+          ]
         },
         {
           path: 'bills',
           children: [
             {
               path: 'list',
-              element: <AppBills />,
+              element: <AppBills />
             },
             {
               path: 'details/:id',
-              element: <AppBilldetails />,
+              element: <AppBilldetails />
             },
             {
               path: 'edit/:id',
-              element: <AppBillEdit />,
+              element: <AppBillEdit />
             },
             {
               path: 'create',
-              element: <AppCreateBill />,
-            },
-          ],
+              element: <AppCreateBill />
+            }
+          ]
         },
         {
           path: 'payments',
           children: [
             {
               path: 'list',
-              element: <AppPaidPayments />,
+              element: <AppPaidPayments />
             },
             {
               path: 'add',
-              element: <AppMakePayment />,
-            },
-          ],
-        },
-      ],
+              element: <AppMakePayment />
+            }
+          ]
+        }
+      ]
     },
     {
       path: '/timesheet',
@@ -270,36 +236,36 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppProjects />,
+              element: <AppProjects />
             },
             {
               path: 'create',
-              element: <MaintenanceComingSoon />,
-            },
-          ],
+              element: <MaintenanceComingSoon />
+            }
+          ]
         },
         {
           path: 'tasks',
           children: [
             {
               path: 'list',
-              element: <AppTasks />,
+              element: <AppTasks />
             },
             {
               path: 'create',
-              element: <MaintenanceComingSoon />,
-            },
-          ],
+              element: <MaintenanceComingSoon />
+            }
+          ]
         },
         {
           path: 'logtime',
-          element: <MaintenanceComingSoon />,
+          element: <MaintenanceComingSoon />
         },
         {
           path: 'filltimesheet',
-          element: <MaintenanceComingSoon />,
-        },
-      ],
+          element: <MaintenanceComingSoon />
+        }
+      ]
     },
     {
       path: '/inventory',
@@ -314,13 +280,13 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <AppProducts />,
+              element: <AppProducts />
             },
             {
               path: 'create',
-              element: <AppAddProduct />,
-            },
-          ],
+              element: <AppAddProduct />
+            }
+          ]
         },
         {
           path: 'orders',
@@ -328,15 +294,15 @@ const MainRoutes = {
           children: [
             {
               path: 'list',
-              element: <MaintenanceComingSoon />,
+              element: <MaintenanceComingSoon />
             },
             {
               path: 'create',
-              element: <MaintenanceComingSoon />,
-            },
-          ],
-        },
-      ],
+              element: <MaintenanceComingSoon />
+            }
+          ]
+        }
+      ]
     },
     {
       path: '/dev',
@@ -348,9 +314,9 @@ const MainRoutes = {
       children: [
         {
           path: 'pr',
-          element: <AppPullRequests />,
-        },
-      ],
+          element: <AppPullRequests />
+        }
+      ]
     },
     {
       path: '/reports/inventoryreports',
@@ -362,11 +328,11 @@ const MainRoutes = {
       children: [
         {
           path: 'closingstock',
-          element: <ComingSoon />,
-        },
-      ],
-    },
-  ],
+          element: <ComingSoon />
+        }
+      ]
+    }
+  ]
 };
 
 export default MainRoutes;
