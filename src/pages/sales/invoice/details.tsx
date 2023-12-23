@@ -49,7 +49,7 @@ const Invoicedetails = () => {
   const [company, setCompany] = useState<any>();
 
   const { list } = useSelector((state) => state.invoice);
-  const [Invoice, setList] = useState<IInvoiceType>();
+  const [Invoice, setInvoice] = useState<IInvoiceType>();
   const [loading, setLoading] = useState<boolean>(false);
   const companyId: string = String(config.companyId);
 
@@ -64,7 +64,7 @@ const Invoicedetails = () => {
   useEffect(() => {
     if (id) {
       getInvoice(id).then((InvoiceHeader) => {
-        setList(InvoiceHeader);
+        setInvoice(InvoiceHeader);
         setLoading(false);
       });
     }
