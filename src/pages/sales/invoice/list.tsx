@@ -24,7 +24,8 @@ import {
   Chip,
   Skeleton,
   styled,
-  Button
+  Button,
+  CircularProgress
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { openDrawer } from 'store/reducers/menu';
@@ -583,7 +584,7 @@ function ReactTable({
           <Button
             key="cancelled"
             variant="contained"
-            color="primary"
+            color="error"
             onClick={() => updateInvoiceCancelStatuses()}
             style={{ marginRight: '10px' }}
           >
@@ -596,7 +597,7 @@ function ReactTable({
           <Button
             key="reject"
             variant="contained"
-            color="primary"
+            color="error"
             style={{ marginRight: '10px' }}
             onClick={() => updateInvoiceRejectStatuses()}
           >
@@ -790,6 +791,7 @@ const List = () => {
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
   dispatch(openDrawer(false));
 
@@ -808,6 +810,7 @@ const List = () => {
       if (Array.isArray(invoices) && Array.isArray(statuses)) {
         setList(invoices);
         setStatuses(statuses);
+        setLoading(false);
       } else {
         console.error('API response is not an array:', invoices, statuses);
       }
@@ -1128,16 +1131,25 @@ const List = () => {
 
       <MainCard content={false}>
         <ScrollX>
-          <ReactTable
-            columns={columns}
-            data={invoice}
-            statuses={statuses || []}
-            renderRowSubComponent={renderRowSubComponent}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-            showIdColumn={showIdColumn}
-            handleSwitchChange={handleSwitchChange}
-            handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
-          />
+          {loading ? (
+            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+              <CircularProgress size={0} thickness={4} />
+              <Typography variant="body1" style={{ marginTop: '32x' }}>
+                Loading, please wait...
+              </Typography>
+            </Box>
+          ) : (
+            <ReactTable
+              columns={columns}
+              data={invoice}
+              statuses={statuses || []}
+              renderRowSubComponent={renderRowSubComponent}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+              showIdColumn={showIdColumn}
+              handleSwitchChange={handleSwitchChange}
+              handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
+            />
+          )}
         </ScrollX>
       </MainCard>
       <AlertInvoiceDelete title={getInvoiceName} open={open} handleClose={handleClose} id={invoiceId} />

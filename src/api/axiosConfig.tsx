@@ -25,6 +25,10 @@ export const apiGit = axios.create({
   baseURL: 'https://api.github.com/repos/b2atech/'
 });
 
+export const apiTimeSheet = axios.create({
+  baseURL: 'https://api-dhanman-timesheet-nonprod.azurewebsites.net/api/'
+});
+
 const errorHandler = (error: any) => {
   const statusCode = error.response?.status;
 
@@ -56,5 +60,9 @@ apiSales.interceptors.response.use(undefined, (error) => {
 });
 
 apiCommon.interceptors.response.use(undefined, (error) => {
+  return errorHandler(error);
+});
+
+apiTimeSheet.interceptors.response.use(undefined, (error) => {
   return errorHandler(error);
 });
