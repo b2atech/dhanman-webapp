@@ -3,9 +3,9 @@ import { apiInventory } from '../axiosConfig';
 import { defineCancelApiObject } from '../axiosUtils';
 
 export const InvetoryAPI = {
-    get: async function (clientId: string, cancel = false) {
+    get: async function (companyId: string, cancel = false) {
       const response = await apiInventory.request({
-        url: `/v1/GetAllProducts/${clientId}`,
+        url: `companyId/${companyId}`,
         method: 'GET',
         signal: cancel ? cancelApiObject[this.get.name].handleRequestCancellation().signal : undefined
       });
@@ -15,16 +15,16 @@ export const InvetoryAPI = {
   },
   getAllUnits = async function (companyId: string, cancel = false) {
     const response = await apiInventory.request({
-      url: `/v1/GetAllUnits/${companyId}`,
+      url: `/v1/units/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllUnits.name].handleRequestCancellation().signal : undefined
     });
 
     return response.data.items;
   },
-  getAllCategories = async function (categoryId: string, cancel = false) {
+  getAllCategories = async function (companyId: string, cancel = false) {
     const response = await apiInventory.request({
-      url: `/v1/GetAllCategories/${categoryId}`,
+      url: `/v1/categories/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllCategories.name].handleRequestCancellation().signal : undefined
     });
@@ -40,18 +40,18 @@ export const InvetoryAPI = {
 
     return response.data.items;
   },
-  getAllProducts = async function (clientId: string, cancel = false) {
+  getAllProducts = async function (companyId: string, cancel = false) {
     const response = await apiInventory.request({
-      url: `/v1/GetAllProducts/${clientId}`,
+      url: `/v1/products/${companyId}`,
       method: 'GET',
       signal: cancel ? cancelApiObject[getAllProducts.name].handleRequestCancellation().signal : undefined
     });
 
     return response.data.items;
   },
-  deleteProductRequest = async function (clientId: string, cancel = false) {
+  deleteProductRequest = async function (companyId: string, cancel = false) {
     const response = await apiInventory.request({
-      url: `/v1/products/${clientId}`,
+      url: `/v1/product/${companyId}`,
       method: 'DELETE',
       signal: cancel ? cancelApiObject[deleteProductRequest.name].handleRequestCancellation().signal : undefined
     });
@@ -61,7 +61,7 @@ export const InvetoryAPI = {
 
 export async function createProductRequest(inventroydata: InventoryData) {
   const response = await apiInventory.request({
-    url: `v1/products`,
+    url: `v1/product`,
     method: 'POST',
     data: inventroydata
   });
