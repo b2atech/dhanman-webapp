@@ -53,6 +53,7 @@ export interface Items {
 
 export interface IBill {
   id: number;
+  billNumber: string;
   bill_id: number;
   vendor_name: string;
   email: string;
@@ -69,6 +70,7 @@ export interface IBill {
   customerInfo: InfoType;
   notes: string;
   amount: number;
+  setteledAmount: number;
 }
 
 export interface IBillType {
