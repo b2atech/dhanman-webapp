@@ -30,7 +30,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 
 // ==============================|| INVOICE - PREVIEW ||============================== //
 
-const InvoiceModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: any) => {
+const InvoiceModal = ({ isOpen, setIsOpen, invoiceInfo, company, items, onAddNextInvoice }: any) => {
   const theme = useTheme();
   function closeModal() {
     setIsOpen(false);
@@ -191,7 +191,7 @@ const InvoiceModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice 
             Cancel
           </Button>
           <PDFDownloadLink
-            document={<ExportPDFView list={invoiceInfo} />}
+            document={<ExportPDFView list={invoiceInfo} company={company} />}
             fileName={`${invoiceInfo?.invoiceId || invoiceInfo?.invoice_id}-${
               invoiceInfo?.customer_name || invoiceInfo?.from?.name || invoiceInfo?.customerInfo?.name
             }.pdf`}

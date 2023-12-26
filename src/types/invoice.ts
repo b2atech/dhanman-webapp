@@ -41,8 +41,8 @@ export interface IInvoiceType {
   invoiceNumber: string;
   email: string;
   avatar: number;
-  invoiceDate: Date | string | number;
-  dueDate: Date | string | number;
+  invoiceDate: Date | string;
+  dueDate: Date | string;
   quantity: number;
   customer: {
     id: string | number;
@@ -52,6 +52,8 @@ export interface IInvoiceType {
     email: string;
     city: string;
     tax: number | null;
+    addressLine: string | null;
+    gstIn: string | null;
   };
   invoiceStatus: string;
   totalAmount: number;
@@ -79,6 +81,15 @@ export interface InvoiceItem {
   quantity: number;
   price: number;
   amount: number;
+  soNo: string | number;
+  soDate: Date | string;
+  fees: number;
+  discount: number;
+  taxableAmount: number;
+  sgstTaxAmount: number;
+  cgstTaxAmount: number;
+  igstTaxAmount: number;
+  totalAmount: number;
 }
 export interface InvoiceProps {
   isOpen: boolean;
@@ -183,6 +194,16 @@ export interface IGetCustomerResponse {
   data: {
     vendrors: ICustomer[];
   };
+}
+
+export interface ICompanyInfo {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  addressLine: string;
+  gstIn: string;
+  description: string;
 }
 
 export interface IStatus {

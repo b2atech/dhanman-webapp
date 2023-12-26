@@ -365,6 +365,18 @@ const Createinvoice = () => {
           const discountStyle = {
             color: '#3EB489'
           };
+          const cgstRate = values?.invoice_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.cgst);
+            else return prev;
+          }, 0);
+          const sgstRate = values?.invoice_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.sgst);
+            else return prev;
+          }, 0);
+          const igstRate = values?.invoice_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.igst);
+            else return prev;
+          }, 0);
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -684,7 +696,9 @@ const Createinvoice = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    CGST Amt
+                                    <Tooltip title={`CGST Rate : ${cgstRate} (%)`} placement="top">
+                                      <span>CGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
@@ -694,7 +708,9 @@ const Createinvoice = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    SGST Amt
+                                    <Tooltip title={`SGST Rate : ${sgstRate} (%)`} placement="top">
+                                      <span>SGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
                                   {showGSTRates && (
                                     <>
@@ -704,7 +720,9 @@ const Createinvoice = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    IGST Amt
+                                    <Tooltip title={`IGST Rate : ${igstRate} (%)`} placement="top">
+                                      <span>IGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                     Total Amt
@@ -895,6 +913,7 @@ const Createinvoice = () => {
                           discountRate,
                           grandAmount
                         }}
+                        company={company}
                         items={values?.invoice_detail}
                         onAddNextInvoice={addNextInvoiceHandler}
                       />
