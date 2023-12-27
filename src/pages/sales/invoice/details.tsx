@@ -23,7 +23,6 @@ import {
 // third-party
 import ReactToPrint from 'react-to-print';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-
 // project import
 import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
@@ -31,7 +30,7 @@ import LogoSection from 'components/logo';
 import ExportPDFView from 'sections/apps/invoice/export-pdf';
 
 import { useSelector } from 'store';
-// import { getInvoiceSingleList } from 'store/reducers/invoice';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
@@ -99,6 +98,9 @@ const Invoicedetails = () => {
         <Box sx={{ p: 2.5, pb: 0 }}>
           <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
             <Stack direction="row" justifyContent="flex-end" spacing={1}>
+              <Button onClick={() => navigation('/sales/invoices/list')} variant="contained" startIcon={<ArrowBackIcon />} size="small">
+                Back
+              </Button>
               <IconButton onClick={() => navigation(`/sales/invoices/edit/${id}`)}>
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>

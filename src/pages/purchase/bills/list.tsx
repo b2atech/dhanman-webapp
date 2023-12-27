@@ -24,7 +24,6 @@ import {
   PaletteColor,
   Grid,
   styled,
-  // CircularProgress,
   Button,
   CircularProgress
 } from '@mui/material';
@@ -46,12 +45,11 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { DeleteTwoTone, EditTwoTone, EyeTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
-
-import InvoiceCard from 'components/cards/invoice/InvoiceCard';
-import InvoiceChart from 'components/cards/invoice/InvoiceChart';
+import { DeleteTwoTone, EditTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 // project import
+import InvoiceCard from 'components/cards/invoice/InvoiceCard';
+import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
@@ -683,7 +681,7 @@ const Bills = () => {
         },
         {
           Header: 'Amount',
-          accessor: 'amount',
+          accessor: 'totalAmount',
           Cell: ({ value }: { value: number }) => (
             <div style={{ textAlign: 'right' }}>
               <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
@@ -711,17 +709,6 @@ const Bills = () => {
           Cell: ({ row }: { row: Row<{}> }) => {
             return (
               <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-                <Tooltip title="View">
-                  <IconButton
-                    color="secondary"
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      navigation(`/purchase/bills/details/${row.values.id}`);
-                    }}
-                  >
-                    <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title="Edit">
                   <IconButton
                     color="primary"

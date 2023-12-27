@@ -1,4 +1,4 @@
-import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, useCallback, FC, MouseEvent } from 'react';
+import { useMemo, useEffect, Fragment, useState, useRef, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router';
 import * as invoiceStataus from 'constants/InvoiceStatus';
 
@@ -22,7 +22,6 @@ import {
   useMediaQuery,
   Tooltip,
   Chip,
-  Skeleton,
   styled,
   Button,
   CircularProgress
@@ -48,7 +47,7 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { DeleteTwoTone, DownOutlined, EditTwoTone, FileDoneOutlined, InfoCircleOutlined, RightOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 // project import
 import MainCard from 'components/MainCard';
@@ -69,13 +68,7 @@ import { NumericFormat } from 'react-number-format';
 // types
 import { IInvoiceList, IStatus, IUpdateInvoiceNextStatus, IUpdateInvoicePreviousStatus } from 'types/invoice';
 import AlertInvoiceDelete from 'sections/apps/invoice/AlertInvoiceDelete';
-import {
-  getAllInvoices,
-  getAllStatus,
-  getInvoiceDetailsByHeaderId,
-  updateNextStatus,
-  updatePreviousStatuses
-} from 'api/services/SalesService';
+import { getAllInvoices, getAllStatus, updateNextStatus, updatePreviousStatuses } from 'api/services/SalesService';
 import Avatar from 'types/Avatar';
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
 import InvoiceChart from 'components/cards/invoice/InvoiceChart';
@@ -96,191 +89,6 @@ export interface InvoiceWidgets {
   color: PaletteColor;
   chartData: number[];
 }
-
-// ==============================|| SUB TABLE ||============================== //
-
-function ReactSubTable({ columns, data, loading }: { columns: Column[]; data: []; loading: boolean }) {
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
-    columns,
-    data
-  });
-
-  if (loading) {
-    return (
-      <Table {...getTableProps()}>
-        <TableHead>
-          {headerGroups.map((headerGroup) => (
-            <TableRow {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <TableCell {...column.getHeaderProps()}>{column.render('Header')}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody {...getTableBodyProps()}>
-          {[0, 1, 2].map((item: number) => (
-            <TableRow key={item}>
-              {[0, 1, 2, 3, 4, 5].map((col: number) => (
-                <TableCell key={col}>
-                  <Skeleton animation="wave" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
-  }
-
-  return (
-    <Table {...getTableProps()}>
-      <TableHead>
-        {headerGroups.map((headerGroup) => (
-          <TableRow {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column: HeaderGroup) => (
-              <TableCell {...column.getHeaderProps([{ className: column.className }])}>{column.render('Header')}</TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableHead>
-      <TableBody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <TableRow {...row.getRowProps()}>
-              {row.cells.map((cell: Cell) => (
-                <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-              ))}
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
-  );
-}
-// ==============================|| SUB ROW - ASYNC DATA ||============================== //
-
-function SubRowAsync({ invoiceId }: { invoiceId: string }) {
-  const theme = useTheme();
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<[]>([]);
-
-  useEffect(() => {
-    getInvoiceDetailsByHeaderId(invoiceId)
-      .then((invoiceList) => {
-        if (Array.isArray(invoiceList)) {
-        }
-        setData(invoiceList);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, [invoiceId]);
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'So No',
-        accessor: 'soNo'
-      },
-      {
-        Header: 'So Date',
-        accessor: 'soDate'
-      },
-      {
-        Header: 'Name',
-        accessor: 'name'
-      },
-      {
-        Header: 'Description',
-        accessor: 'description',
-        Cell: ({ value }: { value: string }) => (
-          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
-        )
-      },
-      {
-        Header: 'Quantity',
-        accessor: 'quantity'
-      },
-      {
-        Header: 'Price',
-        accessor: 'price',
-        Cell: ({ value }: { value: number }) => (
-          <div style={{ textAlign: 'right' }}>
-            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-          </div>
-        )
-      },
-      {
-        Header: 'Fees',
-        accessor: 'fees',
-        Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-        )
-      },
-      {
-        Header: 'Discount',
-        accessor: 'discount',
-        Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-        )
-      },
-      {
-        Header: 'Taxable Amt',
-        accessor: 'taxableAmount',
-        Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-        )
-      },
-      {
-        Header: 'CGST Amt',
-        accessor: 'cgstAmount',
-        Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-        )
-      },
-      {
-        Header: 'SGST Amt',
-        accessor: 'sgstAmount',
-        Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-        )
-      },
-      {
-        Header: 'IGST Amt',
-        accessor: 'igstAmount',
-        Cell: ({ value }: { value: number }) => (
-          <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-        )
-      },
-      {
-        Header: 'Total Amount',
-        accessor: 'amount',
-        disableFilters: true,
-        Cell: ({ value }: { value: number }) => (
-          <div style={{ textAlign: 'center' }}>
-            <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
-          </div>
-        )
-      }
-    ],
-    []
-  );
-
-  const backColor = alpha(theme.palette.primary.lighter, 0.1);
-
-  return (
-    <TableRow sx={{ bgcolor: backColor, '&:hover': { bgcolor: `${backColor} !important` } }}>
-      <TableCell colSpan={8} sx={{ p: 2.5 }}>
-        <MainCard content={false} sx={{ ml: { xs: 2.5, sm: 5, md: 6, lg: 10, xl: 12 } }}>
-          <ReactSubTable columns={columns} data={data} loading={loading} />
-        </MainCard>
-      </TableCell>
-    </TableRow>
-  );
-}
-
 // ==============================|| REACT TABLE ||============================== //
 
 const TableWrapper = styled('div')(({ theme }) => ({
@@ -298,22 +106,13 @@ interface Props {
   columns: Column[];
   data: IInvoiceList[];
   statuses: IStatus[];
-  renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
   showIdColumn: boolean;
   handleSwitchChange: () => void;
   handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({
-  columns: userColumns,
-  data,
-  statuses,
-  renderRowSubComponent,
-  getHeaderProps,
-  showIdColumn,
-  handleAuditColumnSwitchChange
-}: Props) {
+function ReactTable({ columns: userColumns, data, statuses, getHeaderProps, handleAuditColumnSwitchChange }: Props) {
   const defaultColumn = useMemo(
     () => ({
       minWidth: 80,
@@ -344,7 +143,6 @@ function ReactTable({
     prepareRow,
     rows,
     page,
-    visibleColumns,
     gotoPage,
     setPageSize,
     setSortBy,
@@ -729,7 +527,6 @@ function ReactTable({
               <TableBody {...getTableBodyProps()}>
                 {page.map((row: Row, i: number) => {
                   prepareRow(row);
-                  const rowProps = row.getRowProps();
                   return (
                     <Fragment key={i}>
                       <TableRow
@@ -761,7 +558,6 @@ function ReactTable({
                           );
                         })}
                       </TableRow>
-                      {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
                     </Fragment>
                   );
                 })}
@@ -787,7 +583,6 @@ const List = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [invoiceId, setInvoiceId] = useState<string>('');
   const [getInvoiceName, setGetInvoiceName] = useState<any>('');
-  const [expandedRows, setExpandedRows] = useState({});
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const dispatch = useDispatch();
@@ -831,30 +626,6 @@ const List = () => {
 
   const columns = useMemo(
     () => [
-      {
-        Header: () => null,
-        id: 'expander',
-        className: 'cell-center',
-        Cell: ({ row }: CellProps<any>) => {
-          const collapseIcon = row.isExpanded ? <DownOutlined /> : <RightOutlined />;
-          return (
-            <Box sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-              <span
-                onClick={() => {
-                  setExpandedRows((prevState: { [key: string]: boolean }) => ({
-                    ...prevState,
-                    [row.id]: !prevState[row.id]
-                  }));
-                  row.toggleRowExpanded();
-                }}
-              >
-                {collapseIcon}
-              </span>
-            </Box>
-          );
-        },
-        SubCell: () => null
-      },
       {
         title: 'Row Selection',
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
@@ -1011,16 +782,6 @@ const List = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-  const renderRowSubComponent = useCallback(
-    ({ row }: { row: any }) => {
-      if ((expandedRows as { [key: string]: boolean })[row.id]) {
-        return <SubRowAsync invoiceId={row.original.id} />;
-      }
-      return null;
-    },
-    [expandedRows]
-  );
-
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -1143,7 +904,6 @@ const List = () => {
               columns={columns}
               data={invoice}
               statuses={statuses || []}
-              renderRowSubComponent={renderRowSubComponent}
               getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
               showIdColumn={showIdColumn}
               handleSwitchChange={handleSwitchChange}
