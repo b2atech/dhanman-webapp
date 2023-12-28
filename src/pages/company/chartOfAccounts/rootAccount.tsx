@@ -73,10 +73,6 @@ const RootAccount = ({ story, index }: Props) => {
   //     setOpenDrawer((prevState) => !prevState);
   //   };
 
-  // const addItem = () => {
-  //   //setOpenDrawer((prevState) => !prevState);
-  // };
-
   //const [openStoryDrawer, setOpenStoryDrawer] = useState<boolean>(false);
   //   const handleStoryDrawerOpen = () => {
   //     setOpenStoryDrawer((prevState) => !prevState);
