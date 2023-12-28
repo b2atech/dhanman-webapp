@@ -311,23 +311,22 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         </Grid>
                         <Grid item xs={2}>
                           <InputLabel sx={{ mb: 0.5 }}>Total Payable Amount</InputLabel>
-                          <TextField sx={{ width: '100%' }} id="amount"
-                          {...getFieldProps('totalAmount')}
+                          <TextField
+                            sx={{ width: '100%' }}
+                            id="amount"
+                            {...getFieldProps('totalAmount')}
                             inputProps={{
                               inputMode: 'numeric',
-                              onInput: (e:any) => {
+                              onInput: (e: any) => {
                                 var totalPayingAmount = Number(e.currentTarget.value);
                                 if (totalPayingAmount > 0) {
                                   selectedVendorBills?.forEach((element, index) => {
                                     var pendingAmount = selectedVendorBills[index].totalAmount - selectedVendorBills[index].setteledAmount;
-                                    if (totalPayingAmount >= pendingAmount)
-                                    {
+                                    if (totalPayingAmount >= pendingAmount) {
                                       selectedVendorBills[index].payingAmount = pendingAmount;
-                                    }
-                                    else if (totalPayingAmount > 0) {
+                                    } else if (totalPayingAmount > 0) {
                                       selectedVendorBills[index].payingAmount = totalPayingAmount;
-                                    }
-                                    else {
+                                    } else {
                                       selectedVendorBills[index].payingAmount = 0;
                                     }
                                     totalPayingAmount = totalPayingAmount - pendingAmount;
