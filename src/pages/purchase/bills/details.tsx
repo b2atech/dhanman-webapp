@@ -50,7 +50,6 @@ const Details = () => {
   const [company, setCompany] = useState<any>();
   const [loading, setLoading] = useState<boolean>(true);
   const [Bill, setList] = useState<IBillType>();
-  const [loading, setLoading] = useState<boolean>(false);
   const companyId: string = String(config.companyId);
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
