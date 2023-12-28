@@ -21,6 +21,7 @@ const AppReceivedPayment = Loadable(lazy(() => import('pages/sales/receivedpayme
 const AppReceivePayment = Loadable(lazy(() => import('pages/sales/receivedpayments/add')));
 const AppInvoiceEdit = Loadable(lazy(() => import('pages/sales/invoice/edit')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
+const AppCreateCustomers = Loadable(lazy(() => import('pages/sales/customer/create')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/index')));
 const AppCoaContainer = Loadable(lazy(() => import('pages/company/chartOfAccounts/coaContainer')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
@@ -124,11 +125,14 @@ const MainRoutes = {
       children: [
         {
           path: 'customers',
-          element: <AppCustomers />,
           children: [
             {
               path: 'list',
               element: <AppCustomers />
+            },
+            {
+              path: 'create',
+              element: <AppCreateCustomers />
             }
           ]
         },
