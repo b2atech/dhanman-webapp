@@ -49,10 +49,20 @@ export interface Items {
   quantity: number;
   price: string | number;
   amount: number;
+  poNo: string | number;
+  poDate: Date | string;
+  fess: number;
+  discount: number;
+  taxableAmount: number;
+  cgstTaxAmount: number;
+  sgstTaxAmount: number;
+  igstTaxAmount: number;
+  totalAmount: number;
 }
 
 export interface IBill {
   id: number;
+  billNumber: string;
   bill_id: number;
   vendor_name: string;
   email: string;
@@ -68,7 +78,9 @@ export interface IBill {
   tax: number | null;
   customerInfo: InfoType;
   notes: string;
-  amount: number;
+  totalAmount: number;
+  setteledAmount: number;
+  payingAmount: number;
 }
 
 export interface IBillType {
@@ -76,6 +88,7 @@ export interface IBillType {
   billPaymentId: number;
   billNumber: number;
   billDate: Date | string | number;
+  dueDate: Date | string;
   paymentTerm: number;
   billStatus: string;
   vendor: {
@@ -86,14 +99,25 @@ export interface IBillType {
     addressLine: string;
     city: string;
     phoneNumber: number;
+    tax: number | null;
+    gstIn: string | null;
   };
   currency: string;
-  dueDate: Date | string | number;
   totalAmount: number;
   tax: number;
   discount: number | null;
   note: string;
   lines: Items[];
+}
+
+export interface ICompanyInfo {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: number;
+  addressLine: string;
+  gstIn: string | null;
+  description: string;
 }
 
 export interface IBillStatus {

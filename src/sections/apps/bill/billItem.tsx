@@ -1,5 +1,5 @@
 // material-ui
-import { Box, Stack, TableCell, Typography } from '@mui/material';
+import { Box, Stack, TableCell, Typography, Tooltip } from '@mui/material';
 
 // third-party
 import { getIn } from 'formik';
@@ -56,9 +56,9 @@ const BillItem = ({
       var cgstAmount = getCTaxAmount(qty, price, cgst);
       var sgstAmount = getSTaxAmount(qty, price, sgst);
       //var igstAmount = getTaxAmount(qty, price, igst);
-      return (taxableAmount + cgstAmount + sgstAmount).toFixed(2);
+      return (taxableAmount + cgstAmount + sgstAmount)?.toFixed(2);
     }
-    return '0.0';
+    return 0.0;
   };
 
   const getTotalTaxableAmount = (qty: number, price: number, discount: number, fees: number) => {
@@ -90,6 +90,12 @@ const BillItem = ({
     }
     return 0.0;
   };
+
+  <TableCell align="center" sx={{ padding: '2px 0px' }}>
+    <Tooltip title={`CGST Rate: ${cgst || 0}%`} placement="top">
+      <span>CGST Amt</span>
+    </Tooltip>
+  </TableCell>;
 
   const textFieldItem = [
     {

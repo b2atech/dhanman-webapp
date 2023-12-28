@@ -148,8 +148,8 @@ const BillModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: 
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.description}</TableCell>
                     <TableCell align="right">{item.qty}</TableCell>
-                    <TableCell align="right">${Number(item.price).toFixed(2)}</TableCell>
-                    <TableCell align="right">${Number(item.price * item.qty).toFixed(2)}</TableCell>
+                    <TableCell align="right">${Number(item.price)?.toFixed(2)}</TableCell>
+                    <TableCell align="right">${Number(item.price * item.qty)?.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -161,23 +161,23 @@ const BillModal = ({ isOpen, setIsOpen, invoiceInfo, items, onAddNextInvoice }: 
                 <Stack spacing={2}>
                   <Stack direction="row" justifyContent="space-between">
                     <Typography color="secondary">Sub Total:</Typography>
-                    <Typography variant="h6">${subtotal.toFixed(2)}</Typography>
+                    <Typography variant="h6">${subtotal?.toFixed(2)}</Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between">
                     <Typography color="secondary">Discount:</Typography>
                     <Typography variant="h6" color={theme.palette.success.main}>
-                      ${discountRate.toFixed(2)}
+                      ${discountRate?.toFixed(2)}
                     </Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between">
                     <Typography color={theme.palette.grey[500]}>Tax:</Typography>
-                    <Typography variant="h6">${taxRate.toFixed(2)}</Typography>
+                    <Typography variant="h6">${taxRate?.toFixed(2)}</Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between">
                     <Typography sx={{ pr: 2 }} variant="subtitle1">
                       Grand Total:
                     </Typography>
-                    <Typography variant="h6">${total % 1 === 0 ? total : total.toFixed(2)}</Typography>
+                    <Typography variant="h6">${total % 1 === 0 ? total : total?.toFixed(2)}</Typography>
                   </Stack>
                 </Stack>
               </Grid>

@@ -208,7 +208,7 @@ const ProjectListPage = () => {
         }
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching project data:', error);
         setLoading(false);
       });
   }, []);
