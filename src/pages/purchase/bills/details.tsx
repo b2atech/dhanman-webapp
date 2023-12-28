@@ -20,8 +20,9 @@ import {
   IconButton
 } from '@mui/material';
 
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
 // third-party
-//import { format } from 'date-fns';
 
 // project import
 import Loader from 'components/Loader';
@@ -29,8 +30,6 @@ import MainCard from 'components/MainCard';
 import { getBillById } from 'api/services/BillService';
 import { getCompanyDetail } from 'api/services/CommonService';
 import config from 'config';
-
-// import { useSelector } from 'store';
 
 // types
 import { IBillType } from 'types/bill';
@@ -49,10 +48,8 @@ const Details = () => {
   const { id } = useParams();
   const navigation = useNavigate();
   const [company, setCompany] = useState<any>();
-
-  // const { list } = useSelector((state) => state.bill);
+  const [loading, setLoading] = useState<boolean>(true);
   const [Bill, setList] = useState<IBillType>();
-  const [loading, setLoading] = useState<boolean>(false);
   const companyId: string = String(config.companyId);
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
@@ -102,6 +99,9 @@ const Details = () => {
         <Box sx={{ p: 2.5, pb: 0 }}>
           <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
             <Stack direction="row" justifyContent="flex-end" spacing={1}>
+              <Button onClick={() => navigation('/purchase/bills/list')} variant="contained" startIcon={<ArrowBackIcon />} size="small">
+                Back to Bills
+              </Button>
               <IconButton onClick={() => navigation(`/purchase/bills/edit/${id}`)}>
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>

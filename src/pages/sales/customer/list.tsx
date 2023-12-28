@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, useRef } from 'react';
-
+import { useNavigate } from 'react-router';
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import {
@@ -161,6 +161,8 @@ function ReactTable({
     setIsAuditSwitchOn((prevAuditVisible) => !prevAuditVisible);
   };
 
+  const navigation = useNavigate();
+
   return (
     <>
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
@@ -180,7 +182,15 @@ function ReactTable({
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={(e: any) => {
+                e.stopPropagation();
+                navigation(`/sales/customers/create`);
+              }}
+              size="small"
+            >
               Add Customer
             </Button>
             <CSVExport
