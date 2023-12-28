@@ -95,6 +95,7 @@ export interface BillPaymentLine {
   billAmount: number;
   setteledAmount: number;
   remainingAmount: number;
+  payingAmount: number;
   billStatusId: string;
   billStatus: string;
 }

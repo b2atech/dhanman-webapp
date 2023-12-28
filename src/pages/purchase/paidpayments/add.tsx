@@ -175,6 +175,9 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
     }
   });
   const { getFieldProps } = formik;
+  // const handelAmountChange = (totalAmount: any) =>{
+  //  console.log(totalAmount);
+  // }
 
   const handlerCreate = (values: any) => {
     const bill: BillPaymentHeader = {
@@ -199,6 +202,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
       billPaymentLine.billStatus = billItem.billStatus;
       billPaymentLine.billAmount = billItem.billAmount;
       billPaymentLine.setteledAmount = billItem.setteledAmount;
+      billPaymentLine.payingAmount = billItem.payingAmount;
       return billPaymentLine;
     });
   };
@@ -219,7 +223,8 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
               dueDate: '',
               status: '',
               amount: 0,
-              setteledAmount: 0
+              setteledAmount: 0,
+              payingAmount: 0
             }
           ]
         }}
@@ -302,12 +307,35 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                             placeholder={String(totalAmount)}
                             InputProps={{ readOnly: true }}
                             type="number"
-                            {...getFieldProps('amount')}
                           ></TextField>
                         </Grid>
                         <Grid item xs={2}>
                           <InputLabel sx={{ mb: 0.5 }}>Total Payable Amount</InputLabel>
-                          <TextField sx={{ width: '100%' }} id="amount" InputProps={{}} />
+                          <TextField sx={{ width: '100%' }} id="amount"
+                          {...getFieldProps('totalAmount')}
+                            inputProps={{
+                              inputMode: 'numeric',
+                              onInput: (e:any) => {
+                                var totalPayingAmount = Number(e.currentTarget.value);
+                                if (totalPayingAmount > 0) {
+                                  selectedVendorBills?.forEach((element, index) => {
+                                    var pendingAmount = selectedVendorBills[index].totalAmount - selectedVendorBills[index].setteledAmount;
+                                    if (totalPayingAmount >= pendingAmount)
+                                    {
+                                      selectedVendorBills[index].payingAmount = pendingAmount;
+                                    }
+                                    else if (totalPayingAmount > 0) {
+                                      selectedVendorBills[index].payingAmount = totalPayingAmount;
+                                    }
+                                    else {
+                                      selectedVendorBills[index].payingAmount = 0;
+                                    }
+                                    totalPayingAmount = totalPayingAmount - pendingAmount;
+                                  });
+                                }
+                              }
+                            }}
+                          />
                         </Grid>
                       </Grid>
                       <Grid container spacing={1.5} direction="row" sx={{ marginBottom: 2.5 }}>
@@ -315,8 +343,6 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                           <Stack spacing={0}>
                             <InputLabel sx={{ mb: 0.5, whiteSpace: 'nowrap' }}>Payment Mode</InputLabel>
                             <Select
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
                               label="Payment Mode"
                               // value={paymentMode}
                               // onChange={(event) => setPaymentMode(event.target.value)}
@@ -333,8 +359,6 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                           <Stack spacing={0}>
                             <InputLabel sx={{ mb: 0.5 }}>Payment Through</InputLabel>
                             <Select
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
                               label="Payment Through"
                               // value={paymentThrough}
                               // onChange={(event) => setPaymentThrough(event.target.value)}
@@ -431,10 +455,10 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                                                   billDate={item.billDate}
                                                   dueDate={item.dueDate}
                                                   billStatus={item.billStatus}
-                                                  billAmt={item.amount}
+                                                  billAmt={item.totalAmount}
                                                   setteledAmount={item.setteledAmount}
                                                   remainingAmount={item.remainingAmount}
-                                                  payingAmt={item.payingAmt}
+                                                  payingAmt={item.payingAmount}
                                                   onDeleteItem={(index: number) => remove(index)}
                                                   onEditItem={handleChange}
                                                   Blur={handleBlur}
@@ -478,7 +502,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                                     Grand Total :
                                   </Typography>
                                   <Typography variant="subtitle1" paddingLeft={5}>
-                                    {bills?.reduce((acc, current) => acc + current.amount, 0)}
+                                    {bills?.reduce((acc, current) => acc + current.totalAmount, 0)}
                                   </Typography>
                                 </Stack>
                               </Stack>

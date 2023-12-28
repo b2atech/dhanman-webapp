@@ -78,8 +78,9 @@ export interface IBill {
   tax: number | null;
   customerInfo: InfoType;
   notes: string;
-  amount: number;
+  totalAmount: number;
   setteledAmount: number;
+  payingAmount: number;
 }
 
 export interface IBillType {
