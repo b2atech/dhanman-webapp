@@ -73,6 +73,7 @@ import { getAllBills, getAllStatus, updateBillNextStatus, updateBillPreviousStat
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import config from 'config';
+import { openDrawer } from 'store/reducers/menu';
 
 const moment = require('moment');
 const companyId: string = String(config.companyId);
@@ -573,6 +574,7 @@ const Bills = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
+  dispatch(openDrawer(false));
 
   const handleSwitchChange = () => {
     setShowIdColumn(!showIdColumn);
@@ -646,6 +648,7 @@ const Bills = () => {
         {
           Header: 'Vendor Name',
           accessor: 'vendorName',
+          Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
           disableFilters: true
         },
         {
@@ -678,7 +681,7 @@ const Bills = () => {
         {
           Header: 'Due Date',
           accessor: 'dueDate',
-          Cell: (props) => moment(props.value).format('DD MMM YYYY'),
+          Cell: (props: CellProps<{}, any>) => <span style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</span>,
           disableFilters: true
         },
         {
