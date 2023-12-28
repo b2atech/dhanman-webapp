@@ -102,13 +102,12 @@ interface Props {
   columns: Column[];
   data: IBill[];
   statuses: IBillStatus[];
-  showIdColumn: boolean;
   getHeaderProps: (column: HeaderGroup) => {};
   handleSwitchChange: () => void;
   handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, handleAuditColumnSwitchChange }: Props) {
+function ReactTable({ columns, data, getHeaderProps, statuses }: Props) {
   const defaultColumn = useMemo(
     () => ({
       minWidth: 80,
@@ -881,7 +880,6 @@ const Bills = () => {
               columns={columns}
               data={bill}
               statuses={statuses || []}
-              showIdColumn={showIdColumn}
               getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
               handleSwitchChange={handleSwitchChange}
               handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
