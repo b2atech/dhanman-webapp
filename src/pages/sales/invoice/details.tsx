@@ -49,7 +49,7 @@ const Invoicedetails = () => {
   const [company, setCompany] = useState<any>();
 
   const { list } = useSelector((state) => state.invoice);
-  const [Invoice, setInvoice] = useState<IInvoiceType>();
+  const [invoice, setInvoice] = useState<IInvoiceType>();
   const [loading, setLoading] = useState<boolean>(false);
   const companyId: string = String(config.companyId);
 
@@ -70,24 +70,26 @@ const Invoicedetails = () => {
     }
   }, [id]);
 
-  const today = new Date(`${Invoice?.invoiceDate}`).toLocaleDateString('en-GB', {
+  const today = new Date(`${invoice?.invoiceDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const due_dates = new Date(`${Invoice?.dueDate}`).toLocaleDateString('en-GB', {
+  const due_dates = new Date(`${invoice?.dueDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-  const subTotal = (Invoice?.lines ?? []).reduce((total, row) => {
-    return total + row.amount;
+  const subTotal = (invoice?.lines ?? []).reduce((total, row) => {
+    return total;
   }, 0);
-  const taxRate = (Number(Invoice?.tax) * subTotal) / 100;
-  const discountRate = (Number(Invoice?.discount) * subTotal) / 100;
+  const taxRate = Number(invoice?.discount);
+  const discountRate = (invoice?.lines ?? []).reduce((total, row) => {
+    return (row.discount / 100) * row.price * row.quantity;
+  }, 0);
   const discountStyle = {
     color: '#3EB489'
   };
@@ -103,8 +105,8 @@ const Invoicedetails = () => {
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>
               <PDFDownloadLink
-                document={<ExportPDFView list={Invoice} company={company} />}
-                fileName={`${Invoice?.invoiceNumber}-${Invoice?.customer.firstName}.pdf`}
+                document={<ExportPDFView list={invoice} company={company} />}
+                fileName={`${invoice?.invoiceNumber}-${invoice?.customer.firstName}.pdf`}
               >
                 <IconButton>
                   <DownloadOutlined style={{ color: theme.palette.grey[900] }} />
@@ -137,10 +139,10 @@ const Invoicedetails = () => {
                 <Box>
                   <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Chip
-                      label={Invoice?.invoiceStatus}
+                      label={invoice?.invoiceStatus}
                       variant="light"
                       size="small"
-                      color={Invoice?.invoiceStatus === 'Closed' ? 'error' : Invoice?.invoiceStatus === 'Paid' ? 'success' : 'info'}
+                      color={invoice?.invoiceStatus === 'Closed' ? 'error' : invoice?.invoiceStatus === 'Paid' ? 'success' : 'info'}
                     />
                     <Typography variant="subtitle1">Invoice Date</Typography>
                     <Typography color="secondary">{today}</Typography>
@@ -179,17 +181,17 @@ const Invoicedetails = () => {
                   <Typography variant="h5">
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <span style={{ paddingRight: '10px' }}>To:</span>
-                      <span>{`${Invoice?.customer?.firstName} ${Invoice?.customer?.lastName}`}</span>
+                      <span>{`${invoice?.customer?.firstName} ${invoice?.customer?.lastName}`}</span>
                     </Box>
                     <Stack sx={{ width: '100%' }}>
                       <Typography variant="subtitle1"></Typography>
                       <Typography color="secondary">
-                        {Invoice?.customer?.addressLine && Invoice?.customer?.phoneNumber
-                          ? `${Invoice.customer.addressLine}, \u00A0\u00A0${Invoice.customer.phoneNumber}`
-                          : `${Invoice?.customer?.addressLine || ''} ${Invoice?.customer?.phoneNumber || ''}`}
+                        {invoice?.customer?.addressLine && invoice?.customer?.phoneNumber
+                          ? `${invoice.customer.addressLine}, \u00A0\u00A0${invoice.customer.phoneNumber}`
+                          : `${invoice?.customer?.addressLine || ''} ${invoice?.customer?.phoneNumber || ''}`}
                       </Typography>
-                      <Typography color="secondary">{Invoice?.customer?.email}</Typography>
-                      {Invoice?.customer?.gstIn && <Typography color="secondary">GSTIN: {Invoice.customer.gstIn}</Typography>}
+                      <Typography color="secondary">{invoice?.customer?.email}</Typography>
+                      {invoice?.customer?.gstIn && <Typography color="secondary">GSTIN: {invoice.customer.gstIn}</Typography>}
                     </Stack>
                   </Typography>
                 </Stack>
@@ -217,7 +219,7 @@ const Invoicedetails = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Invoice?.lines?.map((row: any, index) => (
+                    {invoice?.lines?.map((row: any, index) => (
                       <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{}</TableCell>
@@ -246,7 +248,7 @@ const Invoicedetails = () => {
             <Grid item xs={12} sm={6} md={8}>
               <Stack direction="row" spacing={1}>
                 <Typography color="secondary">Note: </Typography>
-                <Typography>{Invoice?.note}</Typography>
+                <Typography>{invoice?.note}</Typography>
               </Stack>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
@@ -265,7 +267,7 @@ const Invoicedetails = () => {
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="subtitle1">Grand Total:</Typography>
-                  <Typography variant="subtitle1">₹ {Invoice?.totalAmount}</Typography>
+                  <Typography variant="subtitle1">₹ {invoice?.totalAmount}</Typography>
                 </Stack>
               </Stack>
             </Grid>
@@ -273,8 +275,8 @@ const Invoicedetails = () => {
         </Box>
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ p: 2.5, a: { textDecoration: 'none', color: 'inherit' } }}>
           <PDFDownloadLink
-            document={<ExportPDFView list={Invoice} company={company} />}
-            fileName={`${Invoice?.invoiceNumber}-${Invoice?.customer.firstName}.pdf`}
+            document={<ExportPDFView list={invoice} company={company} />}
+            fileName={`${invoice?.invoiceNumber}-${invoice?.customer.firstName}.pdf`}
           >
             <Button variant="contained" color="primary">
               Download

@@ -30,6 +30,7 @@ const InvoiceItem = ({
   touched,
   setFieldValue,
   products,
+  soNoVisibility,
   ratesVisibility,
   discountVisibility,
   feesVisibility
@@ -103,7 +104,7 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       value: soNo,
-      visibility: true
+      visibility: soNoVisibility
     },
     {
       placeholder: 'SalesDate',
@@ -113,7 +114,7 @@ const InvoiceItem = ({
       id: id,
       value: soDate,
       style: { width: '140px' },
-      visibility: true
+      visibility: soNoVisibility
     },
     {
       placeholder: 'Item name',
@@ -125,7 +126,7 @@ const InvoiceItem = ({
       errors: errorName,
       touched: touchedName,
       select: true,
-      style: { width: '180px' },
+      style: { width: '200px' },
       selectOptions: products.map((product: any) => ({
         label: product.productName,
         value: product.productName
@@ -140,7 +141,7 @@ const InvoiceItem = ({
       type: 'text',
       id: id,
       value: description,
-      style: { width: '150px' },
+      style: { width: '180px' },
       visibility: true
     },
     {
@@ -150,16 +151,26 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.quantity`,
       id: id,
       value: qty,
-      style: { width: '70px' },
+      style: { width: '80px' },
       visibility: true
     },
-    { placeholder: '', label: 'price', type: 'number', name: `invoice_detail.${index}.price`, id: id, value: price, visibility: true },
+    {
+      placeholder: 'price',
+      label: 'price',
+      type: 'number',
+      name: `invoice_detail.${index}.price`,
+      id: id,
+      style: { width: '110px' },
+      value: price,
+      visibility: true
+    },
     {
       placeholder: 'Fees',
       label: 'Fees',
       name: `invoice_detail.${index}.fees`,
       type: 'number',
       id: id,
+      style: { width: '95px' },
       value: fees,
       visibility: feesVisibility
     },
@@ -170,7 +181,7 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       value: discount,
-      style: { width: '70px' },
+      style: { width: '80px' },
       visibility: discountVisibility
     },
     {
@@ -190,7 +201,6 @@ const InvoiceItem = ({
       type: '',
       id: id,
       value: cgst,
-      style: { width: '50px' },
       visibility: ratesVisibility
     },
     {
@@ -199,6 +209,7 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.CgstAmount`,
       type: 'number',
       id: id,
+      style: { width: '100px' },
       value: (cgst / 100) * price * qty,
       visibility: true
     },
@@ -209,7 +220,6 @@ const InvoiceItem = ({
       type: '',
       id: id,
       value: sgst,
-      style: { width: '50px' },
       visibility: ratesVisibility
     },
     {
@@ -218,6 +228,7 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.SgstAmount`,
       type: 'number',
       id: id,
+      style: { width: '100px' },
       value: (sgst / 100) * price * qty,
       visibility: true
     },
@@ -228,7 +239,6 @@ const InvoiceItem = ({
       type: '',
       id: id,
       value: igst,
-      style: { width: '50px' },
       visibility: ratesVisibility
     },
     {
@@ -237,6 +247,7 @@ const InvoiceItem = ({
       name: `invoice_detail.${index}.IgstAmount`,
       type: 'number',
       id: id,
+      style: { width: '110px' },
       value: (igst / 100) * price * qty,
       visibility: true
     }
