@@ -35,7 +35,6 @@ import { v4 as UIDV4 } from 'uuid';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { CountryType } from 'types/invoice';
 import { openDrawer } from 'store/reducers/menu';
-//import BillModal from 'sections/apps/bill/BillModal';
 //import useConfig from 'hooks/useConfig';
 
 // third party
@@ -51,7 +50,7 @@ import { getAllProducts } from 'api/services/InventoryService';
 import { getCompanyDetail } from 'api/services/CommonService';
 import Loader from 'components/Loader';
 // import { CheckBox } from '@mui/icons-material';
-// import BillModal from 'sections/apps/bill/BillModal';
+import BillModal from 'sections/apps/bill/BillModal';
 
 //assets
 import { DeleteOutlined } from '@ant-design/icons';
@@ -96,7 +95,7 @@ const validationSchema = yup.object({
 const CreateBill = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { open, isCustomerOpen, country, countries } = useSelector((state) => state.invoice);
+  const { open, isCustomerOpen, country, countries, isOpen } = useSelector((state) => state.invoice);
   const notesLimit: number = 500;
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
@@ -236,13 +235,13 @@ const CreateBill = () => {
     });
   };
 
-  // const addNextBillHandler = () => {
-  //   dispatch(
-  //     reviewInvoicePopup({
-  //       isOpen: false
-  //     })
-  //   );
-  // };
+  const addNextBillHandler = () => {
+    dispatch(
+      reviewInvoicePopup({
+        isOpen: false
+      })
+    );
+  };
   return (
     <MainCard>
       <Formik
@@ -316,7 +315,7 @@ const CreateBill = () => {
           }, 0);
           const formattedSubtotal = addCommas(subtotal);
 
-          //const taxRate = (values.tax * subtotal) / 100;
+          const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
             else return prev;
@@ -358,6 +357,19 @@ const CreateBill = () => {
 
           const grandAmount = subtotal + discountRate + fees;
           const formattedGrandAmount = addCommas(grandAmount);
+
+          const cgstRate = values?.bill_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.cgst);
+            else return prev;
+          }, 0);
+          const sgstRate = values?.bill_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.sgst);
+            else return prev;
+          }, 0);
+          const igstRate = values?.bill_detail?.reduce((prev, curr: any) => {
+            if (curr.name.trim().length > 0) return prev + Number(curr.igst);
+            else return prev;
+          }, 0);
 
           // values.totalAmount = grandAmount;
           const discountStyle = {
@@ -666,7 +678,9 @@ const CreateBill = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    CGST Amt
+                                    <Tooltip title={`CGST Rate : ${cgstRate} (%)`} placement="top">
+                                      <span>CGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
 
                                   {showGSTRates && (
@@ -678,7 +692,9 @@ const CreateBill = () => {
                                   )}
 
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    SGST Amt
+                                    <Tooltip title={`SGST Rate : ${sgstRate} (%)`} placement="top">
+                                      <span>SGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
 
                                   {showGSTRates && (
@@ -689,7 +705,9 @@ const CreateBill = () => {
                                     </>
                                   )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    IGST Amt
+                                    <Tooltip title={`IGST Rate : ${igstRate} (%)`} placement="top">
+                                      <span>IGST Amt</span>
+                                    </Tooltip>
                                   </TableCell>
 
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
@@ -865,6 +883,27 @@ const CreateBill = () => {
                       <Button color="primary" variant="contained" type="submit">
                         Create & Send
                       </Button>
+                      <BillModal
+                        isOpen={isOpen}
+                        setIsOpen={(value: any) =>
+                          dispatch(
+                            reviewInvoicePopup({
+                              isOpen: value
+                            })
+                          )
+                        }
+                        key={values.billNumber}
+                        invoiceInfo={{
+                          ...values,
+                          subtotal,
+                          taxRate,
+                          discountRate,
+                          grandAmount
+                        }}
+                        company={company}
+                        items={values?.bill_detail}
+                        onAddNextInvoice={addNextBillHandler}
+                      />
                     </Stack>
                   </Grid>
                 </Grid>

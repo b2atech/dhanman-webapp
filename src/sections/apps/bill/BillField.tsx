@@ -1,9 +1,11 @@
-import { MenuItem, Select, TableCell, TextField } from '@mui/material';
+import { MenuItem, Select, TableCell, TextField, Tooltip } from '@mui/material';
 import '../../../components/css/b2astyles.css';
 
 // ==============================|| Bill - TEXT FIELD ||============================== //
 
-const BillField = ({ onEditItem, cellData }: any) => {
+const BillField = ({ onEditItem, cellData, values, index }: any) => {
+  // const billDetailIndex = values?.bill_detail?.findIndex((item: any, itemIndex: number) => itemIndex === index);
+
   return (
     <TableCell
       className={' ' + (cellData.visibility === false ? 'hide-tablecell' : '')}
@@ -34,29 +36,43 @@ const BillField = ({ onEditItem, cellData }: any) => {
             }
           }}
         >
-          {cellData.selectOptions.map((option: any) => (
+          {cellData.selectOptions?.map((option: any) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
           ))}
         </Select>
       ) : (
-        <TextField
-          type={cellData.type}
-          placeholder={cellData.placeholder}
-          name={cellData.name}
-          id={cellData.id}
-          value={cellData.type === 'number' ? (cellData.value > 0 ? cellData.value : '') : cellData.value}
-          onChange={onEditItem}
-          label={cellData.label}
-          error={Boolean(cellData.errors && cellData.touched)}
-          inputProps={{
-            ...(cellData.type === 'number' && { min: 0 })
-          }}
-          style={cellData.style}
-        />
+        <Tooltip
+          title={
+            cellData.placeholder === 'CGST Amount'
+              ? `CGST Rate: ${values?.bill_detail?.[index]?.cgstRate || 0}%`
+              : cellData.placeholder === 'SGST Amount'
+              ? `SGST Rate: ${values?.bill_detail?.[index]?.sgstRate || 0}%`
+              : cellData.placeholder === 'IGST Amount'
+              ? `IGST Rate: ${values?.bill_detail?.[index]?.igstRate || 0}%`
+              : ''
+          }
+          placement="top"
+        >
+          <TextField
+            type={cellData.type}
+            placeholder={cellData.placeholder}
+            name={cellData.name}
+            id={cellData.id}
+            value={cellData.type === 'number' ? (cellData.value > 0 ? cellData.value : '') : cellData.value}
+            onChange={onEditItem}
+            label={cellData.label}
+            error={Boolean(cellData.errors && cellData.touched)}
+            inputProps={{
+              ...(cellData.type === 'number' && { min: 0 })
+            }}
+            style={cellData.style}
+          />
+        </Tooltip>
       )}
     </TableCell>
   );
 };
+
 export default BillField;
