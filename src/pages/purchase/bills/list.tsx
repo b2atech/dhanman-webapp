@@ -45,7 +45,7 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { DeleteTwoTone, EditTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone, FileDoneOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 // project import
 import InvoiceCard from 'components/cards/invoice/InvoiceCard';
@@ -453,6 +453,9 @@ function ReactTable({ columns, data, getHeaderProps, statuses }: Props) {
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             {updateStatusButtons()}
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => navigation('/purchase/bills/create')} size="small">
+              Add Bill
+            </Button>
             <TableRowSelection selected={Object.keys(selectedRowIds).length} />
             <CSVExport data={data} filename={'invoice-list.csv'} />
             <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>

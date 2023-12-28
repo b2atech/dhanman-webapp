@@ -87,7 +87,7 @@ const Details = () => {
           <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
             <Stack direction="row" justifyContent="flex-end" spacing={1}>
               <Button onClick={() => navigation('/purchase/bills/list')} variant="contained" startIcon={<ArrowBackIcon />} size="small">
-                Back
+                Back to Bills
               </Button>
               <IconButton onClick={() => navigation(`/purchase/bills/edit/${id}`)}>
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
