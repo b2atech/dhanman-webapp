@@ -24,7 +24,6 @@ import {
   PaletteColor,
   Grid,
   styled,
-  // CircularProgress,
   Button,
   CircularProgress
 } from '@mui/material';
@@ -46,12 +45,11 @@ import {
   HeaderProps,
   CellProps
 } from 'react-table';
-import { DeleteTwoTone, EditTwoTone, EyeTwoTone, FileDoneOutlined, InfoCircleOutlined } from '@ant-design/icons';
-
-import InvoiceCard from 'components/cards/invoice/InvoiceCard';
-import InvoiceChart from 'components/cards/invoice/InvoiceChart';
+import { DeleteTwoTone, EditTwoTone, FileDoneOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 // project import
+import InvoiceCard from 'components/cards/invoice/InvoiceCard';
+import InvoiceChart from 'components/cards/invoice/InvoiceChart';
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
@@ -105,13 +103,12 @@ interface Props {
   columns: Column[];
   data: IBill[];
   statuses: IBillStatus[];
-  showIdColumn: boolean;
   getHeaderProps: (column: HeaderGroup) => {};
   handleSwitchChange: () => void;
   handleAuditColumnSwitchChange: () => void;
 }
 
-function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, handleAuditColumnSwitchChange }: Props) {
+function ReactTable({ columns, data, getHeaderProps, statuses }: Props) {
   const defaultColumn = useMemo(
     () => ({
       minWidth: 80,
@@ -457,6 +454,9 @@ function ReactTable({ columns, data, getHeaderProps, showIdColumn, statuses, han
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             {updateStatusButtons()}
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => navigation('/purchase/bills/create')} size="small">
+              Add Bill
+            </Button>
             <TableRowSelection selected={Object.keys(selectedRowIds).length} />
             <CSVExport data={data} filename={'invoice-list.csv'} />
             <Tooltip title={isBillIdVisible ? 'Hide ID' : 'Show ID'}>
@@ -686,7 +686,7 @@ const Bills = () => {
         },
         {
           Header: 'Amount',
-          accessor: 'amount',
+          accessor: 'totalAmount',
           Cell: ({ value }: { value: number }) => (
             <div style={{ textAlign: 'right' }}>
               <NumericFormat value={value} displayType="text" thousandSeparator={true} prefix={'₹'} decimalScale={2} />
@@ -714,17 +714,6 @@ const Bills = () => {
           Cell: ({ row }: { row: Row<{}> }) => {
             return (
               <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
-                <Tooltip title="View">
-                  <IconButton
-                    color="secondary"
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      navigation(`/purchase/bills/details/${row.values.id}`);
-                    }}
-                  >
-                    <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title="Edit">
                   <IconButton
                     color="primary"
@@ -897,7 +886,6 @@ const Bills = () => {
               columns={columns}
               data={bill}
               statuses={statuses || []}
-              showIdColumn={showIdColumn}
               getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
               handleSwitchChange={handleSwitchChange}
               handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
