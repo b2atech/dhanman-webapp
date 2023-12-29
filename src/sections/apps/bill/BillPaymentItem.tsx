@@ -184,7 +184,7 @@ const BillPaymentItem = ({
 
       <TableCell sx={{ textAlign: 'right' }}>
         <Stack direction="row" justifyContent="flex-end" alignItems="flex-end">
-          <Box>{/* <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst)}</Typography> */}</Box>
+          <Box></Box>
         </Stack>
       </TableCell>
     </>
