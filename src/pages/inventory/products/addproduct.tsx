@@ -30,7 +30,7 @@ import React from 'react';
 const getInitialValues = (inventroydata?: FormikValues | null) => {
   if (inventroydata) {
     const newProduct = {
-      clientId: inventroydata.clientId,
+      companyId: inventroydata.clientId,
       productName: inventroydata.productName,
       unitId: inventroydata.unitId,
       unit: inventroydata.unit,
@@ -54,7 +54,7 @@ const getInitialValues = (inventroydata?: FormikValues | null) => {
     return newProduct;
   } else {
     const newProduct = {
-      clientId: '',
+      companyId: '',
       productName: '',
       unitId: '',
       unit: '',
@@ -129,7 +129,7 @@ export default function AddProductForm() {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const productdata = {
-          clientId: companyId,
+          companyId: companyId,
           productName: values.productName,
           unitId: values.unitId,
           unit: values.unit,
@@ -152,7 +152,7 @@ export default function AddProductForm() {
         };
 
         const response = await createProductRequest(productdata);
-        if (response === 200) {
+        if ((response.status = 200)) {
           dispatch(
             openSnackbar({
               open: true,
@@ -167,6 +167,16 @@ export default function AddProductForm() {
           );
           navigation('/inventory/products/list');
         }
+        // else{
+        //   const errors = response.data.errors;
+
+        //   errors.forEach((errorItem: { propertyName: string; errorMessage: string }) => {
+        //     const propertyName = errorItem.propertyName;
+        //     const errorMessage = errorItem.errorMessage;
+
+        //     formik.setFieldError(propertyName, errorMessage);
+        //   });
+        // }
         setSubmitting(false);
       } catch (error) {}
     }

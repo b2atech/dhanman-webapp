@@ -62,6 +62,7 @@ export interface Items {
 
 export interface IBill {
   id: number;
+  billNumber: string;
   bill_id: number;
   vendor_name: string;
   email: string;
@@ -77,7 +78,9 @@ export interface IBill {
   tax: number | null;
   customerInfo: InfoType;
   notes: string;
-  amount: number;
+  totalAmount: number;
+  setteledAmount: number;
+  payingAmount: number;
 }
 
 export interface IBillType {

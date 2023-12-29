@@ -65,7 +65,7 @@ export async function createProductRequest(inventroydata: InventoryData) {
     method: 'POST',
     data: inventroydata
   });
-  return response.status;
+  return response.data;
 }
 export async function updateProductRequest(inventroydata: InventoryData) {
   const response = await apiInventory.request({

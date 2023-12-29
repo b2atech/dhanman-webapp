@@ -1,6 +1,5 @@
-/* eslint-disable prettier/prettier */
 export interface InventoryData {
-  clientId: string;
+  companyId: string;
   productName: string;
   unitId: string;
   unit: string;

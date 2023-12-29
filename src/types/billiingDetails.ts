@@ -70,6 +70,36 @@ export interface BillHeader_main {
   vendorInfo: InfoType;
 }
 
+export interface BillPaymentHeader {
+  id: string;
+  vendorId: string;
+  companyId: string;
+  vendorName: string;
+  billDate: Date | string | number;
+  dueDate: Date | string | number;
+  amount: number;
+  payingAmount: number;
+  paymentMode: string | number;
+  paymentThrough: string | number;
+  description: string;
+  lines?: BillPaymentLine[];
+}
+
+export interface BillPaymentLine {
+  id: string;
+  billPaymentId: string;
+  billNumber: string;
+  billDate: Date | string | number;
+  dueDate: Date | string | number;
+  status: String;
+  billAmount: number;
+  setteledAmount: number;
+  remainingAmount: number;
+  payingAmount: number;
+  billStatusId: string;
+  billStatus: string;
+}
+
 export interface BillLine {
   id: string | number;
   name: string;
