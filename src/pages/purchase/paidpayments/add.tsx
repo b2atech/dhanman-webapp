@@ -113,7 +113,6 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
             setBills(list);
             const total = list.reduce((acc, current) => acc + current.amount, 0);
             setTotalAmount(total);
-            // Update the selectedVendorBills state with the fetched bill details
             setSelectedVendorBills(list);
           } else {
             console.error('API response is not an array:', billList);
