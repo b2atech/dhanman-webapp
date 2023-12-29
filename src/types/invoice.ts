@@ -64,6 +64,7 @@ export interface IInvoiceType {
   customerInfo: InfoType;
   note: string;
   currency: string;
+  roundOff: number;
 }
 
 export interface Items {
