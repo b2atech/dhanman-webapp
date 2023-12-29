@@ -48,11 +48,12 @@ const Details = () => {
   const { id } = useParams();
   const navigation = useNavigate();
   const [company, setCompany] = useState<any>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [Bill, setList] = useState<IBillType>();
+
+  // const { list } = useSelector((state) => state.bill);
+  const [bill, setBill] = useState<IBillType>();
+  const [loading, setLoading] = useState<boolean>(false);
   const companyId: string = String(config.companyId);
 
-  const componentRef: React.Ref<HTMLDivElement> = useRef(null);
   useEffect(() => {
     if (companyId) {
       getCompanyDetail(companyId).then((companyInfo) => {
@@ -64,34 +65,36 @@ const Details = () => {
   useEffect(() => {
     if (id) {
       getBillById(id).then((BillList) => {
-        setList(BillList);
+        setBill(BillList);
         setLoading(false);
       });
     }
   }, [id]);
 
-  const today = new Date(`${Bill?.billDate}`).toLocaleDateString('en-GB', {
+  const today = new Date(`${bill?.billDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const due_dates = new Date(`${Bill?.dueDate}`).toLocaleDateString('en-GB', {
+  const due_dates = new Date(`${bill?.dueDate}`).toLocaleDateString('en-GB', {
     month: 'numeric',
     day: 'numeric',
     year: 'numeric'
   });
 
-  const subTotal = (Bill?.lines ?? []).reduce((total, row) => {
-    return total + row.amount;
+  const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+  const subTotal = (bill?.lines ?? []).reduce((total, row) => {
+    return total;
   }, 0);
-  if (loading) return <Loader />;
-
-  const taxRate = (Number(Bill?.tax) * subTotal) / 100;
-  const discountRate = (Number(Bill?.discount) * subTotal) / 100;
+  const taxRate = Number(bill?.discount);
+  const discountRate = (bill?.lines ?? []).reduce((total, row) => {
+    return (row.discount / 100) * row.price * row.quantity;
+  }, 0);
   const discountStyle = {
     color: '#3EB489'
   };
+  if (loading) return <Loader />;
 
   return (
     <MainCard content={false}>
@@ -105,7 +108,7 @@ const Details = () => {
               <IconButton onClick={() => navigation(`/purchase/bills/edit/${id}`)}>
                 <EditOutlined style={{ color: theme.palette.grey[900] }} />
               </IconButton>
-              <PDFDownloadLink document={<ExportPDFView list={Bill} />} fileName={`${Bill?.billNumber}-${Bill?.vendor?.firstName}.pdf`}>
+              <PDFDownloadLink document={<ExportPDFView list={bill} />} fileName={`${bill?.billNumber}-${bill?.vendor?.firstName}.pdf`}>
                 <IconButton>
                   <DownloadOutlined style={{ color: theme.palette.grey[900] }} />
                 </IconButton>
@@ -137,10 +140,10 @@ const Details = () => {
                 <Box>
                   <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Chip
-                      label={Bill?.billStatus}
+                      label={bill?.billStatus}
                       variant="light"
                       size="small"
-                      color={Bill?.billStatus === 'Closed' ? 'error' : Bill?.billStatus === 'Paid' ? 'success' : 'info'}
+                      color={bill?.billStatus === 'Closed' ? 'error' : bill?.billStatus === 'Paid' ? 'success' : 'info'}
                     />
                     <Typography variant="subtitle1">Bill Date</Typography>
                     <Typography color="secondary">{today}</Typography>
@@ -184,17 +187,17 @@ const Details = () => {
                   <Typography variant="h5">
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <span style={{ paddingRight: '10px' }}>To:</span>
-                      <span>{`${Bill?.vendor?.firstName} ${Bill?.vendor?.lastName}`}</span>
+                      <span>{`${bill?.vendor?.firstName} ${bill?.vendor?.lastName}`}</span>
                     </Box>
                     <Stack sx={{ width: '100%' }}>
                       <Typography variant="subtitle1"></Typography>
                       <Typography color="secondary">
-                        {Bill?.vendor?.addressLine && Bill?.vendor?.phoneNumber
-                          ? `${Bill.vendor.addressLine}, \u00A0\u00A0${Bill.vendor.phoneNumber}`
-                          : `${Bill?.vendor?.addressLine || ''} ${Bill?.vendor?.phoneNumber || ''}`}
+                        {bill?.vendor?.addressLine && bill?.vendor?.phoneNumber
+                          ? `${bill.vendor.addressLine}, \u00A0\u00A0${bill.vendor.phoneNumber}`
+                          : `${bill?.vendor?.addressLine || ''} ${bill?.vendor?.phoneNumber || ''}`}
                       </Typography>
-                      <Typography color="secondary">{Bill?.vendor?.email}</Typography>
-                      {Bill?.vendor?.gstIn && <Typography color="secondary">GSTIN: {Bill.vendor.gstIn}</Typography>}
+                      <Typography color="secondary">{bill?.vendor?.email}</Typography>
+                      {bill?.vendor?.gstIn && <Typography color="secondary">GSTIN: {bill.vendor.gstIn}</Typography>}
                     </Stack>
                   </Typography>
                 </Stack>
@@ -222,7 +225,7 @@ const Details = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {Bill?.lines?.map((row: any, index) => (
+                    {bill?.lines?.map((row: any, index) => (
                       <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{}</TableCell>
@@ -251,7 +254,7 @@ const Details = () => {
             <Grid item xs={12} sm={6} md={8}>
               <Stack direction="row" spacing={1}>
                 <Typography color="secondary">Note: </Typography>
-                <Typography>{Bill?.note}</Typography>
+                <Typography>{bill?.note}</Typography>
               </Stack>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
@@ -270,14 +273,14 @@ const Details = () => {
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="subtitle1">Grand Total:</Typography>
-                  <Typography variant="subtitle1">₹ {Bill?.totalAmount.toFixed(2)}</Typography>
+                  <Typography variant="subtitle1">₹ {bill?.totalAmount.toFixed(2)}</Typography>
                 </Stack>
               </Stack>
             </Grid>
           </Grid>
         </Box>
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ p: 2.5, a: { textDecoration: 'none', color: 'inherit' } }}>
-          <PDFDownloadLink document={<ExportPDFView list={Bill} />} fileName={`${Bill?.billNumber}-${Bill?.vendor.firstName}.pdf`}>
+          <PDFDownloadLink document={<ExportPDFView list={bill} />} fileName={`${bill?.billNumber}-${bill?.vendor.firstName}.pdf`}>
             <Button variant="contained" color="primary">
               Download
             </Button>
