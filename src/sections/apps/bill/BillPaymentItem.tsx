@@ -3,6 +3,7 @@ import { Box, Stack, TableCell, Chip } from '@mui/material';
 
 // third-party
 import BillPaymentField from './BillPaymentField';
+import { format } from 'date-fns';
 
 // project import
 
@@ -75,10 +76,10 @@ const BillPaymentItem = ({
       type: 'label',
       id: id,
       value: billNumber,
-      style: { width: '140px', textAlign: 'left' },
       visibility: true,
       selectOnChange: handleNameChange,
-      inputProps: { readOnly: true }
+      inputProps: { readOnly: true },
+      sx: { width: '15%', textAlign: 'left' }
     },
     {
       placeholder: 'Bill Date',
@@ -86,9 +87,8 @@ const BillPaymentItem = ({
       name: `bill_detail.${index}.billDate`,
       type: 'label',
       id: id,
-      value: billDate,
-      style: { width: '140px', textAlign: 'left' },
-      sx: { width: '100%' },
+      value: format(new Date(dueDate), 'dd-MM-yyyy'),
+      sx: { width: '15%', textAlign: 'left' },
       visibility: true,
       readOnly: 'true'
     },
@@ -98,9 +98,8 @@ const BillPaymentItem = ({
       name: `bill_detail.${index}.dueDate`,
       type: 'label',
       id: id,
-      value: dueDate,
-      style: { width: '140px', textAlign: 'left' },
-      sx: { width: '100%' },
+      value: format(new Date(dueDate), 'dd-MM-yyyy'),
+      sx: { width: '15%', textAlign: 'left' },
       visibility: true
     },
     {
@@ -111,8 +110,7 @@ const BillPaymentItem = ({
       id: id,
       value: billStatus,
       visibility: true,
-      style: { width: '140px', textAlign: 'left', color: 'success' },
-      width: '100%',
+      sx: { width: '15%', textAlign: 'left' },
       Color: 'success',
       Cell: ({ value }: { value: string }) => renderStatusChip(value)
     },
@@ -124,8 +122,7 @@ const BillPaymentItem = ({
       id: id,
       value: billAmt,
       visibility: true,
-      style: { width: '140px', textAlign: 'right' },
-      width: '100%'
+      sx: { textAlign: 'right' }
     },
     {
       placeholder: 'Setteled Amount',
@@ -135,8 +132,7 @@ const BillPaymentItem = ({
       id: id,
       value: setteledAmount,
       visibility: true,
-      style: { width: '140px', textAlign: 'right' },
-      width: '100%'
+      sx: { width: '15%', textAlign: 'right' }
     },
     {
       placeholder: 'Remaining Amount',
@@ -146,8 +142,7 @@ const BillPaymentItem = ({
       id: id,
       value: calculateRemainingAmount(),
       visibility: feesVisibility,
-      style: { width: '140px', textAlign: 'right' },
-      width: '100%'
+      sx: { textAlign: 'right' }
     },
     {
       placeholder: 'Paying Amount',
@@ -157,8 +152,7 @@ const BillPaymentItem = ({
       id: id,
       value: payingAmt,
       visibility: discountVisibility,
-      style: { width: '140px', textAlign: 'right' },
-      width: '100%'
+      sx: { width: '15%', textAlign: 'right' }
     }
   ];
 
@@ -190,9 +184,7 @@ const BillPaymentItem = ({
 
       <TableCell sx={{ textAlign: 'right' }}>
         <Stack direction="row" justifyContent="flex-end" alignItems="flex-end">
-          <Box sx={{ minWidth: 90 }}>
-            {/* <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst)}</Typography> */}
-          </Box>
+          <Box>{/* <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst)}</Typography> */}</Box>
         </Stack>
       </TableCell>
     </>

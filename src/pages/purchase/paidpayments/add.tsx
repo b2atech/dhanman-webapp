@@ -80,6 +80,11 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
   const [bills, setBills] = useState<IBill[]>();
   const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [totalSettledAmount, setTotalSettledAmount] = useState<number>(0);
+  const [remainingTotalamount, setRemainingTotalamount] = useState<number>(0);
+  const [totalPaidAmount, setTotalPaidAmount] = useState<number>(0);
+  const [advanceAmount, setAdvanceAmount] = useState<number>(0);
+  const [totalAmountOfBill, settotalAmountOfBill] = useState<number>(0);
 
   useEffect(() => {
     getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6')
@@ -119,6 +124,24 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
         });
     }
   }, [selectedVendorId]);
+
+  const addCommas = (number: number) => {
+    const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+    return formattedNumber;
+  };
+
+  useEffect(() => {
+    settotalAmountOfBill(selectedVendorBills.reduce((acc, bill) => acc + bill.totalAmount, 0));
+    let totalSettledAmount = selectedVendorBills.reduce((acc, bill) => acc + bill.setteledAmount, 0);
+    setTotalSettledAmount(totalSettledAmount);
+    setRemainingTotalamount(totalAmountOfBill - totalSettledAmount);
+  }, [selectedVendorBills, totalAmountOfBill]);
+
+  useEffect(() => {
+    const remainingAmount = totalPaidAmount > totalAmountOfBill ? totalPaidAmount - remainingTotalamount : 0;
+    setAdvanceAmount(remainingAmount);
+  }, [totalPaidAmount, totalAmount, totalAmountOfBill, remainingTotalamount]);
+
   const formik = useFormik({
     initialValues: getInitialValues(paidpayment!),
     validationSchema: PaidPaymentSchema,
@@ -175,9 +198,6 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
     }
   });
   const { getFieldProps } = formik;
-  // const handelAmountChange = (totalAmount: any) =>{
-  //  console.log(totalAmount);
-  // }
 
   const handlerCreate = (values: any) => {
     const bill: BillPaymentHeader = {
@@ -206,12 +226,6 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
       return billPaymentLine;
     });
   };
-
-  // const handleAlertClose = () => {
-  //   setOpenAlert(!openAlert);
-  //   onCancel();
-  // };
-
   return (
     <MainCard>
       <Formik
@@ -234,7 +248,11 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
         }}
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
-          //const taxRate = (values.tax * subtotal) / 100;
+          const formattedTotalAmount = addCommas(totalAmountOfBill);
+          const formattedtotalSettledAmount = addCommas(totalSettledAmount);
+          const formattedremainingTotalamount = addCommas(remainingTotalamount);
+          const formattedtotalPaidAmount = addCommas(totalPaidAmount);
+          const formattedadvanceAmount = addCommas(advanceAmount);
 
           return (
             <Form onSubmit={handleSubmit}>
@@ -252,10 +270,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                       <Grid container spacing={1.5} direction="row" sx={{ marginBottom: 2.5 }}>
                         <Grid item xs={6}>
                           <InputLabel sx={{ mb: 0.5 }}>Vendor Name</InputLabel>
-                          <FormControl
-                            sx={{ width: '100%' }}
-                            // error={Boolean(touched.vendornames && errors.vendornames)}
-                          >
+                          <FormControl sx={{ width: '100%' }}>
                             {vendornames && vendornames.length > 0 ? (
                               <Autocomplete
                                 id="controllable-states-demo"
@@ -269,13 +284,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                                   }
                                   handleChange({ target: { name: 'vendorName', value: newValue ? newValue.name : '' } });
                                 }}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    // error={Boolean(touched.vendornames && errors.vendornames)}
-                                    // helperText={touched.vendornames && errors.vendornames ? errors.vendornames : ''}
-                                  />
-                                )}
+                                renderInput={(params) => <TextField {...params} />}
                               />
                             ) : (
                               <Box display="flex" flexDirection="row" alignItems="left" justifyContent="left" height="100px">
@@ -300,25 +309,33 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         </Grid>
 
                         <Grid item xs={2}>
-                          <InputLabel sx={{ mb: 0.5 }}>Amount</InputLabel>
+                          <InputLabel sx={{ mb: 0.5 }}>Remaining Bill Amount</InputLabel>
                           <TextField
-                            sx={{ width: '100%' }}
+                            disabled
+                            sx={{ width: '100%', textAlign: 'right' }}
                             id="totalAmount"
+                            value={remainingTotalamount}
                             placeholder={String(totalAmount)}
-                            InputProps={{ readOnly: true }}
+                            inputProps={{
+                              style: { textAlign: 'right' },
+                              inputMode: 'numeric',
+                              readOnly: true
+                            }}
                             type="number"
-                          ></TextField>
+                          />
                         </Grid>
                         <Grid item xs={2}>
-                          <InputLabel sx={{ mb: 0.5 }}>Total Payable Amount</InputLabel>
+                          <InputLabel sx={{ mb: 0.5 }}>Total Paying Amount</InputLabel>
                           <TextField
-                            sx={{ width: '100%' }}
+                            sx={{ width: '100%', textAlign: 'right' }}
                             id="amount"
                             {...getFieldProps('totalAmount')}
                             inputProps={{
+                              style: { textAlign: 'right' },
                               inputMode: 'numeric',
                               onInput: (e: any) => {
                                 var totalPayingAmount = Number(e.currentTarget.value);
+                                setTotalPaidAmount(totalPayingAmount);
                                 if (totalPayingAmount > 0) {
                                   selectedVendorBills?.forEach((element, index) => {
                                     var pendingAmount = selectedVendorBills[index].totalAmount - selectedVendorBills[index].setteledAmount;
@@ -341,11 +358,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         <Grid item xs={3} sx={{ width: 50 }}>
                           <Stack spacing={0}>
                             <InputLabel sx={{ mb: 0.5, whiteSpace: 'nowrap' }}>Payment Mode</InputLabel>
-                            <Select
-                              label="Payment Mode"
-                              // value={paymentMode}
-                              // onChange={(event) => setPaymentMode(event.target.value)}
-                            >
+                            <Select label="Payment Mode">
                               <MenuItem value={10}>Cash</MenuItem>
                               <MenuItem value={20}>Cheque</MenuItem>
                               <MenuItem value={30}>NEFT</MenuItem>
@@ -357,11 +370,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         <Grid item xs={3} sx={{ width: '50%' }}>
                           <Stack spacing={0}>
                             <InputLabel sx={{ mb: 0.5 }}>Payment Through</InputLabel>
-                            <Select
-                              label="Payment Through"
-                              // value={paymentThrough}
-                              // onChange={(event) => setPaymentThrough(event.target.value)}
-                            >
+                            <Select label="Payment Through">
                               <MenuItem value={10}>Liability</MenuItem>
                               <MenuItem value={20}>Expense</MenuItem>
                               <MenuItem value={30}>Revenue</MenuItem>
@@ -394,9 +403,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                             ? vendornames.find((vendor: { id: any }) => vendor.id === selectedVendorId)?.name
                             : '') || ''
                         }`}
-                      >
-                        {/* <ReactTable columns={columns} data={bills ?? []} /> */}
-                      </MainCard>
+                      ></MainCard>
                       <MainCard>
                         <Grid item xs={12}>
                           <FieldArray
@@ -417,28 +424,28 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                                         <Table sx={{ minWidth: 650 }}>
                                           <TableHead>
                                             <TableRow>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Bill No.
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Bill Date
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Due Date
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Status
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Bill Amt
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Setteled Amt
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
                                                 Rmn. Amt
                                               </TableCell>
-                                              <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px', textAlign: 'right' }}>
                                                 Paying Amt
                                               </TableCell>
                                             </TableRow>
@@ -495,13 +502,66 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                         <Grid item xs={4}>
                           <Grid paddingTop={2}>
                             <Grid item xs={12}>
-                              <Stack spacing={2} justifyContent="flex-end" alignItems="flex-end" textAlign="right">
-                                <Stack paddingRight={1} direction="row" justifyContent="right" alignItems="right">
+                              <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '50px' }}>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
                                   <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
                                     Grand Total :
                                   </Typography>
-                                  <Typography variant="subtitle1" paddingLeft={5}>
-                                    {bills?.reduce((acc, current) => acc + current.totalAmount, 0)}
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedTotalAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Previously Settled Amount :
+                                  </Typography>
+
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedtotalSettledAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Remaining Amount Total :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedremainingTotalamount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Amount Paid :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedtotalPaidAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Advance Amount Paid :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedadvanceAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
                                   </Typography>
                                 </Stack>
                               </Stack>
