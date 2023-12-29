@@ -12,7 +12,7 @@ const BillPaymentField = ({ onEditItem, cellData }: any) => {
         minWidth: 100,
         overflowX: 'auto',
         padding: '4px 1px',
-        textAlign: 'center',
+        textAlign: 'right',
         ...cellData.sx
       }}
     >
@@ -29,7 +29,7 @@ const BillPaymentField = ({ onEditItem, cellData }: any) => {
           inputProps={{
             ...(cellData.type === 'number' && { min: 0 })
           }}
-          style={cellData.style}
+          style={{ textAlign: 'right', ...cellData.style, width: '100px' }}
         />
       ) : (
         <div>{cellData.value}</div>
