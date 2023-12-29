@@ -1,6 +1,7 @@
 // material-ui
 import { Theme, useTheme } from '@mui/material/styles';
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
+import { useNavigate } from 'react-router';
 
 // third-party
 import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
@@ -29,6 +30,7 @@ const CoaContainer = () => {
 
   const onDragEnd = (result: DropResult) => {};
 
+  const navigation = useNavigate();
   return (
     <MainCard content={false}>
       <TableContainer sx={{ '& .MuiTableCell-root': { p: 1.25 } }}>
@@ -53,7 +55,16 @@ const CoaContainer = () => {
                   <TableRow>
                     <TableCell sx={{ pl: 3 }}>
                       <Tooltip title="Add User Story">
-                        <Button variant="dashed" size="extraSmall" color="secondary" endIcon={<PlusOutlined />}>
+                        <Button
+                          variant="dashed"
+                          size="extraSmall"
+                          color="secondary"
+                          endIcon={<PlusOutlined />}
+                          onClick={(e: any) => {
+                            e.stopPropagation();
+                            navigation('/company/coa/create');
+                          }}
+                        >
                           ADD
                         </Button>
                       </Tooltip>
