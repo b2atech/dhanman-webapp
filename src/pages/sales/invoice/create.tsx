@@ -107,6 +107,7 @@ const Createinvoice = () => {
   const [company, setCompany] = useState<any>();
   const [funcToDelete, setfuncToDelete] = useState<any>();
   const [itemUnderDeletion, setItemUnderDeletion] = useState<number>();
+  const [isCustomerSelected, setIsCustomerSelected] = useState(false);
 
   const companyId: string = String(config.companyId);
   const handelDeleteItem = (func: any, index: number) => {
@@ -204,6 +205,7 @@ const Createinvoice = () => {
         const productList = await getAllProducts(companyId);
         if (Array.isArray(productList)) {
           setProducts(productList);
+          setIsCustomerSelected(false);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -246,6 +248,18 @@ const Createinvoice = () => {
     );
   };
   dispatch(openDrawer(false));
+
+  const handleCustomerSelected = (firstName: string | undefined) => {
+    if (firstName) {
+      console.log(`Customer selected with first name: ${firstName}`);
+      setIsCustomerSelected(true);
+      return '';
+    } else {
+      console.log('No custoemr selected');
+      setIsCustomerSelected(false);
+      return <Typography color="red">* Please select Customer </Typography>;
+    }
+  };
 
   return (
     <MainCard>
@@ -425,6 +439,7 @@ const Createinvoice = () => {
                         <DatePicker
                           format="dd/MM/yyyy"
                           value={values.due_date}
+                          minDate={new Date()}
                           onChange={(newValue) => setFieldValue('due_date', newValue)}
                         />
                       </LocalizationProvider>
@@ -558,6 +573,7 @@ const Createinvoice = () => {
                               </Typography>
                               <Typography color="secondary">{values?.customerInfo?.email}</Typography>
                               {values?.customerInfo?.gstIn && <Typography color="secondary">GSTIN: {values.customerInfo.gstIn}</Typography>}
+                              {handleCustomerSelected(values?.customerInfo?.firstName)}
                             </Stack>
                           </Typography>
                         </Stack>
@@ -599,7 +615,12 @@ const Createinvoice = () => {
                   )}
                 </Grid>
                 <Grid item xs={12} sm={12} sx={{ marginTop: '-25px', marginBottom: '-20px' }}>
-                  <Grid container spacing={2} alignItems="center">
+                  <Grid
+                    container
+                    spacing={2}
+                    alignItems="center"
+                    style={{ opacity: isCustomerSelected ? 1 : 0.2, pointerEvents: isCustomerSelected ? 'auto' : 'none' }}
+                  >
                     <Grid item xs={6} style={{ paddingRight: '0px', paddingLeft: '15px' }}>
                       <Typography variant="h5" style={{ margin: '0', padding: '15px 0' }}>
                         Details <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
@@ -654,7 +675,7 @@ const Createinvoice = () => {
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid item xs={12} style={{ opacity: isCustomerSelected ? 1 : 0.2, pointerEvents: isCustomerSelected ? 'auto' : 'none' }}>
                   <FieldArray
                     name="invoice_detail"
                     render={({ remove, push }) => {
@@ -896,7 +917,7 @@ const Createinvoice = () => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} style={{ opacity: isCustomerSelected ? 1 : 0.2, pointerEvents: isCustomerSelected ? 'auto' : 'none' }}>
                   <Grid container justifyContent="flex-end" alignItems="flex-end">
                     <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
                       <Button
