@@ -102,6 +102,7 @@ const CreateBill = () => {
   const [showGSTRates, setShowGSTRates] = useState(false);
   const [discount, setDiscount] = useState(false);
   const [feesVisible, setFees] = useState(false);
+  const [poNoPoDate, setPoNoPoDate] = useState(false);
   // const [defaultGSTRates, setDefaultGSTRates] = useState();
   const [defaultStatus, setDefaultStatus] = useState();
   const [loading, setLoading] = useState<boolean>(true);
@@ -301,16 +302,7 @@ const CreateBill = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0)
-              return (
-                prev +
-                Number(
-                  (curr.sgst && curr.cgst
-                    ? (curr.cgst / 100) * curr.price * curr.quantity + (curr.sgst / 100) * curr.price * curr.quantity
-                    : (curr.igst / 100) * curr.price * curr.quantity) +
-                    curr.price * Math.floor(curr.quantity)
-                )
-              );
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * curr.quantity);
             else return prev;
           }, 0);
           const formattedSubtotal = addCommas(subtotal);
@@ -323,13 +315,13 @@ const CreateBill = () => {
           const formattedCGSTAmount = addCommas(cgstAmount);
 
           const sgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const formattedSGSTAmount = addCommas(sgstAmount);
 
           const igstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const formattedIGSTAmount = addCommas(igstAmount);
@@ -355,8 +347,18 @@ const CreateBill = () => {
           }, 0);
           const formattedDiscount = addCommas(discountRate);
 
-          const grandAmount = subtotal + discountRate + fees;
+          const taxableAmount = subtotal + discountRate + fees;
+          const formattedTaxableAmount = addCommas(taxableAmount);
+
+          const roundOffAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
+
+          const grandAmount = Math.ceil(roundOffAmount);
           const formattedGrandAmount = addCommas(grandAmount);
+
+          const roundOff = grandAmount - roundOffAmount;
+          const discountStyle = {
+            color: '#3EB489'
+          };
 
           const cgstRate = values?.bill_detail?.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number(curr.cgst);
@@ -372,9 +374,6 @@ const CreateBill = () => {
           }, 0);
 
           // values.totalAmount = grandAmount;
-          const discountStyle = {
-            color: '#3EB489'
-          };
 
           return (
             <Form onSubmit={handleSubmit}>
@@ -599,6 +598,10 @@ const CreateBill = () => {
                   </Grid>
                   <Grid item xs={6} container justifyContent="flex-end" alignItems="center">
                     <FormControlLabel
+                      control={<Switch color="secondary" checked={poNoPoDate} onChange={() => setPoNoPoDate(!poNoPoDate)} name="PO No" />}
+                      label="PO NO"
+                    />
+                    <FormControlLabel
                       control={<Switch checked={showGSTRates} onChange={() => setShowGSTRates(!showGSTRates)} name="showGSTRates" />}
                       label="GST Rates"
                     />
@@ -639,12 +642,16 @@ const CreateBill = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     #
                                   </TableCell>
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    PO No
-                                  </TableCell>
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    PO Date
-                                  </TableCell>
+                                  {poNoPoDate && (
+                                    <>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        PO No
+                                      </TableCell>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        PO Date
+                                      </TableCell>
+                                    </>
+                                  )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Name
                                   </TableCell>
@@ -711,7 +718,7 @@ const CreateBill = () => {
                                   </TableCell>
 
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                    Total Amt
+                                    Item Amt
                                   </TableCell>
                                 </TableRow>
                               </TableHead>
@@ -751,6 +758,7 @@ const CreateBill = () => {
                                       ratesVisibility={showGSTRates}
                                       feesVisibility={feesVisible}
                                       discountVisibility={discount}
+                                      poNoPoDateVisibility={poNoPoDate}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
                                       Blur={handleBlur}
@@ -824,6 +832,18 @@ const CreateBill = () => {
                                   <Typography>{country?.prefix + '' + formattedSubtotal}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}> Fees:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedFees}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}> Discount:</Typography>
+                                  <Typography style={discountStyle}>{country?.prefix + '' + formattedDiscount}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}>Taxable Amount</Typography>
+                                  <Typography>{country?.prefix + '' + formattedTaxableAmount}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
                                   <Typography>{country?.prefix + '' + formattedCGSTAmount}</Typography>
                                 </Stack>
@@ -836,12 +856,8 @@ const CreateBill = () => {
                                   <Typography>{country?.prefix + '' + formattedIGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}> Fees:</Typography>
-                                  <Typography>{country?.prefix + '' + formattedFees}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}> Discount:</Typography>
-                                  <Typography style={discountStyle}>{country?.prefix + '' + formattedDiscount}</Typography>
+                                  <Typography color={theme.palette.grey[500]}>Rounding Off:</Typography>
+                                  <Typography>{country?.prefix + '' + roundOff}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography variant="subtitle1">Grand Total:</Typography>

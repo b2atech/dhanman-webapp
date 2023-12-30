@@ -33,7 +33,8 @@ const BillItem = ({
   products,
   ratesVisibility,
   discountVisibility,
-  feesVisibility
+  feesVisibility,
+  poNoPoDateVisibility
 }: any) => {
   const { country } = useSelector((state) => state.invoice);
   const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -72,7 +73,11 @@ const BillItem = ({
       if (fees) {
         feesAmount = fees;
       }
-      return amount - discountAmount + feesAmount;
+      var totalAmount = amount - discountAmount + feesAmount;
+
+      var roundedTotalAmount = Number(totalAmount.toFixed(2));
+
+      return roundedTotalAmount;
     }
     return 0.0;
   };
@@ -106,7 +111,7 @@ const BillItem = ({
       id: id,
       value: poNo,
       style: { textAlign: 'left' },
-      visibility: true
+      visibility: poNoPoDateVisibility
     },
     {
       placeholder: 'Purchase Date',
@@ -117,7 +122,7 @@ const BillItem = ({
       value: poDate,
       style: { width: '140px', textAlign: 'left' },
       sx: { width: '100%' },
-      visibility: true
+      visibility: poNoPoDateVisibility
     },
     {
       placeholder: 'Item name',
@@ -135,7 +140,7 @@ const BillItem = ({
       })),
       selectOnChange: handleNameChange,
       visibility: true,
-      style: { width: '135px', textAlign: 'left' }
+      style: { width: '200px', textAlign: 'left' }
     },
     {
       placeholder: 'Description',
@@ -145,7 +150,7 @@ const BillItem = ({
       id: id,
       value: description,
       visibility: true,
-      style: { width: '200px', textAlign: 'left' }
+      style: { width: '180px', textAlign: 'center' }
     },
     {
       placeholder: 'Qty',
@@ -155,7 +160,7 @@ const BillItem = ({
       id: id,
       value: qty,
       visibility: true,
-      style: { width: '70px', textAlign: 'right' }
+      style: { width: '80px', textAlign: 'right' }
     },
     {
       placeholder: 'price',
@@ -165,7 +170,7 @@ const BillItem = ({
       id: id,
       value: price,
       visibility: true,
-      style: { textAlign: 'right' }
+      style: { width: '110px', textAlign: 'right' }
     },
     {
       placeholder: 'Fees',
@@ -175,7 +180,7 @@ const BillItem = ({
       id: id,
       value: fees,
       visibility: feesVisibility,
-      style: { textAlign: 'right' }
+      style: { width: '95px', textAlign: 'right' }
     },
     {
       placeholder: 'Discount',
@@ -185,7 +190,7 @@ const BillItem = ({
       id: id,
       value: discount,
       visibility: discountVisibility,
-      style: { width: '70px', textAlign: 'right' }
+      style: { width: '80px', textAlign: 'right' }
     },
     {
       placeholder: 'tax am',
@@ -204,7 +209,6 @@ const BillItem = ({
       name: `bill_detail.${index}.cgstRate`,
       id: id,
       value: cgst || 0,
-      style: { width: '50px', textAlign: 'right' },
       visibility: ratesVisibility
     },
     {
@@ -214,7 +218,7 @@ const BillItem = ({
       name: `bill_detail.${index}.cgstAmount`,
       id: id,
       value: (cgst / 100) * price * qty || 0.0,
-      style: { textAlign: 'right' },
+      style: { width: '100px', textAlign: 'center' },
       visibility: true
     },
     {
@@ -224,7 +228,6 @@ const BillItem = ({
       name: `bill_detail.${index}.sgstRate`,
       id: id,
       value: sgst || 0,
-      style: { width: '50px', textAlign: 'right' },
       visibility: ratesVisibility
     },
     {
@@ -234,7 +237,7 @@ const BillItem = ({
       name: `bill_detail.${index}.sgstAmount`,
       id: id,
       value: (sgst / 100) * price * qty || 0,
-      style: { textAlign: 'right' },
+      style: { width: '100px', textAlign: 'right' },
       visibility: true
     },
     {
@@ -244,7 +247,6 @@ const BillItem = ({
       name: `bill_detail.${index}.igstRate`,
       id: id,
       value: igst || 0,
-      style: { width: '50px', textAlign: 'right' },
       visibility: ratesVisibility
     },
     {
@@ -254,7 +256,7 @@ const BillItem = ({
       name: `bill_detail.${index}.igstAmount`,
       id: id,
       value: (igst / 100) * price * qty || 0,
-      style: { textAlign: 'right' },
+      style: { width: '100px', textAlign: 'right' },
       visibility: true
     }
   ];

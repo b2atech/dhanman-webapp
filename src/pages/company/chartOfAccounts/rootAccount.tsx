@@ -1,4 +1,5 @@
 import React, { CSSProperties } from 'react';
+import { useNavigate } from 'react-router';
 
 // material-ui
 import { Theme, useTheme } from '@mui/material/styles';
@@ -57,6 +58,7 @@ const getDropWrapper = (isDraggingOver: boolean, theme: Theme) => {
 
 const RootAccount = ({ story, index }: Props) => {
   const theme = useTheme();
+  const navigation = useNavigate();
   //const dispatch = useDispatch();
   //const coa = useSelector((state) => state.coa);
   //const { columns, rootAccounts, rootAccountOrder } = coa;
@@ -70,10 +72,6 @@ const RootAccount = ({ story, index }: Props) => {
   //   const handleDrawerOpen = () => {
   //     setOpenDrawer((prevState) => !prevState);
   //   };
-
-  const addItem = () => {
-    //setOpenDrawer((prevState) => !prevState);
-  };
 
   //const [openStoryDrawer, setOpenStoryDrawer] = useState<boolean>(false);
   //   const handleStoryDrawerOpen = () => {
@@ -122,7 +120,15 @@ const RootAccount = ({ story, index }: Props) => {
               <TableCell sx={{ pl: 3, minWidth: 120, width: 120, height: 46 }}>
                 <Stack direction="row" spacing={0.5} alignItems="left">
                   <Tooltip title="Add Task">
-                    <IconButton aria-label="expand row" onClick={addItem} size="small" sx={{ fontSize: '1.15rem' }}>
+                    <IconButton
+                      aria-label="expand row"
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        navigation('/company/coa/create');
+                      }}
+                      size="small"
+                      sx={{ fontSize: '1.15rem' }}
+                    >
                       <PlusSquareTwoTone color={theme.palette.primary.main} />
                     </IconButton>
                   </Tooltip>

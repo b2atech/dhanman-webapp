@@ -47,7 +47,7 @@ export interface Items {
   name: string;
   description: string;
   quantity: number;
-  price: string | number;
+  price: number;
   amount: number;
   poNo: string | number;
   poDate: Date | string;
