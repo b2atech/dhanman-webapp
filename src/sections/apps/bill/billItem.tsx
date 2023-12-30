@@ -180,7 +180,7 @@ const BillItem = ({
       id: id,
       value: fees,
       visibility: feesVisibility,
-      style: { width: '95px', textAlign: 'right' }
+      style: { width: '95px', textAlign: 'center' }
     },
     {
       placeholder: 'Discount',
@@ -190,7 +190,7 @@ const BillItem = ({
       id: id,
       value: discount,
       visibility: discountVisibility,
-      style: { width: '80px', textAlign: 'right' }
+      style: { width: '80px', textAlign: 'center' }
     },
     {
       placeholder: 'tax am',
@@ -237,7 +237,7 @@ const BillItem = ({
       name: `bill_detail.${index}.sgstAmount`,
       id: id,
       value: (sgst / 100) * price * qty || 0,
-      style: { width: '100px', textAlign: 'right' },
+      style: { width: '100px', textAlign: 'center' },
       visibility: true
     },
     {
@@ -256,7 +256,7 @@ const BillItem = ({
       name: `bill_detail.${index}.igstAmount`,
       id: id,
       value: (igst / 100) * price * qty || 0,
-      style: { width: '100px', textAlign: 'right' },
+      style: { width: '100px', textAlign: 'center' },
       visibility: true
     }
   ];
