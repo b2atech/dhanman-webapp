@@ -117,8 +117,12 @@ const CreateBill = () => {
     setOpenDelete(true);
   };
 
-  const addCommas = (number: number) => {
-    const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+  const addCommas = (number: string | number) => {
+    const parsedNumber = typeof number === 'string' ? parseFloat(number) : number;
+    const formattedNumber = new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    }).format(parsedNumber);
     return formattedNumber;
   };
 
@@ -252,7 +256,7 @@ const CreateBill = () => {
     } else {
       console.log('No vendor selected');
       setIsVendorSelected(false);
-      return <Typography color="red"> Please select Vendor *</Typography>;
+      return <Typography color="red">* Please select Vendor </Typography>;
     }
   };
   return (
@@ -317,24 +321,37 @@ const CreateBill = () => {
             if (curr.name.trim().length > 0) return prev + Number(curr.price * curr.quantity);
             else return prev;
           }, 0);
-          const formattedSubtotal = addCommas(subtotal);
+          const formattedSubtotal = addCommas(subtotal.toFixed(2));
 
           const taxRate = (values.tax * subtotal) / 100;
+
           const cgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
-            else return prev;
+            else
+              return (
+                prev +
+                Number((curr.cgst / 100) * (curr.price * curr.quantity + curr.fees - (curr.discount / 100) * curr.price * curr.quantity))
+              );
           }, 0);
           const formattedCGSTAmount = addCommas(cgstAmount);
 
           const sgstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * Math.floor(curr.quantity));
-            else return prev;
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
+            else
+              return (
+                prev +
+                Number((curr.sgst / 100) * (curr.price * curr.quantity + curr.fees - (curr.discount / 100) * curr.price * curr.quantity))
+              );
           }, 0);
           const formattedSGSTAmount = addCommas(sgstAmount);
 
           const igstAmount = values?.bill_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * Math.floor(curr.quantity));
-            else return prev;
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
+            else
+              return (
+                prev +
+                Number((curr.igst / 100) * (curr.price * curr.quantity + curr.fees - (curr.discount / 100) * curr.price * curr.quantity))
+              );
           }, 0);
           const formattedIGSTAmount = addCommas(igstAmount);
 
@@ -351,7 +368,7 @@ const CreateBill = () => {
             const hasValidQuantity = curr.quantity !== undefined && curr.quantity !== null && !isNaN(curr.quantity);
 
             if (curr.name.trim().length > 0 && hasValidDiscount && hasValidPrice && hasValidQuantity) {
-              const discount = -(curr.discount / 100) * curr.price * Math.floor(curr.quantity);
+              const discount = -(curr.discount / 100) * curr.price * curr.quantity;
               return prev + Number(discount);
             } else {
               return prev;
@@ -428,6 +445,7 @@ const CreateBill = () => {
                         <DatePicker
                           format="dd/MM/yyyy"
                           value={values.due_date}
+                          minDate={new Date()}
                           onChange={(newValue) => setFieldValue('due_date', newValue)}
                         />
                       </LocalizationProvider>
@@ -843,7 +861,13 @@ const CreateBill = () => {
                                 />
                               </Stack>
                             </Grid>
-                            <Grid item xs={12} md={4} sx={{ marginTop: '-80px' }}>
+                            <Grid
+                              item
+                              xs={12}
+                              md={4}
+                              sx={{ marginTop: '-80px' }}
+                              style={{ opacity: isVendorSelected ? 1 : 0.3, pointerEvents: isVendorSelected ? 'auto' : 'none' }}
+                            >
                               <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '22px' }}>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>

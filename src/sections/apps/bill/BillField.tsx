@@ -55,7 +55,9 @@ const BillField = ({ onEditItem, cellData, values, index }: any) => {
           inputProps={{
             ...(cellData.type === 'number' && { min: 0 })
           }}
-          style={cellData.style}
+          style={{
+            ...cellData.style
+          }}
         />
       )}
     </TableCell>

@@ -51,7 +51,7 @@ export interface Items {
   amount: number;
   poNo: string | number;
   poDate: Date | string;
-  fess: number;
+  fees: number;
   discount: number;
   taxableAmount: number;
   cgstTaxAmount: number;
