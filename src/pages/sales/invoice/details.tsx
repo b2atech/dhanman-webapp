@@ -82,13 +82,50 @@ const Invoicedetails = () => {
   });
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+
+  const addCommas = (number: string | number) => {
+    const parsedNumber = typeof number === 'string' ? parseFloat(number) : number;
+    const formattedNumber = new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    }).format(parsedNumber);
+    return formattedNumber;
+  };
   const subTotal = (invoice?.lines ?? []).reduce((total, row) => {
-    return total;
+    return total + row.price * row.quantity;
   }, 0);
-  const taxRate = Number(invoice?.discount);
+  const formattedSubtotal = addCommas(subTotal.toFixed(2));
+
+  //const taxRate = Number(invoice?.discount);
   const discountRate = (invoice?.lines ?? []).reduce((total, row) => {
-    return (row.discount / 100) * row.price * row.quantity;
+    return total + row.discount;
   }, 0);
+  const formatteDiscount = addCommas(discountRate.toFixed(2));
+  const fees = (invoice?.lines ?? []).reduce((total, row) => {
+    return total + row.fees;
+  }, 0);
+  const formattedFees = addCommas(fees.toFixed(2));
+  const taxableAmount = subTotal - discountRate + fees;
+  const formattedTaxableAmt = addCommas(taxableAmount.toFixed(2));
+  const cgstAmt = (invoice?.lines ?? []).reduce((total, row) => {
+    return total + row.cgstTaxAmount;
+  }, 0);
+  const formatteCgstAmt = addCommas(cgstAmt.toFixed(2));
+  const sgstAmt = (invoice?.lines ?? []).reduce((total, row) => {
+    return total + row.sgstTaxAmount;
+  }, 0);
+  const formatteSgstAmt = addCommas(sgstAmt.toFixed(2));
+  const igstAmt = (invoice?.lines ?? []).reduce((total, row) => {
+    return total + row.igstTaxAmount;
+  }, 0);
+  const formatteIgstAmt = addCommas(igstAmt.toFixed(2));
+
+  const roundingAmt = subTotal + cgstAmt + sgstAmt - discountRate + fees;
+  const grandAmount = Math.ceil(roundingAmt);
+  const formattedGrandAmount = addCommas(grandAmount);
+
+  const roundingOff = grandAmount - roundingAmt;
+  const formattedRoundOff = addCommas(roundingOff);
   const discountStyle = {
     color: '#3EB489'
   };
@@ -205,27 +242,27 @@ const Invoicedetails = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>#</TableCell>
-                      <TableCell>SO No</TableCell>
-                      <TableCell>SO Date</TableCell>
+                      {/* <TableCell>SO No</TableCell>
+                      <TableCell align="center">SO Date</TableCell> */}
                       <TableCell>Name</TableCell>
                       <TableCell>Description</TableCell>
                       <TableCell align="right">Quantity</TableCell>
                       <TableCell align="right">Price</TableCell>
                       <TableCell align="right">Fees</TableCell>
                       <TableCell align="right">Discount</TableCell>
-                      <TableCell align="right">Taxable Amount</TableCell>
-                      <TableCell align="right">Cgst Amount</TableCell>
-                      <TableCell align="right">Sgst Amount</TableCell>
-                      <TableCell align="right">Igst Amount</TableCell>
-                      <TableCell align="right">Total Amount</TableCell>
+                      <TableCell align="right">Taxable Amt</TableCell>
+                      <TableCell align="right">Cgst Amt</TableCell>
+                      <TableCell align="right">Sgst Amt</TableCell>
+                      <TableCell align="right">Igst Amt</TableCell>
+                      <TableCell align="right">Total Amt</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {invoice?.lines?.map((row: any, index) => (
                       <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>{index + 1}</TableCell>
-                        <TableCell>{}</TableCell>
-                        <TableCell>{}</TableCell>
+                        {/* <TableCell>{row.soNo}</TableCell>
+                        <TableCell>{row.soDate}</TableCell> */}
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.description}</TableCell>
                         <TableCell align="right">{row.quantity}</TableCell>
@@ -257,19 +294,39 @@ const Invoicedetails = () => {
               <Stack spacing={1} sx={{ paddingRight: '22px', marginTop: '-20px' }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                  <Typography variant="subtitle1">₹ {subTotal}</Typography>
+                  <Typography variant="subtitle1">₹ {formattedSubtotal}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography color={theme.palette.success[500]}>Discount:</Typography>
-                  <Typography style={discountStyle}>₹ {discountRate}</Typography>
+                  <Typography color={theme.palette.grey[500]}>Fees:</Typography>
+                  <Typography variant="subtitle1">₹ {formattedFees}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography color={theme.palette.grey[500]}>Tax:</Typography>
-                  <Typography>₹ {taxRate}</Typography>
+                  <Typography color={theme.palette.grey[500]}>Discount:</Typography>
+                  <Typography style={discountStyle}>₹ - {formatteDiscount}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography color={theme.palette.grey[500]}>Taxable Amount:</Typography>
+                  <Typography>₹ {formattedTaxableAmt}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                  <Typography>₹ {formatteCgstAmt}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
+                  <Typography>₹ {formatteSgstAmt}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                  <Typography>₹ {formatteIgstAmt}</Typography>
+                </Stack>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography color={theme.palette.grey[500]}>RoundingOff:</Typography>
+                  <Typography>₹ {formattedRoundOff}</Typography>
                 </Stack>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="subtitle1">Grand Total:</Typography>
-                  <Typography variant="subtitle1">₹ {invoice?.totalAmount}</Typography>
+                  <Typography variant="subtitle1">₹ {formattedGrandAmount}</Typography>
                 </Stack>
               </Stack>
             </Grid>

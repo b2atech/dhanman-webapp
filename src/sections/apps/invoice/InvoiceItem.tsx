@@ -59,7 +59,7 @@ const InvoiceItem = ({
       //var igstAmount = getITaxAmount(qty, price, igst);
       return (taxableAmount + cgstAmount + sgstAmount).toFixed(2);
     }
-    return '0.0';
+    return '0.00';
   };
 
   const getTotalTaxableAmount = (qty: number, price: number, discount: number, fees: number) => {
@@ -79,20 +79,20 @@ const InvoiceItem = ({
   };
   const getCTaxAmount = (qty: number, price: number, cgst: number) => {
     if (cgst && price && qty) {
-      return (cgst / 100) * price * qty;
+      return (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
     }
     return 0.0;
   };
   const getSTaxAmount = (qty: number, price: number, sgst: number) => {
     if (sgst && price && qty) {
-      return (sgst / 100) * price * qty;
+      return (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
     }
     return 0.0;
   };
 
   // const getITaxAmount = (qty: number, price: number, igst: number) => {
   //   if (igst && price && qty) {
-  //     return (igst / 100) * price * qty;
+  //     return (igst / 100) * (price * qty + fees - (discount / 100) * price * qty);
   //   }
   //   return 0.0;
   // };
@@ -210,7 +210,7 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       style: { width: '100px' },
-      value: (cgst / 100) * price * qty,
+      value: (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty),
       visibility: true
     },
     {
@@ -229,7 +229,7 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       style: { width: '100px' },
-      value: (sgst / 100) * price * qty,
+      value: (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty),
       visibility: true
     },
     {
@@ -248,7 +248,7 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       style: { width: '110px' },
-      value: (igst / 100) * price * qty,
+      value: (igst / 100) * (price * qty + fees - (discount / 100) * price * qty),
       visibility: true
     }
   ];
