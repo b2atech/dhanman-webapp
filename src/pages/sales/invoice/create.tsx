@@ -257,7 +257,7 @@ const Createinvoice = () => {
     } else {
       console.log('No customer selected');
       setIsCustomerSelected(false);
-      return <Typography color="red">* Please select Customer </Typography>;
+      return <Typography color="red">* Please select customer </Typography>;
     }
   };
 
