@@ -332,7 +332,12 @@ const Invoicedetails = () => {
             </Grid>
           </Grid>
         </Box>
-        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ p: 2.5, a: { textDecoration: 'none', color: 'inherit' } }}>
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          sx={{ p: 2.5, a: { textDecoration: 'none', color: 'inherit' }, position: 'relative', top: '-30px' }}
+        >
           <PDFDownloadLink
             document={<ExportPDFView list={invoice} company={company} />}
             fileName={`${invoice?.invoiceNumber}-${invoice?.customer.firstName}.pdf`}
