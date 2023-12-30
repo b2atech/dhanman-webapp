@@ -109,6 +109,7 @@ const CreateBill = () => {
   const [company, setCompany] = useState<any>();
   const [funcToDelete, setfuncToDelete] = useState<any>();
   const [itemUnderDeletion, setItemUnderDeletion] = useState<number>();
+  const [isVendorSelected, setIsVendorSelected] = useState(false);
 
   const handelDeleteItem = (func: any, index: number) => {
     setfuncToDelete(() => func);
@@ -157,6 +158,7 @@ const CreateBill = () => {
       .then((productList) => {
         if (Array.isArray(productList)) {
           setProducts(productList);
+          setIsVendorSelected(false);
         }
       })
       .catch((error) => {
@@ -164,7 +166,6 @@ const CreateBill = () => {
       });
   }, []);
 
-  console.log(company?.name);
   useEffect(() => {
     getBillDefaultStatus('3fa85f64-5717-4562-b3fc-2c963f66afa6')
       .then((status) => {
@@ -242,6 +243,17 @@ const CreateBill = () => {
         isOpen: false
       })
     );
+  };
+  const handleVendorSelected = (firstName: string | undefined) => {
+    if (firstName) {
+      console.log(`Vendor selected with first name: ${firstName}`);
+      setIsVendorSelected(true);
+      return '';
+    } else {
+      console.log('No vendor selected');
+      setIsVendorSelected(false);
+      return <Typography color="red"> Please select Vendor *</Typography>;
+    }
   };
   return (
     <MainCard>
@@ -550,6 +562,7 @@ const CreateBill = () => {
                               <Typography color="secondary">{values?.vendorInfo?.email}</Typography>
                               {values?.vendorInfo?.gstIn && <Typography color="secondary">GSTIN: {values.vendorInfo.gstIn}</Typography>}
                             </Stack>
+                            {handleVendorSelected(values?.vendorInfo?.firstName)}
                           </Typography>
                         </Stack>
                       </Grid>
@@ -590,7 +603,12 @@ const CreateBill = () => {
                   )}
                 </Grid>
 
-                <Grid container spacing={2} alignItems="center">
+                <Grid
+                  container
+                  spacing={2}
+                  alignItems="center"
+                  style={{ opacity: isVendorSelected ? 1 : 0.3, pointerEvents: isVendorSelected ? 'auto' : 'none' }}
+                >
                   <Grid item xs={6}>
                     <Typography variant="h5" sx={{ ml: 2 }}>
                       Detail <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
@@ -629,7 +647,7 @@ const CreateBill = () => {
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid item xs={12} style={{ opacity: isVendorSelected ? 1 : 0.3, pointerEvents: isVendorSelected ? 'auto' : 'none' }}>
                   <FieldArray
                     name="bill_detail"
                     render={({ remove, push }) => {
@@ -875,7 +893,8 @@ const CreateBill = () => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+
+                <Grid item xs={12} style={{ opacity: isVendorSelected ? 1 : 0.2, pointerEvents: isVendorSelected ? 'auto' : 'none' }}>
                   <Grid container justifyContent="flex-end" alignItems="flex-end">
                     <Stack direction="row" justifyContent="flex-end" alignItems="flex-end" spacing={2} sx={{ height: '100%' }}>
                       <Button
@@ -899,6 +918,7 @@ const CreateBill = () => {
                       <Button color="primary" variant="contained" type="submit">
                         Create & Send
                       </Button>
+
                       <BillModal
                         isOpen={isOpen}
                         setIsOpen={(value: any) =>
