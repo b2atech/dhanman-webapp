@@ -29,8 +29,17 @@ type AddressModalType = {
 // ==============================|| BILL - SELECT ADDRESS ||============================== //
 
 const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
+  const [selectedVendor, setSelectedVendor] = useState(null);
+
   function closeAddressModal() {
     setOpen(false);
+    setSelectedVendor(null);
+  }
+  function addAddress() {
+    if (selectedVendor) {
+      handlerAddress(selectedVendor);
+    }
+    closeAddressModal();
   }
 
   return (
@@ -51,7 +60,7 @@ const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) =
       <Divider />
       <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
         <Stack spacing={2}>
-          <Address handlerAddress={(value) => handlerAddress(value)} />
+          <Address handlerAddress={(value) => setSelectedVendor(value)} />
         </Stack>
       </DialogContent>
       <Divider />
@@ -59,7 +68,7 @@ const AddressBillModal = ({ open, setOpen, handlerAddress }: AddressModalType) =
         <Button color="error" onClick={closeAddressModal}>
           Cancel
         </Button>
-        <Button onClick={closeAddressModal} color="primary" variant="contained">
+        <Button onClick={addAddress} color="primary" variant="contained">
           Add
         </Button>
       </DialogActions>
