@@ -23,6 +23,7 @@ const AppInvoiceEdit = Loadable(lazy(() => import('pages/sales/invoice/edit')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppCreateCustomers = Loadable(lazy(() => import('pages/sales/customer/create')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/index')));
+const AppAddChartOfAccount = Loadable(lazy(() => import('pages/company/chartOfAccounts/create')));
 const AppCoaContainer = Loadable(lazy(() => import('pages/company/chartOfAccounts/coaContainer')));
 const AppBills = Loadable(lazy(() => import('pages/purchase/bills/list')));
 const AppCreateBill = Loadable(lazy(() => import('pages/purchase/bills/create')));
@@ -66,7 +67,6 @@ const MainRoutes = {
       children: [
         {
           path: 'coa',
-          element: <CommonLayout />,
           children: [
             {
               path: 'list',
@@ -75,6 +75,10 @@ const MainRoutes = {
             {
               path: 'coaContainer',
               element: <AppCoaContainer />
+            },
+            {
+              path: 'create',
+              element: <AppAddChartOfAccount />
             }
           ]
         },

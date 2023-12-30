@@ -97,6 +97,7 @@ const Createinvoice = () => {
   const notesLimit: number = 500;
   const navigation = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
+  const [soNoSoDate, setSoNoSoDate] = useState(false);
   const [showGSTRates, setShowGSTRates] = useState(false);
   const [discount, setDiscount] = useState(false);
   const [feesVisible, setFees] = useState(false);
@@ -288,6 +289,7 @@ const Createinvoice = () => {
               sgstAmount: 0,
               iRt: 0,
               igstAmount: 0,
+              soNoVisibility: soNoSoDate,
               rateVisibility: showGSTRates,
               discountVisibility: discount,
               feesVisibility: feesVisible
@@ -296,6 +298,7 @@ const Createinvoice = () => {
           discount: 0,
           tax: 0,
           note: '',
+          roundOff: 0,
           totalAmount: 0
         }}
         validationSchema={validationSchema}
@@ -305,35 +308,26 @@ const Createinvoice = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0)
-              return (
-                prev +
-                Number(
-                  (curr.sgst && curr.cgst
-                    ? (curr.cgst / 100) * curr.price * curr.quantity + (curr.sgst / 100) * curr.price * curr.quantity
-                    : (curr.igst / 100) * curr.price * curr.quantity) +
-                    curr.price * Math.floor(curr.quantity)
-                )
-              );
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const formattedSubtotal = addCommas(subtotal);
 
           const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * curr.quantity);
+            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const formattedCGSTAmount = addCommas(cgstAmount);
 
           const sgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * curr.quantity);
+            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const formattedSGSTAmount = addCommas(sgstAmount);
 
           const igstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * curr.quantity);
+            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * Math.floor(curr.quantity));
             else return prev;
           }, 0);
           const formattedIGSTAmount = addCommas(igstAmount);
@@ -359,9 +353,16 @@ const Createinvoice = () => {
           }, 0);
           const formattedDiscount = addCommas(discountRate);
 
-          const grandAmount = subtotal + discountRate + fees;
+          const roundingAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
+
+          const grandAmount = Math.ceil(roundingAmount);
           const formattedGrandAmount = addCommas(grandAmount);
-          //values.totalAmount = grandAmount;
+
+          const taxableAmount = subtotal + discountRate + fees;
+          const formattedTaxableAmount = addCommas(taxableAmount);
+
+          const roundingOff = grandAmount - roundingAmount;
+          const formattedRoundingOff = addCommas(roundingOff);
           const discountStyle = {
             color: '#3EB489'
           };
@@ -607,6 +608,15 @@ const Createinvoice = () => {
                     <Grid item xs={6} container justifyContent="flex-end" alignItems="center" style={{ paddingLeft: '5px' }}>
                       <Grid item style={{ marginLeft: 'auto' }}>
                         <FormControlLabel
+                          control={
+                            <Switch color="secondary" checked={soNoSoDate} onChange={() => setSoNoSoDate(!soNoSoDate)} name="soNoSoDate" />
+                          }
+                          label="So Number"
+                          style={{ margin: '0' }}
+                        />
+                      </Grid>
+                      <Grid item style={{ marginLeft: '5px' }}>
+                        <FormControlLabel
                           control={<Switch checked={showGSTRates} onChange={() => setShowGSTRates(!showGSTRates)} name="showGSTRates" />}
                           label="GST Rates"
                           style={{ margin: '0' }}
@@ -657,12 +667,16 @@ const Createinvoice = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     #
                                   </TableCell>
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    So No
-                                  </TableCell>
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    So Date
-                                  </TableCell>
+                                  {soNoSoDate && (
+                                    <>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        So No
+                                      </TableCell>
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        So Date
+                                      </TableCell>
+                                    </>
+                                  )}
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Name
                                   </TableCell>
@@ -685,7 +699,7 @@ const Createinvoice = () => {
                                       Discount (%)
                                     </TableCell>
                                   )}
-                                  <TableCell align="right" sx={{ padding: '2px 0px' }}>
+                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Taxable Amt
                                   </TableCell>
                                   {showGSTRates && (
@@ -725,7 +739,7 @@ const Createinvoice = () => {
                                     </Tooltip>
                                   </TableCell>
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
-                                    Total Amt
+                                    Item Amt
                                   </TableCell>
                                 </TableRow>
                               </TableHead>
@@ -762,6 +776,7 @@ const Createinvoice = () => {
                                       cgst={item.cgst}
                                       sgst={item.sgst}
                                       igst={item.igst}
+                                      soNoVisibility={soNoSoDate}
                                       ratesVisibility={showGSTRates}
                                       feesVisibility={feesVisible}
                                       discountVisibility={discount}
@@ -835,7 +850,19 @@ const Createinvoice = () => {
                               <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '22px' }}>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Sub Total:</Typography>
-                                  <Typography>{country?.prefix + '' + formattedSubtotal}</Typography>
+                                  <Typography>{formattedSubtotal ? country?.prefix + '' + formattedSubtotal : '0.0'}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}> Fees:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedFees}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}> Discount:</Typography>
+                                  <Typography style={discountStyle}>{country?.prefix + '' + formattedDiscount}</Typography>
+                                </Stack>
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography color={theme.palette.grey[500]}>Taxable Amount:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedTaxableAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
@@ -850,12 +877,8 @@ const Createinvoice = () => {
                                   <Typography>{country?.prefix + '' + formattedIGSTAmount}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}> Fees:</Typography>
-                                  <Typography>{country?.prefix + '' + formattedFees}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}> Discount:</Typography>
-                                  <Typography style={discountStyle}>{country?.prefix + '' + formattedDiscount}</Typography>
+                                  <Typography color={theme.palette.grey[500]}>RoundingOff:</Typography>
+                                  <Typography>{country?.prefix + '' + formattedRoundingOff}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography variant="subtitle1">Grand Total:</Typography>
