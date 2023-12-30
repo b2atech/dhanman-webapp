@@ -96,7 +96,6 @@ const Invoicedetails = () => {
   }, 0);
   const formattedSubtotal = addCommas(subTotal.toFixed(2));
 
-  //const taxRate = Number(invoice?.discount);
   const discountRate = (invoice?.lines ?? []).reduce((total, row) => {
     return total + row.discount;
   }, 0);
