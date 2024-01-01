@@ -6,6 +6,7 @@ import BillPaymentField from './BillPaymentField';
 import { format } from 'date-fns';
 
 // project import
+import { useSelector } from 'store';
 
 // ==============================|| Bill - ITEMS ||============================== //
 const BillPaymentItem = ({
@@ -17,7 +18,7 @@ const BillPaymentItem = ({
   billAmt,
   setteledAmount,
   remainingAmount,
-  payingAmt,
+  payingAmt = 0,
   onDeleteItem,
   onEditItem,
   index,
@@ -30,6 +31,7 @@ const BillPaymentItem = ({
   feesVisibility,
   readOnly
 }: any) => {
+  const { country } = useSelector((state) => state.invoice);
   const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const selectedBill = billNumber.find((billNumber: any) => billNumber.productName === event.target.value);
     if (selectedBill) {
@@ -87,7 +89,7 @@ const BillPaymentItem = ({
       name: `bill_detail.${index}.billDate`,
       type: 'label',
       id: id,
-      value: format(new Date(dueDate), 'dd-MM-yyyy'),
+      value: format(new Date(dueDate), 'dd-MMM-yyyy'),
       sx: { width: '15%', textAlign: 'left' },
       visibility: true,
       readOnly: 'true'
@@ -98,7 +100,7 @@ const BillPaymentItem = ({
       name: `bill_detail.${index}.dueDate`,
       type: 'label',
       id: id,
-      value: format(new Date(dueDate), 'dd-MM-yyyy'),
+      value: format(new Date(dueDate), 'dd-MMM-yyyy'),
       sx: { width: '15%', textAlign: 'left' },
       visibility: true
     },
@@ -120,17 +122,17 @@ const BillPaymentItem = ({
       type: 'number',
       name: `bill_detail.${index}.billAmount`,
       id: id,
-      value: billAmt,
+      value: `${country?.prefix} ${billAmt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: true,
       sx: { textAlign: 'right' }
     },
     {
-      placeholder: 'Setteled Amount',
-      label: 'setteledAmount',
+      placeholder: 'Settled Amount',
+      label: 'settledAmount',
       type: 'number',
       name: `bill_detail.${index}.setteledAmount`,
       id: id,
-      value: setteledAmount,
+      value: `${country?.prefix} ${setteledAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: true,
       sx: { width: '15%', textAlign: 'right' }
     },
@@ -140,9 +142,11 @@ const BillPaymentItem = ({
       type: 'number',
       name: `bill_detail.${index}.remainingAmount`,
       id: id,
-      value: calculateRemainingAmount(),
+      value: `${country?.prefix} ${calculateRemainingAmount()
+        .toFixed(2)
+        .replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: feesVisibility,
-      sx: { textAlign: 'right' }
+      sx: { width: '15%', textAlign: 'right' }
     },
     {
       placeholder: 'Paying Amount',
@@ -150,9 +154,9 @@ const BillPaymentItem = ({
       type: 'text',
       name: `bill_detail.${index}.payingAmount`,
       id: id,
-      value: payingAmt,
+      value: `${country?.prefix} ${payingAmt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: discountVisibility,
-      sx: { width: '15%', textAlign: 'right' }
+      sx: { width: '15%', textAlign: 'right !important' }
     }
   ];
 
