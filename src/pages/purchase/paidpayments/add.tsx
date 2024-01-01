@@ -48,7 +48,7 @@ const companyId: string = String(config.companyId);
 const getInitialValues = (paidPayment: FormikValues | null) => {
   const newPaidPayment = {
     vendornames: '',
-    clientId: companyId,
+    companyId: companyId,
     vendorId: '',
     vendorName: '',
     transactionId: '',
@@ -151,7 +151,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const piadPaymentData = {
-          clientId: values.clientId,
+          companyId: values.companyId,
           vendorId: values.vendorId,
           vendorName: values.vendorName,
           transactionId: values.transactionId,
