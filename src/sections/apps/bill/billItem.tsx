@@ -84,14 +84,14 @@ const BillItem = ({
 
   const getCTaxAmount = (qty: number, price: number, cgst: number) => {
     if (cgst && price && qty) {
-      return (cgst / 100) * price * qty;
+      return (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
     }
     return 0.0;
   };
 
   const getSTaxAmount = (qty: number, price: number, sgst: number) => {
     if (sgst && price && qty) {
-      return (sgst / 100) * price * qty;
+      return (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
     }
     return 0.0;
   };
@@ -180,7 +180,7 @@ const BillItem = ({
       id: id,
       value: fees,
       visibility: feesVisibility,
-      style: { width: '95px', textAlign: 'right' }
+      style: { width: '95px', textAlign: 'center' }
     },
     {
       placeholder: 'Discount',
@@ -190,7 +190,7 @@ const BillItem = ({
       id: id,
       value: discount,
       visibility: discountVisibility,
-      style: { width: '80px', textAlign: 'right' }
+      style: { width: '80px', textAlign: 'center' }
     },
     {
       placeholder: 'tax am',
@@ -208,16 +208,16 @@ const BillItem = ({
       type: '',
       name: `bill_detail.${index}.cgstRate`,
       id: id,
-      value: cgst || 0,
+      value: cgst,
       visibility: ratesVisibility
     },
     {
       placeholder: 'CGST Amount',
       label: 'CGST Amount',
-      type: 'text',
+      type: 'number',
       name: `bill_detail.${index}.cgstAmount`,
       id: id,
-      value: (cgst / 100) * price * qty || 0.0,
+      value: (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty),
       style: { width: '100px', textAlign: 'center' },
       visibility: true
     },
@@ -227,17 +227,17 @@ const BillItem = ({
       type: '',
       name: `bill_detail.${index}.sgstRate`,
       id: id,
-      value: sgst || 0,
+      value: sgst,
       visibility: ratesVisibility
     },
     {
       placeholder: 'SGST Amount',
       label: 'SGST Amount',
-      type: 'text',
+      type: 'number',
       name: `bill_detail.${index}.sgstAmount`,
       id: id,
-      value: (sgst / 100) * price * qty || 0,
-      style: { width: '100px', textAlign: 'right' },
+      value: (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty),
+      style: { width: '100px', textAlign: 'center' },
       visibility: true
     },
     {
@@ -246,17 +246,17 @@ const BillItem = ({
       type: '',
       name: `bill_detail.${index}.igstRate`,
       id: id,
-      value: igst || 0,
+      value: igst,
       visibility: ratesVisibility
     },
     {
       placeholder: 'IGST Amount',
       label: 'IGST Amount',
-      type: 'text',
+      type: 'number',
       name: `bill_detail.${index}.igstAmount`,
       id: id,
-      value: (igst / 100) * price * qty || 0,
-      style: { width: '100px', textAlign: 'right' },
+      value: (igst / 100) * (price * qty + fees - (discount / 100) * price * qty),
+      style: { width: '100px', textAlign: 'center' },
       visibility: true
     }
   ];
