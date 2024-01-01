@@ -40,12 +40,15 @@ import { createPaidPaymentRequest, getAllBills, getAllVendors } from 'api/servic
 import BillPaymentItem from 'sections/apps/bill/BillPaymentItem';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
+import config from 'config';
 
 // constant
+
+const companyId: string = String(config.companyId);
 const getInitialValues = (paidPayment: FormikValues | null) => {
   const newPaidPayment = {
     vendornames: '',
-    clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    clientId: companyId,
     vendorId: '',
     vendorName: '',
     transactionId: '',
@@ -87,7 +90,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   const [totalAmountOfBill, settotalAmountOfBill] = useState<number>(0);
 
   useEffect(() => {
-    getAllVendors('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllVendors(companyId)
       .then((vendorList) => {
         if (Array.isArray(vendorList)) {
           const vendorData = vendorList.map((vendor) => ({
@@ -104,7 +107,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
 
   useEffect(() => {
     if (selectedVendorId && selectedVendorId !== '') {
-      getAllBills('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      getAllBills(companyId)
         .then((billList) => {
           if (Array.isArray(billList)) {
             var list = billList.filter(
@@ -201,7 +204,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
   const handlerCreate = (values: any) => {
     const bill: BillPaymentHeader = {
       id: '',
-      companyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      companyId: companyId,
       vendorId: '',
       vendorName: '',
       billDate: new Date(),
@@ -313,14 +316,17 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                             disabled
                             sx={{ width: '100%', textAlign: 'right' }}
                             id="totalAmount"
-                            value={remainingTotalamount}
+                            value={`₹ ${remainingTotalamount.toLocaleString('en-IN', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}`}
                             placeholder={String(totalAmount)}
                             inputProps={{
                               style: { textAlign: 'right' },
                               inputMode: 'numeric',
                               readOnly: true
                             }}
-                            type="number"
+                            type="text"
                           />
                         </Grid>
                         <Grid item xs={2}>
@@ -397,7 +403,7 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                       </Grid>
                       <MainCard
                         content={false}
-                        title={`Bill's of ${
+                        title={`Bill's of :  ${
                           (selectedVendorId && vendornames
                             ? vendornames.find((vendor: { id: any }) => vendor.id === selectedVendorId)?.name
                             : '') || ''
@@ -410,83 +416,75 @@ const AddPaidPayment = ({ paidpayment, onCancel }: Props) => {
                             render={({ remove, push }) => {
                               return (
                                 <>
-                                  <MainCard
-                                    content={false}
-                                    title={`Bill's of ${
-                                      (selectedVendorId && vendornames
-                                        ? vendornames.find((vendor: { id: any }) => vendor.id === selectedVendorId)?.name
-                                        : '') || ''
-                                    }`}
-                                  >
-                                    {bills && bills.length > 0 ? (
-                                      <TableContainer>
-                                        <Table sx={{ minWidth: 650 }}>
-                                          <TableHead>
-                                            <TableRow>
-                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Bill No.
-                                              </TableCell>
-                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Bill Date
-                                              </TableCell>
-                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Due Date
-                                              </TableCell>
-                                              <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Status
-                                              </TableCell>
-                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Bill Amt
-                                              </TableCell>
-                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Setteled Amt
-                                              </TableCell>
-                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
-                                                Rmn. Amt
-                                              </TableCell>
-                                              <TableCell align="right" sx={{ padding: '2px 0px', width: '50px', textAlign: 'right' }}>
-                                                Paying Amt
-                                              </TableCell>
+                                  {bills && bills.length > 0 ? (
+                                    <TableContainer>
+                                      <Table sx={{ minWidth: 650 }}>
+                                        <TableHead>
+                                          <TableRow>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Bill No.
+                                            </TableCell>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Bill Date
+                                            </TableCell>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Due Date
+                                            </TableCell>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Status
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Bill Amt
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Setteled Amt
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Rmn. Amt
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Paying Amt
+                                            </TableCell>
+                                          </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                          {selectedVendorBills?.map((item: any, index: number) => (
+                                            <TableRow key={item.id}>
+                                              <BillPaymentItem
+                                                key={item.id}
+                                                id={item.id}
+                                                index={index}
+                                                billNumber={item.billNumber}
+                                                billDate={item.billDate}
+                                                dueDate={item.dueDate}
+                                                billStatus={item.billStatus}
+                                                billAmt={item.totalAmount}
+                                                setteledAmount={item.setteledAmount}
+                                                remainingAmount={item.remainingAmount}
+                                                payingAmt={item.payingAmount}
+                                                onDeleteItem={(index: number) => remove(index)}
+                                                onEditItem={handleChange}
+                                                Blur={handleBlur}
+                                                errors={errors}
+                                                touched={touched}
+                                                setFieldValue={setFieldValue}
+                                                InputProps={item.inputProps}
+                                              />
                                             </TableRow>
-                                          </TableHead>
-                                          <TableBody>
-                                            {selectedVendorBills?.map((item: any, index: number) => (
-                                              <TableRow key={item.id}>
-                                                <BillPaymentItem
-                                                  key={item.id}
-                                                  id={item.id}
-                                                  index={index}
-                                                  billNumber={item.billNumber}
-                                                  billDate={item.billDate}
-                                                  dueDate={item.dueDate}
-                                                  billStatus={item.billStatus}
-                                                  billAmt={item.totalAmount}
-                                                  setteledAmount={item.setteledAmount}
-                                                  remainingAmount={item.remainingAmount}
-                                                  payingAmt={item.payingAmount}
-                                                  onDeleteItem={(index: number) => remove(index)}
-                                                  onEditItem={handleChange}
-                                                  Blur={handleBlur}
-                                                  errors={errors}
-                                                  touched={touched}
-                                                  setFieldValue={setFieldValue}
-                                                  InputProps={item.inputProps}
-                                                />
-                                              </TableRow>
-                                            ))}
-                                          </TableBody>
-                                        </Table>
-                                      </TableContainer>
-                                    ) : (
-                                      <Typography variant="body1" color={'error'}>
-                                        {`No bills available for the  ${
-                                          (selectedVendorId && vendornames
-                                            ? vendornames.find((vendor: { id: any }) => vendor.id === selectedVendorId)?.name
-                                            : '') || ''
-                                        }`}
-                                      </Typography>
-                                    )}
-                                  </MainCard>
+                                          ))}
+                                        </TableBody>
+                                      </Table>
+                                    </TableContainer>
+                                  ) : (
+                                    <Typography variant="body1" color={'error'}>
+                                      {`No bills available for the  ${
+                                        (selectedVendorId && vendornames
+                                          ? vendornames.find((vendor: { id: any }) => vendor.id === selectedVendorId)?.name
+                                          : '') || ''
+                                      }`}
+                                    </Typography>
+                                  )}
+
                                   <Divider />
                                 </>
                               );
