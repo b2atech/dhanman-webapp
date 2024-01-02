@@ -325,7 +325,7 @@ const Createinvoice = () => {
         }}
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
-          const shoudIdShowTaxColumns = (companyGST: string, customerGST: string): boolean => {
+          const showTaxColumns = (companyGST: string, customerGST: string): boolean => {
             const getStateCodeFromGSTIN = (gstIn: string): string | null => {
               if (gstIn && gstIn.length >= 2) {
                 return gstIn.substr(0, 2);
@@ -336,7 +336,7 @@ const Createinvoice = () => {
             const customerStateCode = getStateCodeFromGSTIN(customerGST);
             return companyStateCode === customerStateCode;
           };
-          const shouldShow = shoudIdShowTaxColumns(company?.gstIn, values?.customerInfo?.gstIn);
+          const showTax = showTaxColumns(company?.gstIn, values?.customerInfo?.gstIn);
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number(curr.price * curr.quantity);
             else return prev;
@@ -395,7 +395,7 @@ const Createinvoice = () => {
           }, 0);
           const formattedDiscount = addCommas(discountRate);
           let roundingAmount;
-          if (shouldShow) {
+          if (showTax) {
             roundingAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
           } else {
             roundingAmount = subtotal + igstAmount + discountRate + fees;
@@ -661,7 +661,7 @@ const Createinvoice = () => {
                           (
                           {company?.gstIn && values?.customerInfo?.gstIn && (
                             <Typography variant="body1" component="span" style={{ margin: '0', padding: '15px 0' }}>
-                              {shouldShow ? (
+                              {showTax ? (
                                 <span>
                                   Both parties are from <span style={{ color: '#3EB489' }}>Intra State</span>.
                                 </span>
@@ -935,7 +935,7 @@ const Createinvoice = () => {
                                   <Typography color={theme.palette.grey[500]}>Taxable Amount:</Typography>
                                   <Typography>{country?.prefix + '' + formattedTaxableAmount}</Typography>
                                 </Stack>
-                                {shouldShow ? (
+                                {showTax ? (
                                   <>
                                     <Stack direction="row" justifyContent="space-between">
                                       <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
