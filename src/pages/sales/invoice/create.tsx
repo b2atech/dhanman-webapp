@@ -261,7 +261,7 @@ const Createinvoice = () => {
     } else {
       console.log('No customer selected');
       setIsCustomerSelected(false);
-      return <Typography color="red">* Please select Customer </Typography>;
+      return <Typography color="rgba(255, 0, 0, 0.7)">* Please select Customer </Typography>;
     }
   };
 
@@ -385,7 +385,7 @@ const Createinvoice = () => {
 
           const roundingAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
 
-          const grandAmount = Math.ceil(roundingAmount);
+          const grandAmount = Math.round(roundingAmount);
           const formattedGrandAmount = addCommas(grandAmount);
 
           const taxableAmount = subtotal + discountRate + fees;
@@ -408,6 +408,13 @@ const Createinvoice = () => {
             if (curr.name.trim().length > 0) return prev + Number(curr.igst);
             else return prev;
           }, 0);
+
+          const getStateCodeFromGSTIN = (gstIn: string | undefined): string | null => {
+            if (gstIn && gstIn.length >= 2) {
+              return gstIn.substr(0, 2);
+            }
+            return null;
+          };
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -639,7 +646,24 @@ const Createinvoice = () => {
                   >
                     <Grid item xs={6} style={{ paddingRight: '0px', paddingLeft: '15px' }}>
                       <Typography variant="h5" style={{ margin: '0', padding: '15px 0' }}>
-                        Details <span style={{ color: 'grey', fontSize: '0.9em' }}>(Note : )</span>
+                        Details{' '}
+                        <span style={{ color: 'grey', fontSize: '0.9em' }}>
+                          (
+                          {company?.gstIn && values?.customerInfo?.gstIn && (
+                            <Typography variant="body1" component="span" style={{ margin: '0', padding: '15px 0' }}>
+                              {getStateCodeFromGSTIN(company.gstIn) === getStateCodeFromGSTIN(values.customerInfo.gstIn) ? (
+                                <span>
+                                  Both parties are from <span style={{ color: '#3EB489' }}>Inter State</span>.
+                                </span>
+                              ) : (
+                                <span>
+                                  Parties are from <span style={{ color: 'blue' }}>Intra State</span>.
+                                </span>
+                              )}
+                            </Typography>
+                          )}
+                          )
+                        </span>
                       </Typography>
                     </Grid>
                     <Grid item xs={6} container justifyContent="flex-end" alignItems="center" style={{ paddingLeft: '5px' }}>

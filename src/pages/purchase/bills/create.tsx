@@ -381,10 +381,11 @@ const CreateBill = () => {
 
           const roundOffAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
 
-          const grandAmount = Math.ceil(roundOffAmount);
+          const grandAmount = Math.round(roundOffAmount);
           const formattedGrandAmount = addCommas(grandAmount);
 
           const roundOff = grandAmount - roundOffAmount;
+          const formattedRoundOff = addCommas(roundOff);
           const discountStyle = {
             color: '#3EB489'
           };
@@ -899,7 +900,7 @@ const CreateBill = () => {
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>Rounding Off:</Typography>
-                                  <Typography>{country?.prefix + '' + roundOff}</Typography>
+                                  <Typography>{country?.prefix + '' + formattedRoundOff}</Typography>
                                 </Stack>
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography variant="subtitle1">Grand Total:</Typography>
