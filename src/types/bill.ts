@@ -33,7 +33,7 @@ export interface IPaidPayment {
 }
 
 export interface PaidPaymentData {
-  clientId: string;
+  companyId: string;
   vendorId: string;
   vendorName: string;
   transactionId: string;
