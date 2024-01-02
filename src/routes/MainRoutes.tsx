@@ -19,7 +19,7 @@ const AppCreateInvoice = Loadable(lazy(() => import('pages/sales/invoice/create'
 const AppInvoicedetails = Loadable(lazy(() => import('pages/sales/invoice/details')));
 const AppReceivedPayment = Loadable(lazy(() => import('pages/sales/receivedpayments/list')));
 const AppReceivePayment = Loadable(lazy(() => import('pages/sales/receivedpayments/add')));
-const AppInvoiceEdit = Loadable(lazy(() => import('pages/sales/invoice/edit')));
+//const AppInvoiceEdit = Loadable(lazy(() => import('pages/sales/invoice/edit')));
 const AppCustomers = Loadable(lazy(() => import('pages/sales/customer/list')));
 const AppCreateCustomers = Loadable(lazy(() => import('pages/sales/customer/create')));
 const AppChartOfAccounts = Loadable(lazy(() => import('pages/company/chartOfAccounts/index')));
@@ -158,7 +158,7 @@ const MainRoutes = {
             },
             {
               path: 'edit/:id',
-              element: <AppInvoiceEdit />
+              element: <MaintenanceComingSoon />
             }
           ]
         },

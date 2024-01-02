@@ -115,8 +115,12 @@ const Createinvoice = () => {
     setItemUnderDeletion(index);
     setOpenDelete(true);
   };
-  const addCommas = (number: number) => {
-    const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+  const addCommas = (number: string | number) => {
+    const parsedNumber = typeof number === 'string' ? parseFloat(number) : number;
+    const formattedNumber = new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    }).format(parsedNumber);
     return formattedNumber;
   };
   const handlerCreate = (values: any) => {
@@ -322,26 +326,38 @@ const Createinvoice = () => {
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number(curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0) return prev + Number(curr.price * curr.quantity);
             else return prev;
           }, 0);
           const formattedSubtotal = addCommas(subtotal);
 
           const taxRate = (values.tax * subtotal) / 100;
           const cgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.cgst / 100) * curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0)
+              return (
+                prev +
+                Number((curr.cgst / 100) * (curr.price * curr.quantity + curr.fees - (curr.discount / 100) * curr.price * curr.quantity))
+              );
             else return prev;
           }, 0);
           const formattedCGSTAmount = addCommas(cgstAmount);
 
           const sgstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.sgst / 100) * curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0)
+              return (
+                prev +
+                Number((curr.sgst / 100) * (curr.price * curr.quantity + curr.fees - (curr.discount / 100) * curr.price * curr.quantity))
+              );
             else return prev;
           }, 0);
           const formattedSGSTAmount = addCommas(sgstAmount);
 
           const igstAmount = values?.invoice_detail.reduce((prev, curr: any) => {
-            if (curr.name.trim().length > 0) return prev + Number((curr.igst / 100) * curr.price * Math.floor(curr.quantity));
+            if (curr.name.trim().length > 0)
+              return (
+                prev +
+                Number((curr.igst / 100) * (curr.price * curr.quantity + curr.fees - (curr.discount / 100) * curr.price * curr.quantity))
+              );
             else return prev;
           }, 0);
           const formattedIGSTAmount = addCommas(igstAmount);
@@ -359,7 +375,7 @@ const Createinvoice = () => {
             const hasValidQuantity = curr.quantity !== undefined && curr.quantity !== null && !isNaN(curr.quantity);
 
             if (curr.name.trim().length > 0 && hasValidDiscount && hasValidPrice && hasValidQuantity) {
-              const discount = -(curr.discount / 100) * curr.price * Math.floor(curr.quantity);
+              const discount = -(curr.discount / 100) * curr.price * curr.quantity;
               return prev + Number(discount);
             } else {
               return prev;
