@@ -325,6 +325,18 @@ const Createinvoice = () => {
         }}
       >
         {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
+          const shoudIdShowTaxColumns = (companyGST: string, customerGST: string): boolean => {
+            const getStateCodeFromGSTIN = (gstIn: string): string | null => {
+              if (gstIn && gstIn.length >= 2) {
+                return gstIn.substr(0, 2);
+              }
+              return null;
+            };
+            const companyStateCode = getStateCodeFromGSTIN(companyGST);
+            const customerStateCode = getStateCodeFromGSTIN(customerGST);
+            return companyStateCode === customerStateCode;
+          };
+          const shouldShow = shoudIdShowTaxColumns(company?.gstIn, values?.customerInfo?.gstIn);
           const subtotal = values?.invoice_detail.reduce((prev, curr: any) => {
             if (curr.name.trim().length > 0) return prev + Number(curr.price * curr.quantity);
             else return prev;
@@ -382,8 +394,12 @@ const Createinvoice = () => {
             }
           }, 0);
           const formattedDiscount = addCommas(discountRate);
-
-          const roundingAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
+          let roundingAmount;
+          if (shouldShow) {
+            roundingAmount = subtotal + cgstAmount + sgstAmount + discountRate + fees;
+          } else {
+            roundingAmount = subtotal + igstAmount + discountRate + fees;
+          }
 
           const grandAmount = Math.round(roundingAmount);
           const formattedGrandAmount = addCommas(grandAmount);
@@ -409,12 +425,6 @@ const Createinvoice = () => {
             else return prev;
           }, 0);
 
-          const getStateCodeFromGSTIN = (gstIn: string | undefined): string | null => {
-            if (gstIn && gstIn.length >= 2) {
-              return gstIn.substr(0, 2);
-            }
-            return null;
-          };
           return (
             <Form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
@@ -651,13 +661,13 @@ const Createinvoice = () => {
                           (
                           {company?.gstIn && values?.customerInfo?.gstIn && (
                             <Typography variant="body1" component="span" style={{ margin: '0', padding: '15px 0' }}>
-                              {getStateCodeFromGSTIN(company.gstIn) === getStateCodeFromGSTIN(values.customerInfo.gstIn) ? (
+                              {shouldShow ? (
                                 <span>
-                                  Both parties are from <span style={{ color: '#3EB489' }}>Inter State</span>.
+                                  Both parties are from <span style={{ color: '#3EB489' }}>Intra State</span>.
                                 </span>
                               ) : (
                                 <span>
-                                  Parties are from <span style={{ color: 'blue' }}>Intra State</span>.
+                                  Parties are from <span style={{ color: 'blue' }}>Inter State</span>.
                                 </span>
                               )}
                             </Typography>
@@ -925,18 +935,23 @@ const Createinvoice = () => {
                                   <Typography color={theme.palette.grey[500]}>Taxable Amount:</Typography>
                                   <Typography>{country?.prefix + '' + formattedTaxableAmount}</Typography>
                                 </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + formattedCGSTAmount}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + formattedSGSTAmount}</Typography>
-                                </Stack>
-                                <Stack direction="row" justifyContent="space-between">
-                                  <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
-                                  <Typography>{country?.prefix + '' + formattedIGSTAmount}</Typography>
-                                </Stack>
+                                {shouldShow ? (
+                                  <>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>CGST Tax Amount:</Typography>
+                                      <Typography>{country?.prefix + '' + formattedCGSTAmount}</Typography>
+                                    </Stack>
+                                    <Stack direction="row" justifyContent="space-between">
+                                      <Typography color={theme.palette.grey[500]}>SGST Tax Amount:</Typography>
+                                      <Typography>{country?.prefix + '' + formattedSGSTAmount}</Typography>
+                                    </Stack>
+                                  </>
+                                ) : (
+                                  <Stack direction="row" justifyContent="space-between">
+                                    <Typography color={theme.palette.grey[500]}>IGST Tax Amount:</Typography>
+                                    <Typography>{country?.prefix + '' + formattedIGSTAmount}</Typography>
+                                  </Stack>
+                                )}
                                 <Stack direction="row" justifyContent="space-between">
                                   <Typography color={theme.palette.grey[500]}>RoundingOff:</Typography>
                                   <Typography>{country?.prefix + '' + formattedRoundingOff}</Typography>

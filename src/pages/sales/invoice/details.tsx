@@ -120,7 +120,7 @@ const Invoicedetails = () => {
   const formatteIgstAmt = addCommas(igstAmt.toFixed(2));
 
   const roundingAmt = subTotal + cgstAmt + sgstAmt - discountRate + fees;
-  const grandAmount = Math.ceil(roundingAmt);
+  const grandAmount = Math.round(roundingAmt);
   const formattedGrandAmount = addCommas(grandAmount);
 
   const roundingOff = grandAmount - roundingAmt;
