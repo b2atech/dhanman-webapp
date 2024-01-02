@@ -29,8 +29,17 @@ type AddressModalType = {
 // ==============================|| INVOICE - SELECT ADDRESS ||============================== //
 
 const AddressModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
   function closeAddressModal() {
     setOpen(false);
+    setSelectedCustomer(null);
+  }
+  function addAddress() {
+    if (selectedCustomer) {
+      handlerAddress(selectedCustomer);
+    }
+    closeAddressModal();
   }
 
   return (
@@ -51,7 +60,7 @@ const AddressModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
       <Divider />
       <DialogContent sx={{ p: 2.5, height: '500px', width: '400px' }}>
         <Stack spacing={2}>
-          <Address handlerAddress={handlerAddress} />
+          <Address handlerAddress={(value) => setSelectedCustomer(value)} />
         </Stack>
       </DialogContent>
       <Divider />
@@ -59,7 +68,7 @@ const AddressModal = ({ open, setOpen, handlerAddress }: AddressModalType) => {
         <Button color="error" onClick={closeAddressModal}>
           Cancel
         </Button>
-        <Button onClick={closeAddressModal} color="primary" variant="contained">
+        <Button onClick={addAddress} color="primary" variant="contained">
           Add
         </Button>
       </DialogActions>
