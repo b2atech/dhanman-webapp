@@ -40,12 +40,14 @@ import { createReceivedPaymentRequest, getAllInvoiceHeadersByCustomerId, getAllC
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import InvoicePaymentItem from 'sections/apps/invoice/InvoicePaymentItem';
+import config from 'config';
 
 // constant
+const companyId: string = String(config.companyId);
 const getInitialValues = (paidPayment: FormikValues | null) => {
   const newPaidPayment = {
     customernames: '',
-    clientId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    companyId: companyId,
     customerId: '',
     customerName: '',
     transactionId: '',
@@ -145,7 +147,7 @@ const AddReceivedPayment = ({ receivedPayment, onCancel }: Props) => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const receivedPaymentData = {
-          clientId: values.clientId,
+          companyId: values.companyId,
           customerId: values.customerId,
           customerName: values.customerName,
           transactionId: values.transactionId,
@@ -198,7 +200,7 @@ const AddReceivedPayment = ({ receivedPayment, onCancel }: Props) => {
   const handlerCreate = (values: any) => {
     const invoice: InvoicePaymentHeader = {
       id: '',
-      companyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      companyId: companyId,
       customerId: '',
       customerName: '',
       invoiceDate: new Date(),

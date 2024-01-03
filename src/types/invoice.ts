@@ -146,7 +146,7 @@ export interface IReceivedPayment {
 }
 
 export interface ReceivedPaymentData {
-  clientId: string;
+  companyId: string;
   customerId: string;
   customerName: string;
   transactionId: string;
