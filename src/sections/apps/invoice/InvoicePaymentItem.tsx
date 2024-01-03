@@ -4,6 +4,7 @@ import { Box, Stack, TableCell, Chip } from '@mui/material';
 // third-party
 import InvoicePaymentField from './InvoicePaymentField';
 import { format } from 'date-fns';
+import { useSelector } from 'store';
 
 // project import
 
@@ -30,6 +31,7 @@ const InvoicePaymentItem = ({
   feesVisibility,
   readOnly
 }: any) => {
+  const { country } = useSelector((state) => state.invoice);
   const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     const selectedInvoice = invoiceNumber.find((invoiceNumber: any) => invoiceNumber.productName === event.target.value);
     if (selectedInvoice) {
@@ -121,7 +123,7 @@ const InvoicePaymentItem = ({
       type: 'number',
       name: `invoice_detail.${index}.invoiceAmount`,
       id: id,
-      value: invoiceAmount,
+      value: `${country?.prefix} ${invoiceAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: true,
       sx: { textAlign: 'right' }
     },
@@ -131,7 +133,7 @@ const InvoicePaymentItem = ({
       type: 'number',
       name: `invoice_detail.${index}.setteledAmount`,
       id: id,
-      value: setteledAmount,
+      value: `${country?.prefix} ${setteledAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: true,
       sx: { width: '15%', textAlign: 'right' }
     },
@@ -141,7 +143,9 @@ const InvoicePaymentItem = ({
       type: 'number',
       name: `invoice_detail.${index}.remainingAmount`,
       id: id,
-      value: calculateRemainingAmount(),
+      value: `${country?.prefix} ${calculateRemainingAmount()
+        .toFixed(2)
+        .replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: feesVisibility,
       sx: { textAlign: 'right' }
     },
@@ -151,7 +155,7 @@ const InvoicePaymentItem = ({
       type: 'text',
       name: `invoice_detail.${index}.receivingAmount`,
       id: id,
-      value: receivingAmount,
+      value: `${country?.prefix} ${receivingAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`,
       visibility: discountVisibility,
       sx: { width: '15%', textAlign: 'right' }
     }
