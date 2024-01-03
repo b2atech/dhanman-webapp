@@ -60,7 +60,7 @@ const InvoiceItem = ({
     cgst: number,
     sgst: number,
     igst: number,
-    showTax: boolean // Assuming showTax is a boolean variable
+    showTax: boolean
   ) => {
     if (qty && price) {
       var taxableAmount = getTotalTaxableAmount(qty, price, discount, fees);
