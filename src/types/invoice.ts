@@ -122,6 +122,8 @@ export interface IInvoice {
   customerInfo: InfoType;
   notes: string;
   amount: number;
+  receivingAmount: number;
+  setteledAmount: number;
 }
 
 export interface InvoiceDetail {
@@ -144,7 +146,7 @@ export interface IReceivedPayment {
 }
 
 export interface ReceivedPaymentData {
-  companyId: string;
+  clientId: string;
   customerId: string;
   customerName: string;
   transactionId: string;
