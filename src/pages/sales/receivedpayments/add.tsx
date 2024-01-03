@@ -1,66 +1,75 @@
-import { useEffect, useState, useMemo } from 'react';
-
 // material-ui
 import {
-  Autocomplete,
-  Button,
-  Chip,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   FormControl,
   Grid,
   InputLabel,
-  MenuItem,
-  Select,
   TextField,
-  TextareaAutosize,
-  Typography,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Divider,
+  Autocomplete,
   Box,
-  CircularProgress
+  CircularProgress,
+  Typography,
+  Select,
+  MenuItem,
+  TextareaAutosize,
+  Button
 } from '@mui/material';
 
 // third-party
 import * as Yup from 'yup';
-import { useFormik, FormikValues } from 'formik';
-import { Column, useTable, HeaderGroup, Cell, CellProps } from 'react-table';
+import { Form, FieldArray, useFormik, FormikValues, Formik } from 'formik';
+import {} from 'utils/react-table';
 
 // project imports
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-import { createReceivedPaymentRequest, getAllInvoices, getAllCustomers } from 'api/services/SalesService';
 import MainCard from 'components/MainCard';
 import { IInvoice } from 'types/invoice';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { InvoicePaymentHeader, IInvoicePaymentLine } from 'types/invoiceDetails';
+import { format } from 'date-fns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useEffect, useState } from 'react';
+import { createReceivedPaymentRequest, getAllInvoiceHeadersByCustomerId, getAllCustomers } from 'api/services/SalesService';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
+import InvoicePaymentItem from 'sections/apps/invoice/InvoicePaymentItem';
+import config from 'config';
 
 // constant
-const getInitialValues = (receivedPayment: FormikValues | null) => {
-  const newReceivedPayment = {
+const companyId: string = String(config.companyId);
+const getInitialValues = (paidPayment: FormikValues | null) => {
+  const newPaidPayment = {
     customernames: '',
-    companyId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    companyId: companyId,
     customerId: '',
     customerName: '',
     transactionId: '',
     coaId: '',
     description: '',
-    amount: ''
+    amount: '',
+    totalAmount: '',
+    setteledAmount: ''
   };
 
-  return newReceivedPayment;
+  return newPaidPayment;
 };
 
-// ==============================|| Received Payment ADD / EDIT ||============================== //
-
+// ==============================|| Paid Payment ADD / EDIT ||============================== //
 export interface Props {
-  receivedpayment?: any;
+  receivedPayment?: any;
   onCancel: () => void;
+  data: IInvoice;
 }
-const moment = require('moment');
 
-const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
-  const ReceivedPaymentSchema = Yup.object().shape({
+const AddReceivedPayment = ({ receivedPayment, onCancel }: Props) => {
+  const PaidPaymentSchema = Yup.object().shape({
     customerName: Yup.string().max(255).required('Please Enter customer Name'),
     amount: Yup.string()
       .matches(/^\d+(\.\d{0,2})?$/, 'Use only two decimal places')
@@ -68,16 +77,73 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
     description: Yup.string().max(255).required('Please Enter Description')
   });
 
-  const [openAlert, setOpenAlert] = useState(false);
+  const [customernames, setCustomerNames] = useState<any>();
+  const [selectedCustomerInvoices, setSelectedCustomerInvoices] = useState<IInvoice[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [invoices, setInvoices] = useState<IInvoice[]>();
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [totalSettledAmount, setTotalSettledAmount] = useState<number>(0);
+  const [remainingTotalamount, setRemainingTotalamount] = useState<number>(0);
+  const [totalReceivedAmount, setTotalReceivedAmount] = useState<number>(0);
+  const [advanceAmount, setAdvanceAmount] = useState<number>(0);
+  const [totalAmountOfInvoice, setTotalAmountOfInvoice] = useState<number>(0);
 
-  const handleAlertClose = () => {
-    setOpenAlert(!openAlert);
-    onCancel();
+  useEffect(() => {
+    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+      .then((customerList) => {
+        if (Array.isArray(customerList)) {
+          const customerData = customerList.map((customer) => ({
+            id: customer.id,
+            name: `${customer.firstName} ${customer.lastName}`
+          }));
+          setCustomerNames(customerData);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (selectedCustomerId && selectedCustomerId !== '') {
+      getAllInvoiceHeadersByCustomerId(selectedCustomerId)
+        .then((invoiceList) => {
+          if (Array.isArray(invoiceList)) {
+            setInvoices(invoiceList);
+            const total = invoiceList.reduce((acc, current) => acc + current.totalAmount, 0);
+            setTotalAmount(total);
+            setSelectedCustomerInvoices(invoiceList);
+          } else {
+            console.error('API response is not an array:', invoiceList);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching invoice data:', error);
+        });
+    }
+  }, [selectedCustomerId]);
+
+  const addCommas = (number: number) => {
+    const formattedNumber = new Intl.NumberFormat('en-IN').format(number);
+    return formattedNumber;
   };
 
+  useEffect(() => {
+    setTotalAmountOfInvoice(selectedCustomerInvoices.reduce((acc, invoice) => acc + invoice.totalAmount, 0));
+    let totalSettledAmount = selectedCustomerInvoices.reduce((acc, invoice) => acc + invoice.setteledAmount, 0);
+    setTotalSettledAmount(totalSettledAmount);
+    setRemainingTotalamount(totalAmountOfInvoice - totalSettledAmount);
+  }, [selectedCustomerInvoices, totalAmountOfInvoice]);
+
+  useEffect(() => {
+    const remainingAmount = totalReceivedAmount > remainingTotalamount ? totalReceivedAmount - remainingTotalamount : 0;
+    setAdvanceAmount(remainingAmount);
+  }, [totalReceivedAmount, totalAmount, totalAmountOfInvoice, remainingTotalamount]);
+
   const formik = useFormik({
-    initialValues: getInitialValues(receivedpayment!),
-    validationSchema: ReceivedPaymentSchema,
+    initialValues: getInitialValues(receivedPayment!),
+    validationSchema: PaidPaymentSchema,
+
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const receivedPaymentData = {
@@ -88,13 +154,13 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
           coaId: values.coaId,
           description: values.description,
           amount: values.amount,
-          paymentMode: paymentMode
+          setteledAmount: values.setteledAmount
         };
-        if (receivedpayment) {
+        if (receivedPayment) {
           dispatch(
             openSnackbar({
               open: true,
-              message: 'Received Payment updated successfully.',
+              message: 'Paid Payment updated successfully.',
               anchorOrigin: { vertical: 'top', horizontal: 'right' },
               variant: 'alert',
               alert: {
@@ -129,309 +195,393 @@ const AddReceivedPayment = ({ receivedpayment, onCancel }: Props) => {
       }
     }
   });
-  const {
-    errors,
-    touched,
-    //  handleSubmit,
-    //isSubmitting,
-    getFieldProps,
-    handleChange
-  } = formik;
-  const [customernames, setCustomerNames] = useState<any>();
-  const [paymentMode, setPaymentMode] = useState('');
-  const [paymentThrough, setPaymentThrough] = useState('');
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
-  const [invoices, setInvoices] = useState<IInvoice[]>();
-  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const { getFieldProps } = formik;
 
-  useEffect(() => {
-    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-      .then((customerList) => {
-        if (Array.isArray(customerList)) {
-          const customerData = customerList.map((customer) => ({
-            id: customer.id,
-            name: `${customer.firstName} ${customer.lastName}`
-          }));
-          setCustomerNames(customerData);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (selectedCustomerId && selectedCustomerId !== '') {
-      getAllInvoices('3fa85f64-5717-4562-b3fc-2c963f66afa6')
-        .then((invoiceList) => {
-          if (Array.isArray(invoiceList)) {
-            var list = invoiceList.filter(
-              (e) => e.customerId === selectedCustomerId && (e.invoiceStatus === 'Approved' || e.invoiceStatus === 'Partially Received')
-            );
-            setInvoices(list);
-            const total = list.reduce((acc, current) => acc + current.totalAmount, 0);
-            setTotalAmount(total);
-          } else {
-            console.error('API response is not an array:', invoiceList);
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching invoice data:', error);
-        });
-    }
-  }, [selectedCustomerId]);
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'Invoice NO.',
-        accessor: 'invoiceNumber',
-        className: 'cell-center'
-      },
-      {
-        Header: 'Invoice Date',
-        accessor: 'invoiceDate',
-        className: 'cell-center',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
-      },
-      {
-        Header: 'Due Date',
-        accessor: 'dueDate',
-        className: 'cell-center',
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
-      },
-      {
-        Header: 'Status',
-        className: 'cell-center',
-        accessor: 'invoiceStatus',
-        Cell: ({ value }: { value: string }) => {
-          switch (value) {
-            case 'Draft':
-              return <Chip color="secondary" label="Draft" size="medium" variant="light" />;
-            case 'Pending Approval':
-              return <Chip color="default" label="Pending Approval" size="medium" variant="light" />;
-            case 'Approved':
-              return <Chip color="primary" label="Approved" size="medium" variant="light" />;
-            case 'Partially Received':
-              return <Chip color="info" label="Partially Received" size="medium" variant="light" />;
-            case 'Received':
-              return <Chip color="success" label="Received" size="medium" variant="light" />;
-            case 'Rejected':
-              return <Chip color="error" label="Rejected" size="medium" variant="light" />;
-            case 'Cancelled':
-            default:
-              return <Chip color="warning" label="Cancelled" size="medium" variant="light" />;
-          }
-        }
-      },
-      {
-        Header: 'Amount',
-        accessor: 'totalAmount',
-        className: 'cell-right'
-      }
-    ],
-    []
-  );
-
+  const handlerCreate = (values: any) => {
+    const invoice: InvoicePaymentHeader = {
+      id: '',
+      companyId: companyId,
+      customerId: '',
+      customerName: '',
+      invoiceDate: new Date(),
+      dueDate: format(values.dueDate, 'yyyy-MM-dd'),
+      amount: Number(values.amount),
+      receivingAmount: Number(values.receivingAmount),
+      description: '',
+      paymentMode: '',
+      paymentThrough: ''
+    };
+    invoice.lines = values.invoice_payment_detail.map((invoiceItem: any) => {
+      let invoicePaymentLine = {} as IInvoicePaymentLine;
+      invoicePaymentLine.invoicelNumber = invoiceItem.invoicelNumber;
+      invoicePaymentLine.invoiceDate = invoiceItem.invoiceDate;
+      invoicePaymentLine.dueDate = invoiceItem.dueDate;
+      invoicePaymentLine.invoiceStatusId = invoiceItem.invoiceStatusId;
+      invoicePaymentLine.invoiceStatus = invoiceItem.invoiceStatus;
+      invoicePaymentLine.invoiceAmount = invoiceItem.invoiceAmount;
+      invoicePaymentLine.setteledAmount = invoiceItem.setteledAmount;
+      invoicePaymentLine.receivingAmount = invoiceItem.receivingAmount;
+      return invoicePaymentLine;
+    });
+  };
   return (
-    <>
-      <MainCard>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          <Grid item xs={12} sm={6}>
-            <MainCard>
-              <Grid container spacing={2} direction="column">
-                <Grid item xs={12}>
-                  <InputLabel sx={{ mb: 1 }}>Customer Name</InputLabel>
-                  <FormControl sx={{ width: '100%' }} error={Boolean(touched.customernames && errors.customernames)}>
-                    {customernames && customernames.length > 0 ? (
-                      <Autocomplete
-                        id="controllable-states-demo"
-                        options={(customernames || []) as any[]}
-                        getOptionLabel={(option: any) => `${option.name}`}
-                        onChange={(event, newValue) => {
-                          if (newValue && newValue.id) {
-                            setSelectedCustomerId(newValue.id);
-                          } else {
-                            setSelectedCustomerId(null);
-                          }
-                          handleChange({ target: { name: 'customerName', value: newValue ? newValue.name : '' } });
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            error={Boolean(touched.customernames && errors.customernames)}
-                            helperText={touched.customernames && errors.customernames ? errors.customernames : ''}
-                          />
-                        )}
-                      />
-                    ) : (
-                      <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" height="100px">
-                        <CircularProgress size={30} thickness={4} />
-                        <Grid flexDirection={'column'}>
-                          <Typography variant="body1" style={{ marginTop: '32px' }}>
-                            Loading Customer Names,
-                          </Typography>
-                          <Typography variant="body1" style={{ marginTop: '32px' }}>
-                            Please Wait...!
-                          </Typography>
+    <MainCard>
+      <Formik
+        initialValues={{
+          invoice_payment_detail: [
+            {
+              invoicelNumber: 0,
+              invoiceDate: '',
+              dueDate: '',
+              status: '',
+              totalAmount: 0,
+              setteledAmount: 0,
+              receivingAmount: 0
+            }
+          ]
+        }}
+        validationSchema={PaidPaymentSchema}
+        onSubmit={(values) => {
+          handlerCreate(values);
+        }}
+      >
+        {({ handleBlur, errors, handleChange, handleSubmit, values, isValid, setFieldValue, touched }) => {
+          const formattedTotalAmount = addCommas(totalAmountOfInvoice);
+          const formattedtotalSettledAmount = addCommas(totalSettledAmount);
+          const formattedremainingTotalamount = addCommas(remainingTotalamount);
+          const formattedtotalPaidAmount = addCommas(totalReceivedAmount);
+          const formattedadvanceAmount = addCommas(advanceAmount);
+
+          return (
+            <Form onSubmit={handleSubmit}>
+              <Grid item xs={12} sm={5} md={4}>
+                <Grid container justifyContent="flex-end">
+                  <Stack spacing={1}>
+                    {/* <InputLabel sx={{ color: 'grey', fontSize: '0.95rem' }}>Status : {defaultStatus}</InputLabel> */}
+                  </Stack>
+                </Grid>
+              </Grid>
+              <Form onSubmit={handleSubmit}>
+                <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                  <Grid item xs={12}>
+                    <Grid container spacing={1} direction="column">
+                      <Grid container spacing={1.5} direction="row" sx={{ marginBottom: 2.5 }}>
+                        <Grid item xs={6}>
+                          <InputLabel sx={{ mb: 0.5 }}>Customer Name</InputLabel>
+                          <FormControl sx={{ width: '100%' }}>
+                            {customernames && customernames.length > 0 ? (
+                              <Autocomplete
+                                id="controllable-states-demo"
+                                options={(customernames || []) as any[]}
+                                getOptionLabel={(option: any) => `${option.name}`}
+                                onChange={(event, newValue) => {
+                                  if (newValue && newValue.id) {
+                                    setSelectedCustomerId(newValue.id);
+                                  } else {
+                                    setSelectedCustomerId(null);
+                                  }
+                                  handleChange({ target: { name: 'customerName', value: newValue ? newValue.name : '' } });
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                              />
+                            ) : (
+                              <Box display="flex" flexDirection="row" alignItems="left" justifyContent="left" height="100px">
+                                <CircularProgress size={30} thickness={4} />
+                                <Grid flexDirection={'column'}>
+                                  <Typography variant="body1" style={{ marginTop: '32x' }}>
+                                    Loading Customer Names,
+                                  </Typography>
+                                  <Typography variant="body1" style={{ marginTop: '32x' }}>
+                                    Please Wait...!
+                                  </Typography>
+                                </Grid>
+                              </Box>
+                            )}
+                          </FormControl>
                         </Grid>
-                      </Box>
-                    )}
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <InputLabel sx={{ mb: 1 }}>Amount</InputLabel>
-                  <TextField
-                    sx={{ width: '100%' }}
-                    id="totalAmount"
-                    type="number"
-                    placeholder={String(totalAmount)}
-                    {...getFieldProps('totalAmount')}
-                    error={Boolean(touched.amount && errors.amount)}
-                    helperText={touched.amount && typeof errors.amount === 'string' ? errors.amount : ''}
-                  />
-                  <InputLabel sx={{ mb: 3 }}>Total Receivable Amount: {totalAmount}</InputLabel>
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={2}>
-                    <InputLabel sx={{ mb: 1 }}>Payment Mode</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Payment Mode"
-                      value={paymentMode}
-                      onChange={(event) => setPaymentMode(event.target.value)}
-                    >
-                      <MenuItem value={10}>Cash</MenuItem>
-                      <MenuItem value={20}>Cheque</MenuItem>
-                      <MenuItem value={30}>NEFT</MenuItem>
-                      <MenuItem value={40}>RTGS</MenuItem>
-                      <MenuItem value={50}>UPI</MenuItem>
-                    </Select>
-                  </Stack>
-                </Grid>
-              </Grid>
-            </MainCard>
-          </Grid>
+                        <Grid item xs={2}>
+                          <InputLabel sx={{ mb: 0.5 }}>Date</InputLabel>
+                          <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker format="DD-MM-YYYY" />
+                          </LocalizationProvider>
+                        </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <MainCard>
-              <Grid container spacing={2} direction="column">
-                <Grid item xs={12}>
-                  <InputLabel sx={{ mb: 1 }}>Description</InputLabel>
-                  <TextareaAutosize
-                    id="description"
-                    minRows={3}
-                    maxRows={10}
-                    placeholder="Enter Description"
-                    style={{
-                      width: '100%',
-                      resize: 'vertical',
-                      border: '1px solid #ced4da',
-                      borderRadius: '4px',
-                      padding: '8px',
-                      fontFamily: 'inherit'
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={2}>
-                    <InputLabel sx={{ mb: 1 }}>Payment Through</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Payment Through"
-                      value={paymentThrough}
-                      onChange={(event) => setPaymentThrough(event.target.value)}
-                    >
-                      <MenuItem value={10}>Liability</MenuItem>
-                      <MenuItem value={20}>Expense</MenuItem>
-                      <MenuItem value={30}>Revenue</MenuItem>
-                      <MenuItem value={40}>Asset</MenuItem>
-                    </Select>
-                  </Stack>
-                </Grid>
-              </Grid>
-            </MainCard>
-          </Grid>
-
-          <Grid item xs={12}>
-            <MainCard content={false} title="Invoices">
-              <ReactTable columns={columns} data={invoices ?? []} striped={true} />
-            </MainCard>
-          </Grid>
-          <Grid item xs={12}>
-            <MainCard>
-              <Grid container spacing={1} direction="row">
-                <Grid item xs={8}></Grid>
-                <Grid item xs={4}>
-                  <Grid paddingTop={2}>
-                    <Grid item xs={12}>
-                      <Stack spacing={2} justifyContent="flex-end" alignItems="flex-end" textAlign="right">
-                        <Stack direction="row" justifyContent="right" alignItems="right">
-                          <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
-                            Grand Total :
-                          </Typography>
-                          <Typography variant="subtitle1" paddingLeft={5}>
-                            {invoices?.reduce((acc, current) => acc + current.totalAmount, 0)}
-                          </Typography>
-                        </Stack>
-                      </Stack>
+                        <Grid item xs={2}>
+                          <InputLabel sx={{ mb: 0.5 }}>Remaining Invoice Amount</InputLabel>
+                          <TextField
+                            disabled
+                            sx={{ width: '100%', textAlign: 'right' }}
+                            id="totalAmount"
+                            value={`₹ ${remainingTotalamount.toLocaleString('en-IN', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}`}
+                            placeholder={String(totalAmount)}
+                            inputProps={{
+                              style: { textAlign: 'right' },
+                              inputMode: 'numeric',
+                              readOnly: true
+                            }}
+                            type="text"
+                          />
+                        </Grid>
+                        <Grid item xs={2}>
+                          <InputLabel sx={{ mb: 0.5 }}>Total Receiving Amount</InputLabel>
+                          <TextField
+                            sx={{ width: '100%', textAlign: 'right' }}
+                            id="amount"
+                            {...getFieldProps('totalAmount')}
+                            inputProps={{
+                              style: { textAlign: 'right' },
+                              inputMode: 'numeric',
+                              onInput: (e: any) => {
+                                var totalReceivingAmount = Number(e.currentTarget.value);
+                                setTotalReceivedAmount(totalReceivingAmount);
+                                if (totalReceivingAmount > 0) {
+                                  selectedCustomerInvoices?.forEach((element, index) => {
+                                    var pendingAmount =
+                                      selectedCustomerInvoices[index].totalAmount - selectedCustomerInvoices[index].setteledAmount;
+                                    if (totalReceivingAmount >= pendingAmount) {
+                                      selectedCustomerInvoices[index].receivingAmount = pendingAmount;
+                                    } else if (totalReceivingAmount > 0) {
+                                      selectedCustomerInvoices[index].receivingAmount = totalReceivingAmount;
+                                    } else {
+                                      selectedCustomerInvoices[index].receivingAmount = 0;
+                                    }
+                                    totalReceivingAmount = totalReceivingAmount - pendingAmount;
+                                  });
+                                }
+                              }
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                      <Grid container spacing={1.5} direction="row" sx={{ marginBottom: 2.5 }}>
+                        <Grid item xs={3} sx={{ width: 50 }}>
+                          <Stack spacing={0}>
+                            <InputLabel sx={{ mb: 0.5, whiteSpace: 'nowrap' }}>Payment Mode</InputLabel>
+                            <Select label="Payment Mode">
+                              <MenuItem value={10}>Cash</MenuItem>
+                              <MenuItem value={20}>Cheque</MenuItem>
+                              <MenuItem value={30}>NEFT</MenuItem>
+                              <MenuItem value={40}>RTGS</MenuItem>
+                              <MenuItem value={50}>UPI</MenuItem>
+                            </Select>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={3} sx={{ width: '50%' }}>
+                          <Stack spacing={0}>
+                            <InputLabel sx={{ mb: 0.5 }}>Payment Through</InputLabel>
+                            <Select label="Payment Through">
+                              <MenuItem value={10}>Liability</MenuItem>
+                              <MenuItem value={20}>Expense</MenuItem>
+                              <MenuItem value={30}>Revenue</MenuItem>
+                              <MenuItem value={40}>Asset</MenuItem>
+                            </Select>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <InputLabel sx={{ mb: 0.5 }}>Description</InputLabel>
+                          <TextareaAutosize
+                            id="description"
+                            minRows={1.5}
+                            maxRows={10}
+                            placeholder="Enter Description"
+                            style={{
+                              width: '100%',
+                              resize: 'vertical',
+                              border: '1px solid #ced4da',
+                              borderRadius: '4px',
+                              padding: '8px',
+                              fontFamily: 'inherit'
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                      <MainCard
+                        content={false}
+                        title={`Invoice's of ${
+                          (selectedCustomerId && customernames
+                            ? customernames.find((customer: { id: any }) => customer.id === selectedCustomerId)?.name
+                            : '') || ''
+                        }`}
+                      ></MainCard>
+                      <MainCard>
+                        <Grid item xs={12}>
+                          <FieldArray
+                            name="invoice_detail"
+                            render={({ remove, push }) => {
+                              return (
+                                <>
+                                  {invoices && invoices.length > 0 ? (
+                                    <TableContainer>
+                                      <Table sx={{ minWidth: 650 }}>
+                                        <TableHead>
+                                          <TableRow>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Invoice No.
+                                            </TableCell>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Invoice Date
+                                            </TableCell>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Due Date
+                                            </TableCell>
+                                            <TableCell align="left" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Status
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Invoice Amt
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Setteled Amt
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px' }}>
+                                              Rmn. Amt
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ padding: '2px 0px', width: '50px', textAlign: 'right' }}>
+                                              Receiving Amt
+                                            </TableCell>
+                                          </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                          {selectedCustomerInvoices?.map((item: any, index: number) => (
+                                            <TableRow key={item.id}>
+                                              <InvoicePaymentItem
+                                                key={item.id}
+                                                id={item.id}
+                                                index={index}
+                                                invoiceNumber={item.invoiceNumber}
+                                                invoiceDate={item.invoiceDate}
+                                                dueDate={item.dueDate}
+                                                invoiceStatus={item.invoiceStatus}
+                                                invoiceAmount={item.totalAmount}
+                                                setteledAmount={item.setteledAmount}
+                                                remainingAmount={item.remainingAmount}
+                                                receivingAmount={item.receivingAmount}
+                                                onDeleteItem={(index: number) => remove(index)}
+                                                onEditItem={handleChange}
+                                                Blur={handleBlur}
+                                                errors={errors}
+                                                touched={touched}
+                                                setFieldValue={setFieldValue}
+                                                InputProps={item.inputProps}
+                                              />
+                                            </TableRow>
+                                          ))}
+                                        </TableBody>
+                                      </Table>
+                                    </TableContainer>
+                                  ) : (
+                                    <Typography variant="body1" color={'error'}>
+                                      {`No invoices available for the  ${
+                                        (selectedCustomerId && customernames
+                                          ? customernames.find((customer: { id: any }) => customer.id === selectedCustomerId)?.name
+                                          : '') || ''
+                                      }`}
+                                    </Typography>
+                                  )}
+                                  <Divider />
+                                </>
+                              );
+                            }}
+                          />
+                        </Grid>
+                      </MainCard>
                     </Grid>
                     <Grid item xs={12}>
-                      <Stack direction="row" spacing={2} justifyContent="flex-end" alignItems="flex-end" sx={{ mt: 8 }}>
-                        <Button variant="outlined" color="secondary" onClick={handleAlertClose}>
-                          Cancel
-                        </Button>
-                        <Button variant="contained" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>
-                          Pay Invoice's
-                        </Button>
-                      </Stack>
+                      <Grid container spacing={1} direction="row">
+                        <Grid item xs={8}></Grid>
+                        <Grid item xs={4}>
+                          <Grid paddingTop={2}>
+                            <Grid item xs={12}>
+                              <Stack spacing={1} sx={{ marginTop: 2, paddingRight: '50px' }}>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Grand Total :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedTotalAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Previously Settled Amount :
+                                  </Typography>
+
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedtotalSettledAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Remaining Amount Total :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedremainingTotalamount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Amount Received :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedtotalPaidAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                                <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
+                                  <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
+                                    Advance Amount Received :
+                                  </Typography>
+                                  <Typography paddingLeft={5}>
+                                    ₹{' '}
+                                    {Number(formattedadvanceAmount.replace(/,/g, '')).toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })}
+                                  </Typography>
+                                </Stack>
+                              </Stack>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Stack direction="row" spacing={2} justifyContent="flex-end" alignItems="flex-end" sx={{ mt: 8 }}>
+                                <Button variant="outlined" color="secondary">
+                                  Cancel
+                                </Button>
+                                <Button variant="contained" sx={{ whiteSpace: 'nowrap', textTransform: 'none' }}>
+                                  Pay Invoices
+                                </Button>
+                              </Stack>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
-            </MainCard>
-          </Grid>
-        </Grid>
-      </MainCard>
-    </>
+              </Form>
+            </Form>
+          );
+        }}
+      </Formik>
+    </MainCard>
   );
 };
 
 export default AddReceivedPayment;
-
-// ==============================|| REACT TABLE ||============================== //
-
-function ReactTable({ columns, data, striped }: { columns: Column[]; data: IInvoice[]; striped?: boolean }) {
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
-    columns,
-    data
-  });
-
-  return (
-    <Table {...getTableProps()}>
-      <TableHead>
-        {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-          <TableRow {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column: HeaderGroup<{}>) => (
-              <TableCell {...column.getHeaderProps([{ className: column.className }])}>{column.render('Header')}</TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableHead>
-      <TableBody {...getTableBodyProps()} {...(striped && { className: 'striped' })}>
-        {rows.map((row, i) => {
-          prepareRow(row);
-          return (
-            <TableRow {...row.getRowProps()}>
-              {row.cells.map((cell: Cell<{}>) => (
-                <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
-              ))}
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
-  );
-}

@@ -61,11 +61,41 @@ export interface InvoiceHeader_main {
   customerInfo: InfoType;
 }
 
+export interface InvoicePaymentHeader {
+  id: string;
+  customerId: string;
+  companyId: string;
+  customerName: string;
+  invoiceDate: Date | string | number;
+  dueDate: Date | string | number;
+  amount: number;
+  receivingAmount: number;
+  paymentMode: string | number;
+  paymentThrough: string | number;
+  description: string;
+  lines?: IInvoicePaymentLine[];
+}
+
+export interface IInvoicePaymentLine {
+  id: string;
+  invoicePaymentId: string;
+  invoicelNumber: string;
+  invoiceDate: Date | string | number;
+  dueDate: Date | string | number;
+  status: String;
+  invoiceAmount: number;
+  setteledAmount: number;
+  remainingAmount: number;
+  receivingAmount: number;
+  invoiceStatusId: string;
+  invoiceStatus: string;
+}
+
 export interface InvoiceLine {
+  id: string | number;
   name: string;
   description: string;
   price: string | number;
   quantity: number;
   amount: string | number;
-  id: string | number;
 }

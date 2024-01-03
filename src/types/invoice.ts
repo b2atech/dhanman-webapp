@@ -122,6 +122,8 @@ export interface IInvoice {
   customerInfo: InfoType;
   notes: string;
   amount: number;
+  receivingAmount: number;
+  setteledAmount: number;
 }
 
 export interface InvoiceDetail {

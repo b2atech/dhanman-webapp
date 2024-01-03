@@ -30,6 +30,14 @@ export const InvoiceAPI = {
     });
     return response.data.items;
   },
+  getAllInvoiceHeadersByCustomerId = async function (customerId: string, cancel = false) {
+    const response = await apiSales.request({
+      url: `v1/invoiceHeaderByCustomerId/${customerId}`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllInvoiceHeadersByCustomerId.name].handleRequestCancellation().signal : undefined
+    });
+    return response.data.items;
+  },
   getAllReceivedPayments = async function (companyId: string, cancel = false) {
     const response = await apiSales.request({
       url: `v1/invoicePayments//${companyId}`,
