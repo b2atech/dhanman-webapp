@@ -659,19 +659,17 @@ const Createinvoice = () => {
                         Details{' '}
                         <span style={{ color: 'grey', fontSize: '0.9em' }}>
                           (
-                          {company?.gstIn && values?.customerInfo?.gstIn && (
-                            <Typography variant="body1" component="span" style={{ margin: '0', padding: '15px 0' }}>
-                              {showTax ? (
-                                <span>
-                                  Both parties are from <span style={{ color: '#3EB489' }}>Intra State</span>.
-                                </span>
-                              ) : (
-                                <span>
-                                  Parties are from <span style={{ color: 'blue' }}>Inter State</span>.
-                                </span>
-                              )}
-                            </Typography>
-                          )}
+                          <Typography variant="body1" component="span" style={{ margin: '0', padding: '15px 0' }}>
+                            {showTax ? (
+                              <span>
+                                Both parties are from <span style={{ color: '#3EB489' }}>Intra State</span>.
+                              </span>
+                            ) : (
+                              <span>
+                                Parties are from <span style={{ color: 'blue' }}>Inter State</span>.
+                              </span>
+                            )}
+                          </Typography>
                           )
                         </span>
                       </Typography>
@@ -773,42 +771,49 @@ const Createinvoice = () => {
                                   <TableCell align="center" sx={{ padding: '2px 0px' }}>
                                     Taxable Amt
                                   </TableCell>
-                                  {showGSTRates && (
+                                  {showTax ? (
                                     <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
-                                        CGST (%)
+                                      {showGSTRates && (
+                                        <>
+                                          <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
+                                            CGST (%)
+                                          </TableCell>
+                                        </>
+                                      )}
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        <Tooltip title={`CGST Rate : ${cgstRate} (%)`} placement="top">
+                                          <span>CGST Amt</span>
+                                        </Tooltip>
+                                      </TableCell>
+                                      {showGSTRates && (
+                                        <>
+                                          <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
+                                            SGST (%)
+                                          </TableCell>
+                                        </>
+                                      )}
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        <Tooltip title={`SGST Rate : ${sgstRate} (%)`} placement="top">
+                                          <span>SGST Amt</span>
+                                        </Tooltip>
+                                      </TableCell>
+                                    </>
+                                  ) : (
+                                    <>
+                                      {showGSTRates && (
+                                        <>
+                                          <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
+                                            IGST (%)
+                                          </TableCell>
+                                        </>
+                                      )}
+                                      <TableCell align="center" sx={{ padding: '2px 0px' }}>
+                                        <Tooltip title={`IGST Rate : ${igstRate} (%)`} placement="top">
+                                          <span>IGST Amt</span>
+                                        </Tooltip>
                                       </TableCell>
                                     </>
                                   )}
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    <Tooltip title={`CGST Rate : ${cgstRate} (%)`} placement="top">
-                                      <span>CGST Amt</span>
-                                    </Tooltip>
-                                  </TableCell>
-                                  {showGSTRates && (
-                                    <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
-                                        SGST (%)
-                                      </TableCell>
-                                    </>
-                                  )}
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    <Tooltip title={`SGST Rate : ${sgstRate} (%)`} placement="top">
-                                      <span>SGST Amt</span>
-                                    </Tooltip>
-                                  </TableCell>
-                                  {showGSTRates && (
-                                    <>
-                                      <TableCell align="center" sx={{ padding: '2px 0px', color: 'Highlight' }}>
-                                        IGST (%)
-                                      </TableCell>
-                                    </>
-                                  )}
-                                  <TableCell align="center" sx={{ padding: '2px 0px' }}>
-                                    <Tooltip title={`IGST Rate : ${igstRate} (%)`} placement="top">
-                                      <span>IGST Amt</span>
-                                    </Tooltip>
-                                  </TableCell>
                                   <TableCell align="right" sx={{ padding: '2px 0px' }}>
                                     Item Amt
                                   </TableCell>
@@ -851,6 +856,7 @@ const Createinvoice = () => {
                                       ratesVisibility={showGSTRates}
                                       feesVisibility={feesVisible}
                                       discountVisibility={discount}
+                                      showTax={showTax}
                                       onDeleteItem={(index: number) => remove(index)}
                                       onEditItem={handleChange}
                                       Blur={handleBlur}
