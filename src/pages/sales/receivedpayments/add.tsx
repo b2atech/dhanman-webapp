@@ -533,7 +533,7 @@ const AddReceivedPayment = ({ receivedPayment, onCancel }: Props) => {
                                 </Stack>
                                 <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
                                   <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
-                                    Amount Paid :
+                                    Amount Received :
                                   </Typography>
                                   <Typography paddingLeft={5}>
                                     ₹{' '}
@@ -545,7 +545,7 @@ const AddReceivedPayment = ({ receivedPayment, onCancel }: Props) => {
                                 </Stack>
                                 <Stack paddingRight={1} direction="row" justifyContent="space-between" alignItems="right">
                                   <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap' }}>
-                                    Advance Amount Paid :
+                                    Advance Amount Received :
                                   </Typography>
                                   <Typography paddingLeft={5}>
                                     ₹{' '}
