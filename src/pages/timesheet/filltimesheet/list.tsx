@@ -1,5 +1,18 @@
 import React from 'react';
-import { TextField, TableCell, TableHead, TableRow, TableContainer, TableBody, Table, Stack, Button, Select, MenuItem, Paper } from '@mui/material';
+import {
+  TextField,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableContainer,
+  TableBody,
+  Table,
+  Stack,
+  Button,
+  Select,
+  MenuItem,
+  Paper
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import MainCard from 'components/MainCard';
@@ -66,16 +79,12 @@ function AddDeleteTableRows() {
   return (
     <MainCard>
       <Stack>
-        <TableContainer
-          component={Paper}
-          sx={{ overflowX: 'auto', '& .MuiTableCell-root': { minWidth: '120px' } }}>
+        <TableContainer component={Paper} sx={{ overflowX: 'auto', '& .MuiTableCell-root': { minWidth: '120px' } }}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    onClick={addTableRows}>
+                  <Button variant="outlined" onClick={addTableRows}>
                     Add Row
                   </Button>
                 </TableCell>
@@ -97,17 +106,17 @@ function AddDeleteTableRows() {
                     <Button
                       // variant="outlined"
                       startIcon={<DeleteIcon />}
-                      onClick={() => deleteTableRows(index)}></Button>
+                      onClick={() => deleteTableRows(index)}
+                    ></Button>
                   </TableCell>
                   <TableCell style={{ minWidth: 200 }}>
                     <Select
                       style={{ width: '100%' }}
                       value={data.projectName}
-                      onChange={(evnt) => handleChange(index, 'projectName', evnt.target.value)}>
+                      onChange={(evnt) => handleChange(index, 'projectName', evnt.target.value)}
+                    >
                       {projectNameOptions.map((option) => (
-                        <MenuItem
-                          key={option}
-                          value={option}>
+                        <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>
                       ))}
@@ -117,11 +126,10 @@ function AddDeleteTableRows() {
                     <Select
                       style={{ width: '100%', paddingRight: '20px' }}
                       value={data.taskName}
-                      onChange={(evnt) => handleChange(index, 'taskName', evnt.target.value)}>
+                      onChange={(evnt) => handleChange(index, 'taskName', evnt.target.value)}
+                    >
                       {taskNameOptions.map((option) => (
-                        <MenuItem
-                          key={option}
-                          value={option}>
+                        <MenuItem key={option} value={option}>
                           {option}
                         </MenuItem>
                       ))}
