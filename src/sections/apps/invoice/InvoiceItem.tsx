@@ -33,7 +33,8 @@ const InvoiceItem = ({
   soNoVisibility,
   ratesVisibility,
   discountVisibility,
-  feesVisibility
+  feesVisibility,
+  showTax
 }: any) => {
   const { country } = useSelector((state) => state.invoice);
   const handleNameChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -51,13 +52,23 @@ const InvoiceItem = ({
   const Name = `invoice_detail[${index}].name`;
   const touchedName = getIn(touched, Name);
   const errorName = getIn(errors, Name);
-  const getTotalAmount = (qty: number, price: number, discount: number, fees: number, cgst: number, sgst: number, igst: number) => {
+  const getTotalAmount = (
+    qty: number,
+    price: number,
+    discount: number,
+    fees: number,
+    cgst: number,
+    sgst: number,
+    igst: number,
+    showTax: boolean
+  ) => {
     if (qty && price) {
       var taxableAmount = getTotalTaxableAmount(qty, price, discount, fees);
-      var cgstAmount = getCTaxAmount(qty, price, cgst);
-      var sgstAmount = getSTaxAmount(qty, price, sgst);
-      //var igstAmount = getITaxAmount(qty, price, igst);
-      return (taxableAmount + cgstAmount + sgstAmount).toFixed(2);
+      var cgstAmount = getCTaxAmount(qty, price, cgst, discount, fees);
+      var sgstAmount = getSTaxAmount(qty, price, sgst, discount, fees);
+      var igstAmount = showTax ? getITaxAmount(qty, price, igst, discount, fees) : 0;
+      var totalAmount = taxableAmount + cgstAmount + sgstAmount + igstAmount;
+      return totalAmount.toFixed(2);
     }
     return '0.00';
   };
@@ -77,25 +88,28 @@ const InvoiceItem = ({
     }
     return 0.0;
   };
-  const getCTaxAmount = (qty: number, price: number, cgst: number) => {
+  const getCTaxAmount = (qty: number, price: number, cgst: number, discount: number, fees: number) => {
     if (cgst && price && qty) {
-      return (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
+      const cTaxAmount = (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
+      return cTaxAmount;
     }
     return 0.0;
   };
-  const getSTaxAmount = (qty: number, price: number, sgst: number) => {
+  const getSTaxAmount = (qty: number, price: number, sgst: number, discount: number, fees: number) => {
     if (sgst && price && qty) {
-      return (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
+      const sTaxAmount = (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty);
+      return sTaxAmount;
     }
     return 0.0;
   };
 
-  // const getITaxAmount = (qty: number, price: number, igst: number) => {
-  //   if (igst && price && qty) {
-  //     return (igst / 100) * (price * qty + fees - (discount / 100) * price * qty);
-  //   }
-  //   return 0.0;
-  // };
+  const getITaxAmount = (qty: number, price: number, igst: number, discount: number, fees: number) => {
+    if (igst && price && qty) {
+      const iTaxAmount = (igst / 100) * (price * qty + fees - (discount / 100) * price * qty);
+      return iTaxAmount;
+    }
+    return 0.0;
+  };
   const textFieldItem = [
     {
       placeholder: 'SalesOrder',
@@ -201,7 +215,7 @@ const InvoiceItem = ({
       type: '',
       id: id,
       value: cgst,
-      visibility: ratesVisibility
+      visibility: showTax ? ratesVisibility : false
     },
     {
       placeholder: 'Cgst Amount',
@@ -210,8 +224,8 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       style: { width: '100px' },
-      value: (cgst / 100) * (price * qty + fees - (discount / 100) * price * qty),
-      visibility: true
+      value: showTax ? getCTaxAmount(qty, price, cgst, discount, fees) : 0.0,
+      visibility: showTax
     },
     {
       placeholder: 'SgstRate',
@@ -220,7 +234,7 @@ const InvoiceItem = ({
       type: '',
       id: id,
       value: sgst,
-      visibility: ratesVisibility
+      visibility: showTax ? ratesVisibility : false
     },
     {
       placeholder: 'Sgst Amount',
@@ -229,8 +243,8 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       style: { width: '100px' },
-      value: (sgst / 100) * (price * qty + fees - (discount / 100) * price * qty),
-      visibility: true
+      value: showTax ? getSTaxAmount(qty, price, sgst, discount, fees) : 0.0,
+      visibility: showTax
     },
     {
       placeholder: 'IgstRate',
@@ -239,7 +253,7 @@ const InvoiceItem = ({
       type: '',
       id: id,
       value: igst,
-      visibility: ratesVisibility
+      visibility: !showTax ? ratesVisibility : false
     },
     {
       placeholder: 'Igst Amount',
@@ -248,8 +262,8 @@ const InvoiceItem = ({
       type: 'number',
       id: id,
       style: { width: '110px' },
-      value: (igst / 100) * (price * qty + fees - (discount / 100) * price * qty),
-      visibility: true
+      value: !showTax ? getITaxAmount(qty, price, igst, discount, fees) : 0.0,
+      visibility: !showTax
     }
   ];
 
@@ -283,7 +297,7 @@ const InvoiceItem = ({
       <TableCell sx={{ textAlign: 'right' }}>
         <Stack direction="row" justifyContent="flex-end" alignItems="flex-end">
           <Box sx={{ minWidth: 90 }}>
-            <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst)}</Typography>
+            <Typography>{country?.prefix + ' ' + getTotalAmount(qty, price, discount, fees, cgst, sgst, igst, showTax)}</Typography>
           </Box>
         </Stack>
       </TableCell>
