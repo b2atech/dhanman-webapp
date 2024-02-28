@@ -20,6 +20,15 @@ export const TimeSheetAPI = {
 
     return response.data.items;
   },
+  getAllProjectsName = async function (cancel = false) {
+    const response = await apiTimeSheet.request({
+      url: `v1/getAllProjects`,
+      method: 'GET',
+      signal: cancel ? cancelApiObject[getAllProjects.name].handleRequestCancellation().signal : undefined
+    });
+
+    return response.data.items.name;
+  },
   getAllTasks = async function (cancel = false) {
     const response = await apiTimeSheet.request({
       url: `v1/getAllTasks`,
