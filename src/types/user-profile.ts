@@ -47,3 +47,9 @@ export type UserCardProps = {
   skills: string[];
   time: string;
 };
+
+export interface IUser {  
+  firstName: string;
+  lastName: string;
+  email: string;   
+}
