@@ -1,7 +1,16 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, useRef } from 'react';
-import { useNavigate } from 'react-router';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  FC,
+  Fragment,
+  MouseEvent,
+  useRef,
+} from "react";
+import { useNavigate } from "react-router";
 // material-ui
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
@@ -18,11 +27,11 @@ import {
   Typography,
   useMediaQuery,
   CircularProgress,
-  styled
-} from '@mui/material';
+  styled,
+} from "@mui/material";
 
 // third-party
-import { PatternFormat } from 'react-number-format';
+import { PatternFormat } from "react-number-format";
 import {
   useFilters,
   useExpanded,
@@ -36,46 +45,52 @@ import {
   Row,
   Cell,
   HeaderProps,
-  CellProps
-} from 'react-table';
+  CellProps,
+} from "react-table";
 
 // project import
-import MainCard from 'components/MainCard';
-import ScrollX from 'components/ScrollX';
-import IconButton from 'components/@extended/IconButton';
-import { PopupTransition } from 'components/@extended/Transitions';
+import MainCard from "components/MainCard";
+import ScrollX from "components/ScrollX";
+import IconButton from "components/@extended/IconButton";
+import { PopupTransition } from "components/@extended/Transitions";
 import {
   CSVExport,
   HeaderSort,
   IndeterminateCheckbox,
   SortingSelect,
   TablePagination,
-  TableRowSelection
-} from 'components/third-party/ReactTable';
+  TableRowSelection,
+} from "components/third-party/ReactTable";
 
-import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
+import { renderFilterTypes, GlobalFilter } from "utils/react-table";
 
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import AlertCustomerDelete from './AlertCustomerDelete';
-import AddCustomer from './AddCustomer';
-import CustomerDetails from './CustomerDetails';
-import { getAllCustomers } from 'api/services/SalesService';
-import { ICustomer } from 'types/invoice';
-import moment from 'moment';
-import { useSticky } from 'react-table-sticky';
+import {
+  CloseOutlined,
+  PlusOutlined,
+  EyeTwoTone,
+  EditTwoTone,
+  DeleteTwoTone,
+} from "@ant-design/icons";
+import AlertCustomerDelete from "./AlertCustomerDelete";
+import AddCustomer from "./AddCustomer";
+import CustomerDetails from "./CustomerDetails";
+import { getAllCustomers } from "api/services/SalesService";
+import { ICustomer } from "types/invoice";
+import moment from "moment";
+import { useSticky } from "react-table-sticky";
 
 // ==============================|| REACT TABLE ||============================== //
-const TableWrapper = styled('div')(({ theme }) => ({
-  '.header': {
-    position: 'sticky',
+const TableWrapper = styled("div")(({ theme }) => ({
+  ".header": {
+    position: "sticky",
     zIndex: 1,
-    width: 'fit-content'
+    width: "fit-content",
   },
-  '& th[data-sticky-td]': {
-    position: 'sticky',
-    zIndex: '5 !important'
-  }
+  "& th[data-sticky-td]": {
+    position: "sticky",
+    zIndex: "5 !important",
+  },
 }));
 
 interface Props {
@@ -98,21 +113,21 @@ function ReactTable({
   getHeaderProps,
   showIdColumn,
   showCreatedOnColumn,
-  handleAuditColumnSwitchChange
+  handleAuditColumnSwitchChange,
 }: Props) {
   const defaultColumn = useMemo(
     () => ({
       minWidth: 80,
       width: 200,
       maxWidth: 400,
-      margin: 20
+      margin: 20,
     }),
     []
   );
   const theme = useTheme();
-  const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const matchDownSM = useMediaQuery(theme.breakpoints.down("sm"));
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: '', desc: false };
+  const sortBy = { id: "", desc: false };
   const {
     getTableProps,
     getTableBodyProps,
@@ -128,14 +143,19 @@ function ReactTable({
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
-    selectedFlatRows
+    selectedFlatRows,
   } = useTable(
     {
       columns,
       data,
       defaultColumn,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['firstName', 'lastName', 'avatar', 'addressLine'], sortBy: [sortBy] }
+      initialState: {
+        pageIndex: 0,
+        pageSize: 10,
+        hiddenColumns: ["firstName", "lastName", "avatar", "addressLine"],
+        sortBy: [sortBy],
+      },
     },
     useGlobalFilter,
     useFilters,
@@ -147,14 +167,17 @@ function ReactTable({
   );
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-  const moment = require('moment');
+  const moment = require("moment");
   const now = new Date();
-  const formatedFilename = 'CustomersList' + moment(now).format('YYYY-MM-DD_HH-mm-ss');
+  const formatedFilename =
+    "CustomersList" + moment(now).format("YYYY-MM-DD_HH-mm-ss");
   const [isAuditSwitchOn, setIsAuditSwitchOn] = useState(false);
   const [isCustomerIdVisible, setIsCustomerIdVisible] = useState(false);
 
   const handleSwitchChange = () => {
-    setIsCustomerIdVisible((prevIsCustomerIdVisible) => !prevIsCustomerIdVisible);
+    setIsCustomerIdVisible(
+      (prevIsCustomerIdVisible) => !prevIsCustomerIdVisible
+    );
   };
 
   const handleAuditSwitchChange = () => {
@@ -168,7 +191,7 @@ function ReactTable({
       <TableRowSelection selected={Object.keys(selectedRowIds).length} />
       <Stack spacing={3}>
         <Stack
-          direction={matchDownSM ? 'column' : 'row'}
+          direction={matchDownSM ? "column" : "row"}
           spacing={1}
           justifyContent="space-between"
           alignItems="center"
@@ -180,8 +203,16 @@ function ReactTable({
             setGlobalFilter={setGlobalFilter}
             size="small"
           />
-          <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
-            <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+          <Stack
+            direction={matchDownSM ? "column" : "row"}
+            alignItems="center"
+            spacing={1}
+          >
+            <SortingSelect
+              sortBy={sortBy.id}
+              setSortBy={setSortBy}
+              allColumns={allColumns}
+            />
             <Button
               variant="contained"
               startIcon={<PlusOutlined />}
@@ -194,22 +225,38 @@ function ReactTable({
               Add Customer
             </Button>
             <CSVExport
-              data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
+              data={
+                selectedFlatRows.length > 0
+                  ? selectedFlatRows.map((d: Row) => d.original)
+                  : data
+              }
               filename={formatedFilename}
             />
-            <Tooltip title={isCustomerIdVisible ? 'Hide ID' : 'Show ID'}>
+            <Tooltip title={isCustomerIdVisible ? "Hide ID" : "Show ID"}>
               <FormControlLabel
                 value=""
-                control={<Switch color="success" checked={isCustomerIdVisible} onChange={handleSwitchChange} />}
+                control={
+                  <Switch
+                    color="success"
+                    checked={isCustomerIdVisible}
+                    onChange={handleSwitchChange}
+                  />
+                }
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
               />
             </Tooltip>
-            <Tooltip title={isAuditSwitchOn ? 'Hide Audit' : 'Show Audit'}>
+            <Tooltip title={isAuditSwitchOn ? "Hide Audit" : "Show Audit"}>
               <FormControlLabel
                 value=""
-                control={<Switch color="info" checked={isAuditSwitchOn} onChange={handleAuditSwitchChange} />}
+                control={
+                  <Switch
+                    color="info"
+                    checked={isAuditSwitchOn}
+                    onChange={handleAuditSwitchChange}
+                  />
+                }
                 label=""
                 labelPlacement="start"
                 sx={{ mr: 0 }}
@@ -218,25 +265,33 @@ function ReactTable({
           </Stack>
         </Stack>
         <Box ref={componentRef}>
-          <ScrollX sx={{ maxHeight: 400, overflowY: 'auto' }}>
+          <ScrollX sx={{ maxHeight: 400, overflowY: "auto" }}>
             <TableWrapper>
               <Table {...getTableProps()} stickyHeader>
                 <TableHead>
                   {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
-                    <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                    <TableRow
+                      {...headerGroup.getHeaderGroupProps()}
+                      sx={{ "& > th:first-of-type": { width: "58px" } }}
+                    >
                       {headerGroup.headers.map((column: HeaderGroup) => {
                         if (
-                          (column.id === 'id' && !isCustomerIdVisible) ||
-                          (column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                          (column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
-                          (column.id === 'createdBy' && !isAuditSwitchOn) ||
-                          (column.id === 'modifiedBy' && !isAuditSwitchOn)
+                          (column.id === "id" && !isCustomerIdVisible) ||
+                          (column.id === "createdOnUtc" && !isAuditSwitchOn) ||
+                          (column.id === "modifiedOnUtc" && !isAuditSwitchOn) ||
+                          (column.id === "createdBy" && !isAuditSwitchOn) ||
+                          (column.id === "modifiedBy" && !isAuditSwitchOn)
                         ) {
                           return null;
                         }
 
                         return (
-                          <TableCell sx={{ position: 'sticky !important' }} {...column.getHeaderProps([{ className: column.className }])}>
+                          <TableCell
+                            sx={{ position: "sticky !important" }}
+                            {...column.getHeaderProps([
+                              { className: column.className },
+                            ])}
+                          >
                             <HeaderSort column={column} />
                           </TableCell>
                         );
@@ -256,25 +311,47 @@ function ReactTable({
                           onClick={() => {
                             row.toggleRowSelected();
                           }}
-                          sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                          sx={{
+                            cursor: "pointer",
+                            bgcolor: row.isSelected
+                              ? alpha(theme.palette.primary.lighter, 0.35)
+                              : "inherit",
+                          }}
                         >
                           {row.cells.map((cell: Cell) => {
                             if (
-                              (cell.column.id === 'id' && !isCustomerIdVisible) ||
-                              (cell.column.id === 'createdOnUtc' && !isAuditSwitchOn) ||
-                              (cell.column.id === 'modifiedOnUtc' && !isAuditSwitchOn) ||
-                              (cell.column.id === 'createdBy' && !isAuditSwitchOn) ||
-                              (cell.column.id === 'modifiedBy' && !isAuditSwitchOn)
+                              (cell.column.id === "id" &&
+                                !isCustomerIdVisible) ||
+                              (cell.column.id === "createdOnUtc" &&
+                                !isAuditSwitchOn) ||
+                              (cell.column.id === "modifiedOnUtc" &&
+                                !isAuditSwitchOn) ||
+                              (cell.column.id === "createdBy" &&
+                                !isAuditSwitchOn) ||
+                              (cell.column.id === "modifiedBy" &&
+                                !isAuditSwitchOn)
                             ) {
                               return null;
                             }
 
                             return (
-                              <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                              <TableCell
+                                {...cell.getCellProps([
+                                  { className: cell.column.className },
+                                ])}
+                              >
+                                {cell.render("Cell")}
+                              </TableCell>
                             );
                           })}
                         </TableRow>
-                        {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
+                        {row.isExpanded &&
+                          renderRowSubComponent({
+                            row,
+                            rowProps,
+                            visibleColumns,
+                            expanded,
+                          })}
                       </Fragment>
                     );
                   })}
@@ -282,8 +359,20 @@ function ReactTable({
               </Table>
             </TableWrapper>
           </ScrollX>
-          <Box sx={{ '&:hover': { bgcolor: 'transparent !important' }, p: 2, py: 1 }}>
-            <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+          <Box
+            sx={{
+              "&:hover": { bgcolor: "transparent !important" },
+              p: 2,
+              py: 1,
+            }}
+          >
+            <TablePagination
+              gotoPage={gotoPage}
+              rows={rows}
+              setPageSize={setPageSize}
+              pageSize={pageSize}
+              pageIndex={pageIndex}
+            />
           </Box>
         </Box>
       </Stack>
@@ -299,8 +388,8 @@ const CustomerListPage = () => {
   const [customer, setCustomer] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
   const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [customerDeleteName, setcustomerDeleteName] = useState<any>('');
-  const [customerDeleteId, setCustomerDeleteId] = useState<string>('');
+  const [customerDeleteName, setcustomerDeleteName] = useState<any>("");
+  const [customerDeleteId, setCustomerDeleteId] = useState<string>("");
   const [showIdColumn, setShowIdColumn] = useState(false);
   const [showCreatedOnColumn, setshowCreatedOnColumn] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -314,7 +403,7 @@ const CustomerListPage = () => {
   };
 
   useEffect(() => {
-    getAllCustomers('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+    getAllCustomers("3fa85f64-5717-4562-b3fc-2c963f66afa6")
       .then((customerList) => {
         if (Array.isArray(customerList)) {
           setCustomers(customerList);
@@ -322,7 +411,7 @@ const CustomerListPage = () => {
         }
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setLoading(false);
       });
   }, []);
@@ -341,49 +430,56 @@ const CustomerListPage = () => {
   const columns = useMemo(
     () => [
       {
-        title: 'Row Selection',
+        title: "Row Selection",
         Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
+          <IndeterminateCheckbox
+            indeterminate
+            {...getToggleAllPageRowsSelectedProps()}
+          />
         ),
-        accessor: 'selection',
-        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-        disableSortBy: true
+        accessor: "selection",
+        Cell: ({ row }: any) => (
+          <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+        ),
+        disableSortBy: true,
       },
       {
         show: false,
-        accessor: 'firstName',
-        disableSortBy: true
+        accessor: "firstName",
+        disableSortBy: true,
       },
       {
         show: false,
-        accessor: 'lastName',
-        disableSortBy: true
+        accessor: "lastName",
+        disableSortBy: true,
       },
       {
-        Header: 'Customer id',
-        accessor: 'id',
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>,
-        disableSortBy: true
+        Header: "Customer id",
+        accessor: "id",
+        Cell: ({ value }: { value: string }) => (
+          <span style={{ whiteSpace: "nowrap" }}>{value}</span>
+        ),
+        disableSortBy: true,
       },
       {
-        Header: 'Customer Name',
-        accessor: 'customerName',
+        Header: "Customer Name",
+        accessor: "name",
 
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Typography variant="subtitle1">
-                {' '}
-                <span style={{ whiteSpace: 'nowrap' }}>{values.customerName}</span>
+                {" "}
+                <span style={{ whiteSpace: "nowrap" }}>{values.name}</span>
               </Typography>
             </Stack>
           );
-        }
+        },
       },
       {
-        Header: 'Contact',
-        accessor: 'phoneNumber',
+        Header: "Contact",
+        accessor: "contact.phoneNumber",
         Width: 400,
         Cell: ({ value }: { value: number }) => (
           <PatternFormat
@@ -391,34 +487,34 @@ const CustomerListPage = () => {
             format="+91 ##### #####"
             mask="_"
             defaultValue={value}
-            style={{ whiteSpace: 'nowrap', textAlign: 'center' }}
+            style={{ whiteSpace: "nowrap", textAlign: "center" }}
           />
-        )
+        ),
       },
       {
-        Header: 'GST NO.',
-        accessor: 'gstIn'
+        Header: "GST NO.",
+        accessor: "gstIn",
       },
       {
-        Header: 'Email',
-        accessor: 'email'
+        Header: "Email",
+        accessor: "contact.email",
       },
       {
-        Header: 'City',
-        accessor: 'city',
-        className: 'cell-right'
+        Header: "City",
+        accessor: "billingAddress.addressLine1",
+        className: "cell-right",
       },
       {
         show: false,
-        Header: 'Address',
-        accessor: 'addressLine',
+        Header: "Address",
+        accessor: "addressLine",
         width: 200,
-        sticky: 'left',
-        disableSortBy: true
+        sticky: "left",
+        disableSortBy: true,
       },
       {
-        Header: 'Actions',
-        className: 'cell-right',
+        Header: "Actions",
+        className: "cell-right",
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           const collapseIcon = row.isExpanded ? (
@@ -427,7 +523,12 @@ const CustomerListPage = () => {
             <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
           );
           return (
-            <Stack direction="row" alignItems="left" justifyContent="left" spacing={0}>
+            <Stack
+              direction="row"
+              alignItems="left"
+              justifyContent="left"
+              spacing={0}
+            >
               <Tooltip title="View">
                 <IconButton
                   color="secondary"
@@ -466,38 +567,48 @@ const CustomerListPage = () => {
               </Tooltip>
             </Stack>
           );
-        }
+        },
       },
       {
-        Header: 'Created On',
-        accessor: 'createdOnUtc',
+        Header: "Created On",
+        accessor: "createdOnUtc",
         disableSortBy: true,
-        Cell: (props: CellProps<{}, any>) => <div style={{ whiteSpace: 'nowrap' }}>{moment(props.value).format('DD MMM YYYY')}</div>
+        Cell: (props: CellProps<{}, any>) => (
+          <div style={{ whiteSpace: "nowrap" }}>
+            {moment(props.value).format("DD MMM YYYY")}
+          </div>
+        ),
       },
       {
-        Header: 'Modified On',
-        accessor: 'modifiedOnUtc',
+        Header: "Modified On",
+        accessor: "modifiedOnUtc",
         disableSortBy: true,
-        Cell: (props: CellProps<{}, any>) => <>{moment(props.value).format('DD MMM YYYY')}</>
+        Cell: (props: CellProps<{}, any>) => (
+          <>{moment(props.value).format("DD MMM YYYY")}</>
+        ),
       },
       {
-        Header: 'Created By',
-        accessor: 'createdBy',
+        Header: "Created By",
+        accessor: "createdBy",
         disableSortBy: true,
-        Cell: ({ value }: { value: string }) => <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        Cell: ({ value }: { value: string }) => (
+          <span style={{ whiteSpace: "nowrap" }}>{value}</span>
+        ),
       },
       {
-        Header: 'Modified By',
-        accessor: 'modifiedBy',
-        disableSortBy: true
-      }
+        Header: "Modified By",
+        accessor: "modifiedBy",
+        disableSortBy: true,
+      },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
 
   const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <CustomerDetails data={memoizedCustomers[Number(row.id)]} />,
+    ({ row }: { row: Row<{}> }) => (
+      <CustomerDetails data={memoizedCustomers[Number(row.id)]} />
+    ),
 
     [memoizedCustomers]
   );
@@ -506,9 +617,15 @@ const CustomerListPage = () => {
     <MainCard content={false}>
       <ScrollX>
         {loading ? (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="500px">
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            height="500px"
+          >
             <CircularProgress size={60} thickness={4} />
-            <Typography variant="body1" style={{ marginTop: '32x' }}>
+            <Typography variant="body1" style={{ marginTop: "32x" }}>
               Loading, please wait...
             </Typography>
           </Box>
@@ -518,7 +635,9 @@ const CustomerListPage = () => {
             data={memoizedCustomers}
             handleAdd={handleAdd}
             renderRowSubComponent={renderRowSubComponent}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            getHeaderProps={(column: HeaderGroup) =>
+              column.getSortByToggleProps()
+            }
             showIdColumn={showIdColumn}
             handleSwitchChange={handleSwitchChange}
             handleAuditColumnSwitchChange={handleAuditColumnSwitchChange}
@@ -526,7 +645,12 @@ const CustomerListPage = () => {
           />
         )}
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteName} open={open} handleClose={handleClose} id={customerDeleteId} />
+      <AlertCustomerDelete
+        title={customerDeleteName}
+        open={open}
+        handleClose={handleClose}
+        id={customerDeleteId}
+      />
 
       <Dialog
         maxWidth="sm"
@@ -535,7 +659,7 @@ const CustomerListPage = () => {
         fullWidth
         onClose={handleAdd}
         open={add}
-        sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+        sx={{ "& .MuiDialog-paper": { p: 0 }, transition: "transform 225ms" }}
         aria-describedby="alert-dialog-slide-description"
       >
         <AddCustomer customer={customer} onCancel={handleAdd} />
